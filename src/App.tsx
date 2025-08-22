@@ -1,7 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, AppState } from 'react-native';
 
+import { CustomStatusBar } from '@/components/CustomStatusBar';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { AppNavigator } from '@/navigation/AppNavigator';
@@ -40,9 +40,7 @@ const AppContent: React.FC = () => {
   if (showSplash) {
     return (
       <>
-        <StatusBar
-          style={theme.colors.background === '#000000' ? 'light' : 'dark'}
-        />
+        <CustomStatusBar />
         <SplashScreen onFinish={handleSplashFinish} />
       </>
     );
@@ -63,9 +61,7 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      <StatusBar
-        style={theme.colors.background === '#000000' ? 'light' : 'dark'}
-      />
+      <CustomStatusBar />
       <AppNavigator />
     </>
   );

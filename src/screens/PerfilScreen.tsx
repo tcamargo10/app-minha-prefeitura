@@ -2,57 +2,144 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppBar } from '@/components/AppBar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export const PerfilScreen: React.FC = () => {
   const { theme } = useTheme();
+  const { user } = useAuth();
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      style={[styles.container, { backgroundColor: theme.colors.primary }]}
+      edges={['top']}
     >
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>Perfil</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-          Gerencie suas informações pessoais
-        </Text>
+      <AppBar title="Perfil" />
+      <View
+        style={[
+          styles.contentContainer,
+          { backgroundColor: theme.colors.surface },
+        ]}
+      >
+        <View style={styles.content}>
+          <View style={styles.userInfoSection}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Informações do Usuário
+            </Text>
 
-        <View style={styles.settingsSection}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-            Configurações
-          </Text>
+            <View
+              style={[
+                styles.userInfoCard,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.userInfoLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Nome:
+              </Text>
+              <Text
+                style={[styles.userInfoValue, { color: theme.colors.text }]}
+              >
+                {user?.user_metadata?.name || 'Não informado'}
+              </Text>
+            </View>
 
-          <View
-            style={[
-              styles.settingCard,
-              {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <ThemeToggle />
+            <View
+              style={[
+                styles.userInfoCard,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.userInfoLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Email:
+              </Text>
+              <Text
+                style={[styles.userInfoValue, { color: theme.colors.text }]}
+              >
+                {user?.email}
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.userInfoCard,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.userInfoLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                ID:
+              </Text>
+              <Text
+                style={[styles.userInfoValue, { color: theme.colors.text }]}
+              >
+                {user?.id}
+              </Text>
+            </View>
           </View>
-        </View>
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: theme.colors.primary }]}
-        >
-          <Text style={[styles.buttonText, { color: theme.colors.onPrimary }]}>
-            Editar Perfil
-          </Text>
-        </TouchableOpacity>
+          <View style={styles.settingsSection}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Configurações
+            </Text>
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: theme.colors.error }]}
-        >
-          <Text
-            style={[styles.logoutButtonText, { color: theme.colors.onError }]}
+            <View
+              style={[
+                styles.settingCard,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+            >
+              <ThemeToggle />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.colors.primary }]}
           >
-            Sair
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[styles.buttonText, { color: theme.colors.onPrimary }]}
+            >
+              Editar Perfil
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.colors.error }]}
+          >
+            <Text
+              style={[styles.logoutButtonText, { color: theme.colors.onError }]}
+            >
+              Sair
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -62,21 +149,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  contentContainer: {
+    flex: 1,
+  },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
+  userInfoSection: {
+    width: '100%',
     marginBottom: 30,
+  },
+  userInfoCard: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+  },
+  userInfoLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  userInfoValue: {
+    fontSize: 16,
   },
   button: {
     paddingHorizontal: 30,

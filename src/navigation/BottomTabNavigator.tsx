@@ -59,10 +59,10 @@ export const BottomTabNavigator: React.FC = () => {
             />
           );
         },
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.textSecondary,
+        tabBarActiveTintColor: theme.colors.onPrimary,
+        tabBarInactiveTintColor: theme.colors.onPrimary,
         tabBarStyle: {
-          backgroundColor: theme.colors.surface,
+          backgroundColor: theme.colors.primary,
           borderTopWidth: 0,
           elevation: 8,
           shadowColor: theme.colors.shadow,
