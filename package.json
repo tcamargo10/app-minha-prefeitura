@@ -1,6 +1,7 @@
 {
   "name": "app-minha-prefeitura",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -9,14 +10,38 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~53.0.20",
+    "@hookform/resolvers": "^5.2.1",
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-navigation/bottom-tabs": "^7.4.6",
+    "@react-navigation/native": "^7.1.17",
+    "@react-navigation/stack": "^7.4.7",
+    "@supabase/supabase-js": "^2.56.0",
+    "axios": "^1.11.0",
+    "expo": "53.0.22",
+    "expo-secure-store": "~14.2.4",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.5"
+    "react-hook-form": "^7.62.0",
+    "react-native": "0.79.5",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-url-polyfill": "^2.0.0",
+    "zod": "^4.0.17",
+    "react-native-screens": "~4.11.1",
+    "react-native-gesture-handler": "~2.24.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.40.0",
+    "@typescript-eslint/parser": "^8.40.0",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "eslint": "^9.33.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-native": "^5.0.0",
+    "prettier": "^3.6.2",
     "typescript": "~5.8.3"
   },
   "private": true
