@@ -3,31 +3,33 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 import { useTheme } from '@/contexts/ThemeContext';
+import { lightColors } from '@/theme/colors';
 
 export const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const isLightMode = theme.colors === lightColors;
 
   return (
     <TouchableOpacity
       style={[
-        styles.container, 
-        { 
+        styles.container,
+        {
           backgroundColor: theme.colors.surface,
           borderColor: theme.colors.border,
           shadowColor: theme.colors.shadow,
-        }
+        },
       ]}
       onPress={toggleTheme}
       activeOpacity={0.7}
     >
       <View style={styles.content}>
         <Ionicons
-          name={theme.mode === 'light' ? 'moon' : 'sunny'}
+          name={isLightMode ? 'moon' : 'sunny'}
           size={20}
           color={theme.colors.text}
         />
         <Text style={[styles.text, { color: theme.colors.text }]}>
-          {theme.mode === 'light' ? 'Modo Escuro' : 'Modo Claro'}
+          {isLightMode ? 'Modo Escuro' : 'Modo Claro'}
         </Text>
       </View>
     </TouchableOpacity>

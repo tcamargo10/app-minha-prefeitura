@@ -53,7 +53,7 @@ export const LoginScreen: React.FC = () => {
         message: result.error,
       });
     } else {
-      navigation.replace('Home');
+      navigation.replace('Main');
     }
   };
 

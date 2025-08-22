@@ -2,15 +2,15 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, AppState } from 'react-native';
 
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { SplashScreen } from '@/screens/SplashScreen';
-import { lightColors } from '@/theme/colors';
 import { supabase } from '@/utils/supabase';
 
-export default function App() {
+const AppContent: React.FC = () => {
   const { loading } = useAuth();
+  const { theme } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
 
   // Configuração do Supabase para refresh automático de token
@@ -39,25 +39,42 @@ export default function App() {
 
   if (showSplash) {
     return (
-      <ThemeProvider>
-        <StatusBar style="auto" />
+      <>
+        <StatusBar
+          style={theme.colors.background === '#000000' ? 'light' : 'dark'}
+        />
         <SplashScreen onFinish={handleSplashFinish} />
-      </ThemeProvider>
+      </>
     );
   }
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
   return (
-    <ThemeProvider>
-      <StatusBar style="auto" />
+    <>
+      <StatusBar
+        style={theme.colors.background === '#000000' ? 'light' : 'dark'}
+      />
       <AppNavigator />
+    </>
+  );
+};
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
     </ThemeProvider>
   );
 }
@@ -67,6 +84,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: lightColors.background,
   },
 });
