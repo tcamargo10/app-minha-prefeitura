@@ -55,7 +55,7 @@ export const PerfilScreen: React.FC = () => {
       icon: 'shield-checkmark',
       title: 'Privacidade',
       subtitle: 'Configurações de segurança',
-      onPress: () => console.log('Privacidade'),
+      onPress: () => navigation.navigate('Privacidade' as never),
     },
     {
       id: 4,
