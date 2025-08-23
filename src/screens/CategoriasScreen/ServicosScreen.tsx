@@ -468,8 +468,7 @@ export const ServicosScreen: React.FC = () => {
   };
 
   const handleServicoPress = (servico: Servico) => {
-    // Em um app real, navegaria para formulário de solicitação
-    console.log('Serviço selecionado:', servico.titulo);
+    (navigation as any).navigate('ServicoDetalhes', { servicoId: servico.id });
   };
 
   const renderServicoCard = (servico: Servico) => (

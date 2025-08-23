@@ -9,11 +9,11 @@ import { SplashScreen } from '@/screens/SplashScreen';
 import { supabase } from '@/utils/supabase';
 
 const AppContent: React.FC = () => {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
   const { theme } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
 
-  // Configuração do Supabase para refresh automático de token
+  // Configuração do Supabase para refresh automático de token e listener de auth
   useEffect(() => {
     const handleAppStateChange = (state: string) => {
       if (state === 'active') {
@@ -23,13 +23,21 @@ const AppContent: React.FC = () => {
       }
     };
 
-    const subscription = AppState.addEventListener(
+    // Listener para mudanças de autenticação
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Listener silencioso para detectar mudanças de autenticação
+    });
+
+    const appStateSubscription = AppState.addEventListener(
       'change',
       handleAppStateChange
     );
 
     return () => {
-      subscription?.remove();
+      subscription?.unsubscribe();
+      appStateSubscription?.remove();
     };
   }, []);
 
@@ -62,7 +70,7 @@ const AppContent: React.FC = () => {
   return (
     <>
       <CustomStatusBar />
-      <AppNavigator />
+      <AppNavigator user={user} />
     </>
   );
 };

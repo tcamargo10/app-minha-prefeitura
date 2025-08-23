@@ -4,6 +4,7 @@ import React from 'react';
 
 import { BottomTabNavigator } from '@/navigation/BottomTabNavigator';
 import { ServicosScreen } from '@/screens/CategoriasScreen/ServicosScreen';
+import { ServicoDetalhesScreen } from '@/screens/CategoriasScreen/ServicoDetalhesScreen';
 import { ComunicacaoDetalhesScreen } from '@/screens/ComunicacaoScreen/DetalhesScreen';
 import { LoginScreen } from '@/screens/LoginScreen';
 import { AjudaSuporteScreen } from '@/screens/PerfilScreen/AjudaSuporteScreen';
@@ -28,15 +29,20 @@ export type RootStackParamList = {
   ComunicacaoDetalhes: { comunicado: any };
   SolicitacoesDetalhes: { solicitacaoId: string };
   Servicos: { categoriaId: number; categoriaTitulo: string };
+  ServicoDetalhes: { servicoId: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-export const AppNavigator: React.FC = () => {
+interface AppNavigatorProps {
+  user: any;
+}
+
+export const AppNavigator: React.FC<AppNavigatorProps> = ({ user }) => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName={user ? "Main" : "Login"}
         screenOptions={{
           headerShown: false,
         }}
@@ -65,9 +71,10 @@ export const AppNavigator: React.FC = () => {
           name="SolicitacoesDetalhes"
           component={SolicitacoesDetalhesScreen}
         />
+        <Stack.Screen name="Servicos" component={ServicosScreen} />
         <Stack.Screen
-          name="Servicos"
-          component={ServicosScreen}
+          name="ServicoDetalhes"
+          component={ServicoDetalhesScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

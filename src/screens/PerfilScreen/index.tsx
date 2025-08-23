@@ -21,7 +21,7 @@ export const PerfilScreen: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigation = useNavigation();
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     Alert.alert('Sair da Aplicação', 'Tem certeza que deseja sair?', [
       {
         text: 'Cancelar',
@@ -30,7 +30,24 @@ export const PerfilScreen: React.FC = () => {
       {
         text: 'Sair',
         style: 'destructive',
-        onPress: signOut,
+        onPress: async () => {
+          try {
+            // Fazer logout
+            await signOut();
+
+            // Navegar para login
+            (navigation as any).reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            });
+          } catch (error) {
+            // Mesmo com erro, navegar para login
+            (navigation as any).reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            });
+          }
+        },
       },
     ]);
   };

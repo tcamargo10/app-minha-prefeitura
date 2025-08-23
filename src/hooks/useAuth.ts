@@ -110,11 +110,12 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    setAuthState(prev => ({ ...prev, loading: true }));
+    setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
       const result = await AuthService.signOut();
 
+      // Sempre limpar o estado, mesmo se houver erro
       setAuthState({
         user: null,
         session: null,
@@ -127,11 +128,13 @@ export const useAuth = () => {
       console.error('Erro inesperado no logout:', error);
       const errorMessage = 'Erro inesperado durante o logout. Tente novamente.';
 
-      setAuthState(prev => ({
-        ...prev,
+      // Sempre limpar o estado, mesmo se houver erro
+      setAuthState({
+        user: null,
+        session: null,
         loading: false,
         error: errorMessage,
-      }));
+      });
 
       return { error: errorMessage };
     }

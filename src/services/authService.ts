@@ -50,8 +50,11 @@ export class AuthService {
   static async signOut() {
     try {
       const { error } = await supabase.auth.signOut();
+
+      // Mesmo se houver erro, tentamos limpar o estado local
       if (error) {
-        throw error;
+        // Não lançamos o erro, apenas retornamos
+        return { error: error.message };
       }
 
       return { error: null };
