@@ -95,6 +95,24 @@ Aplicativo React Native com Expo para gestão de solicitações municipais, dese
    - Pressione `i` para iOS
    - Pressione `w` para web
 
+## 📱 Deploy para App Stores
+
+Para fazer deploy automatizado para Google Play e Apple App Store, consulte o [guia completo de deployment](DEPLOYMENT.md).
+
+### Deploy Rápido
+
+```bash
+# Windows (PowerShell)
+.\scripts\deploy.ps1
+
+# Linux/Mac
+./scripts/deploy.sh
+
+# Manual
+eas build --platform all --profile production
+eas submit --platform all
+```
+
 ## 📱 Funcionalidades
 
 ### Telas Implementadas
