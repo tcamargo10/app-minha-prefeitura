@@ -6,6 +6,7 @@ import { BottomTabNavigator } from '@/navigation/BottomTabNavigator';
 import { EditarPerfilScreen } from '@/screens/PerfilScreen/EditarPerfilScreen';
 import { NotificacoesScreen } from '@/screens/PerfilScreen/NotificacoesScreen';
 import { PrivacidadeScreen } from '@/screens/PerfilScreen/PrivacidadeScreen';
+import { AjudaSuporteScreen } from '@/screens/PerfilScreen/AjudaSuporteScreen';
 import { LoginScreen } from '@/screens/LoginScreen';
 import { RegisterScreen } from '@/screens/RegisterScreen';
 
@@ -16,6 +17,7 @@ export type RootStackParamList = {
   EditarPerfil: undefined;
   Notificacoes: undefined;
   Privacidade: undefined;
+  AjudaSuporte: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -42,6 +44,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="EditarPerfil" component={EditarPerfilScreen} />
         <Stack.Screen name="Notificacoes" component={NotificacoesScreen} />
         <Stack.Screen name="Privacidade" component={PrivacidadeScreen} />
+        <Stack.Screen name="AjudaSuporte" component={AjudaSuporteScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -62,7 +62,7 @@ export const PerfilScreen: React.FC = () => {
       icon: 'help-circle',
       title: 'Ajuda e Suporte',
       subtitle: 'Central de ajuda e contato',
-      onPress: () => console.log('Ajuda'),
+      onPress: () => navigation.navigate('AjudaSuporte' as never),
     },
     {
       id: 5,
