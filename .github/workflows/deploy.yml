@@ -2,7 +2,7 @@ name: Deploy to App Stores
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     tags: ['v*']
 
 jobs:
@@ -11,26 +11,26 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm install
-      
+
       - name: Install EAS CLI
         run: npm install -g @expo/eas-cli
-      
+
       - name: Setup Expo
         run: |
           echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-      
+
       - name: Build Android
         run: eas build --platform android --profile production --non-interactive
-      
+
       - name: Submit to Google Play
         run: eas submit --platform android --non-interactive
         env:
@@ -41,26 +41,26 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm install
-      
+
       - name: Install EAS CLI
         run: npm install -g @expo/eas-cli
-      
+
       - name: Setup Expo
         run: |
           echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-      
+
       - name: Build iOS
         run: eas build --platform ios --profile production --non-interactive
-      
+
       - name: Submit to App Store
         run: eas submit --platform ios --non-interactive
         env:
@@ -69,25 +69,25 @@ jobs:
 
   build-preview:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm install
-      
+
       - name: Install EAS CLI
         run: npm install -g @expo/eas-cli
-      
+
       - name: Setup Expo
         run: |
           echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-      
+
       - name: Build Preview
         run: eas build --platform all --profile preview --non-interactive

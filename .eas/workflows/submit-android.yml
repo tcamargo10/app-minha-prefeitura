@@ -1,0 +1,27 @@
+on:
+  push:
+    branches: ['master']
+    tags: ['v*']
+
+jobs:
+  build_android:
+    name: Build Android app
+    type: build
+    params:
+      profile: production
+    if: startsWith(github.ref, 'refs/tags/v')
+
+  submit_android:
+    name: Submit to Google Play Store
+    needs: [build_android]
+    type: submit
+    params:
+      build_id: ${{ needs.build_android.outputs.build_id }}
+    if: startsWith(github.ref, 'refs/tags/v')
+
+  build_preview:
+    name: Build Preview
+    type: build
+    params:
+      profile: preview
+    if: github.ref == 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/v')
