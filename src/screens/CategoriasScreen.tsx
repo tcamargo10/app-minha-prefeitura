@@ -143,7 +143,7 @@ export const CategoriasScreen: React.FC = () => {
       style={[styles.container, { backgroundColor: theme.colors.primary }]}
       edges={['top']}
     >
-      <AppBar title="Categorias" showBackButton />
+      <AppBar title="Categorias" />
       <View
         style={[
           styles.contentContainer,
