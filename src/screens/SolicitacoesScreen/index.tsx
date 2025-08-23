@@ -14,10 +14,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { AppBar } from '@/components/AppBar';
 import { useTheme } from '@/contexts/ThemeContext';
-import { RootStackParamList } from '@/navigation/AppNavigator';
+import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
 
 type SolicitacoesScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  BottomTabParamList,
   'Solicitacoes'
 >;
 

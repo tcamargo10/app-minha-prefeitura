@@ -11,6 +11,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '@/navigation/AppNavigator';
 
 import { AppBar } from '@/components/AppBar';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -38,9 +40,14 @@ interface Comunicado {
   horario?: string;
 }
 
+type ComunicacaoScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'ComunicacaoDetalhes'
+>;
+
 export const ComunicacaoScreen: React.FC = () => {
   const { theme } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<ComunicacaoScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const [comunicados, setComunicados] = useState<Comunicado[]>([
     {
@@ -243,12 +250,7 @@ export const ComunicacaoScreen: React.FC = () => {
             : theme.colors.border,
         },
       ]}
-      onPress={() =>
-        navigation.navigate(
-          'ComunicacaoDetalhes' as never,
-          { comunicado } as never
-        )
-      }
+      onPress={() => navigation.navigate('ComunicacaoDetalhes', { comunicado })}
     >
       <View style={styles.comunicadoHeader}>
         <View style={styles.comunicadoInfo}>

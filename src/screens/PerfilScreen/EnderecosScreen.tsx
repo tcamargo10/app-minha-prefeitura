@@ -136,7 +136,11 @@ export const EnderecosScreen: React.FC = () => {
       setEnderecos(
         enderecos.map(endereco =>
           endereco.id === editingEndereco.id
-            ? { ...endereco, ...formData }
+            ? {
+                ...endereco,
+                ...formData,
+                tipo: formData.tipo as 'residencial' | 'comercial' | 'outro',
+              }
             : formData.principal
               ? { ...endereco, principal: false }
               : endereco
@@ -147,6 +151,7 @@ export const EnderecosScreen: React.FC = () => {
       const newEndereco: Endereco = {
         id: Date.now().toString(),
         ...formData,
+        tipo: formData.tipo as 'residencial' | 'comercial' | 'outro',
       };
       setEnderecos([
         ...enderecos.map(e => ({

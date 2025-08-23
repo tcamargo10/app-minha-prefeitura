@@ -40,6 +40,7 @@ yarn-error.*
 # Arquivos de deploy
 google-service-account.json
 *.keystore
+config/
 
 # Logs
 *.log

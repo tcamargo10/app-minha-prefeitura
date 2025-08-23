@@ -7,10 +7,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { AppBar } from '@/components/AppBar';
 import { CategoriesGrid } from '@/components/CategoriesGrid';
 import { useTheme } from '@/contexts/ThemeContext';
-import { RootStackParamList } from '@/navigation/AppNavigator';
+import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
 
 type CategoriasScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  BottomTabParamList,
   'Categorias'
 >;
 
@@ -38,14 +38,16 @@ export const CategoriasScreen: React.FC = () => {
       icon: 'leaf',
       title: 'Manutenção de Praças',
       color: '#FF9500',
-      onPress: () => handleCategoriaPress({ id: 2, title: 'Manutenção de Praças' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 2, title: 'Manutenção de Praças' }),
     },
     {
       id: 3,
       icon: 'tree',
       title: 'Manutenção de Parques',
       color: '#FF9500',
-      onPress: () => handleCategoriaPress({ id: 3, title: 'Manutenção de Parques' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 3, title: 'Manutenção de Parques' }),
     },
   ];
 
@@ -62,21 +64,24 @@ export const CategoriasScreen: React.FC = () => {
       icon: 'card',
       title: 'Credencial de Estacionamento',
       color: '#00CED1',
-      onPress: () => handleCategoriaPress({ id: 5, title: 'Credencial de Estacionamento' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 5, title: 'Credencial de Estacionamento' }),
     },
     {
       id: 6,
       icon: 'car',
       title: 'Táxi/Escolar/Turismo',
       color: '#00CED1',
-      onPress: () => handleCategoriaPress({ id: 6, title: 'Táxi/Escolar/Turismo' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 6, title: 'Táxi/Escolar/Turismo' }),
     },
     {
       id: 7,
       icon: 'warning',
       title: 'Infrações de Trânsito',
       color: '#00CED1',
-      onPress: () => handleCategoriaPress({ id: 7, title: 'Infrações de Trânsito' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 7, title: 'Infrações de Trânsito' }),
     },
   ];
 
@@ -93,14 +98,16 @@ export const CategoriasScreen: React.FC = () => {
       icon: 'road',
       title: 'Manutenção de vias',
       color: '#FF3B30',
-      onPress: () => handleCategoriaPress({ id: 9, title: 'Manutenção de vias' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 9, title: 'Manutenção de vias' }),
     },
     {
       id: 10,
       icon: 'location',
       title: 'Consulte sua Rua',
       color: '#FF3B30',
-      onPress: () => handleCategoriaPress({ id: 10, title: 'Consulte sua Rua' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 10, title: 'Consulte sua Rua' }),
     },
   ];
 
@@ -145,7 +152,8 @@ export const CategoriasScreen: React.FC = () => {
       icon: 'people',
       title: 'Agricultura Familiar',
       color: '#FF9500',
-      onPress: () => handleCategoriaPress({ id: 16, title: 'Agricultura Familiar' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 16, title: 'Agricultura Familiar' }),
     },
   ];
 
@@ -155,14 +163,16 @@ export const CategoriasScreen: React.FC = () => {
       icon: 'paw',
       title: 'Apreensão de Animais',
       color: '#FF2D92',
-      onPress: () => handleCategoriaPress({ id: 17, title: 'Apreensão de Animais' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 17, title: 'Apreensão de Animais' }),
     },
     {
       id: 18,
       icon: 'heart',
       title: 'Bem-Estar Animal',
       color: '#FF2D92',
-      onPress: () => handleCategoriaPress({ id: 18, title: 'Bem-Estar Animal' }),
+      onPress: () =>
+        handleCategoriaPress({ id: 18, title: 'Bem-Estar Animal' }),
     },
     {
       id: 19,

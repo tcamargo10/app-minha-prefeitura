@@ -41,6 +41,9 @@
         "projectId": "3e0b445e-36d0-4c75-890c-aed05e88a6c2"
       }
     },
-    "owner": "tcamargo10"
+    "owner": "tcamargo10",
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
