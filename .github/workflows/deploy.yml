@@ -27,7 +27,7 @@ jobs:
       - name: Setup Expo
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login --non-interactive
+        run: eas login
 
       - name: Build and Submit Android
         run: eas build --platform android --profile production --auto-submit --non-interactive
@@ -55,7 +55,7 @@ jobs:
       - name: Setup Expo
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login --non-interactive
+        run: eas login
 
       - name: Build iOS
         run: eas build --platform ios --profile production --non-interactive
@@ -87,7 +87,7 @@ jobs:
       - name: Setup Expo
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login --non-interactive
+        run: eas login
 
       - name: Build Preview
         run: eas build --platform all --profile preview --non-interactive
