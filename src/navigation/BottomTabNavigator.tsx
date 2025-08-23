@@ -4,7 +4,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 
 import { useTheme } from '@/contexts/ThemeContext';
-import { CategoriasScreen } from '@/screens/CategoriasScreen';
+import { CategoriasScreen } from '@/screens/CategoriasScreen/index';
 import { ComunicacaoScreen } from '@/screens/ComunicacaoScreen/index';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { PerfilScreen } from '@/screens/PerfilScreen';

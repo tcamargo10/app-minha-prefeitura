@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
 import { BottomTabNavigator } from '@/navigation/BottomTabNavigator';
+import { ServicosScreen } from '@/screens/CategoriasScreen/ServicosScreen';
 import { ComunicacaoDetalhesScreen } from '@/screens/ComunicacaoScreen/DetalhesScreen';
 import { LoginScreen } from '@/screens/LoginScreen';
 import { AjudaSuporteScreen } from '@/screens/PerfilScreen/AjudaSuporteScreen';
@@ -26,6 +27,7 @@ export type RootStackParamList = {
   SobreApp: undefined;
   ComunicacaoDetalhes: { comunicado: any };
   SolicitacoesDetalhes: { solicitacaoId: string };
+  Servicos: { categoriaId: number; categoriaTitulo: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -62,6 +64,10 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="SolicitacoesDetalhes"
           component={SolicitacoesDetalhesScreen}
+        />
+        <Stack.Screen
+          name="Servicos"
+          component={ServicosScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
