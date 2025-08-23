@@ -8,7 +8,7 @@ import { CategoriasScreen } from '@/screens/CategoriasScreen';
 import { ComunicacaoScreen } from '@/screens/ComunicacaoScreen/index';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { PerfilScreen } from '@/screens/PerfilScreen';
-import { SolicitacoesScreen } from '@/screens/SolicitacoesScreen';
+import { SolicitacoesScreen } from '@/screens/SolicitacoesScreen/index';
 
 export type BottomTabParamList = {
   Inicio: undefined;

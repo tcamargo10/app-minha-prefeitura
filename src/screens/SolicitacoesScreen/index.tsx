@@ -9,9 +9,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { AppBar } from '@/components/AppBar';
 import { useTheme } from '@/contexts/ThemeContext';
+import { RootStackParamList } from '@/navigation/AppNavigator';
+
+type SolicitacoesScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'Solicitacoes'
+>;
 
 interface Solicitacao {
   id: string;
@@ -26,6 +34,7 @@ interface Solicitacao {
 
 export const SolicitacoesScreen: React.FC = () => {
   const { theme } = useTheme();
+  const navigation = useNavigation<SolicitacoesScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([
     {
@@ -136,6 +145,12 @@ export const SolicitacoesScreen: React.FC = () => {
     return date.toLocaleDateString('pt-BR');
   };
 
+  const handleSolicitacaoPress = (solicitacao: Solicitacao) => {
+    navigation.navigate('SolicitacoesDetalhes' as any, {
+      solicitacaoId: solicitacao.id,
+    });
+  };
+
   const renderSolicitacao = (solicitacao: Solicitacao) => (
     <TouchableOpacity
       key={solicitacao.id}
@@ -146,6 +161,8 @@ export const SolicitacoesScreen: React.FC = () => {
           borderColor: theme.colors.border,
         },
       ]}
+      onPress={() => handleSolicitacaoPress(solicitacao)}
+      activeOpacity={0.7}
     >
       <View style={styles.solicitacaoHeader}>
         <View style={styles.solicitacaoInfo}>

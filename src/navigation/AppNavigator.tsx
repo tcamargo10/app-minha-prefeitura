@@ -12,6 +12,7 @@ import { NotificacoesScreen } from '@/screens/PerfilScreen/NotificacoesScreen';
 import { PrivacidadeScreen } from '@/screens/PerfilScreen/PrivacidadeScreen';
 import { SobreAppScreen } from '@/screens/PerfilScreen/SobreAppScreen';
 import { RegisterScreen } from '@/screens/RegisterScreen';
+import { SolicitacoesDetalhesScreen } from '@/screens/SolicitacoesScreen/DetalhesScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -24,6 +25,7 @@ export type RootStackParamList = {
   AjudaSuporte: undefined;
   SobreApp: undefined;
   ComunicacaoDetalhes: { comunicado: any };
+  SolicitacoesDetalhes: { solicitacaoId: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -56,6 +58,10 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="ComunicacaoDetalhes"
           component={ComunicacaoDetalhesScreen}
+        />
+        <Stack.Screen
+          name="SolicitacoesDetalhes"
+          component={SolicitacoesDetalhesScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
