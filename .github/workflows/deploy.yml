@@ -26,13 +26,10 @@ jobs:
 
       - name: Setup Expo
         run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
+          echo ${{ secrets.EXPO_TOKEN }} | eas login
 
-      - name: Build Android
-        run: eas build --platform android --profile production --non-interactive
-
-      - name: Submit to Google Play
-        run: eas submit --platform android --non-interactive
+      - name: Build and Submit Android
+        run: eas build --platform android --profile production --auto-submit --non-interactive
         env:
           GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
 
@@ -56,7 +53,7 @@ jobs:
 
       - name: Setup Expo
         run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
+          echo ${{ secrets.EXPO_TOKEN }} | eas login
 
       - name: Build iOS
         run: eas build --platform ios --profile production --non-interactive
@@ -87,7 +84,7 @@ jobs:
 
       - name: Setup Expo
         run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
+          echo ${{ secrets.EXPO_TOKEN }} | eas login
 
       - name: Build Preview
         run: eas build --platform all --profile preview --non-interactive
