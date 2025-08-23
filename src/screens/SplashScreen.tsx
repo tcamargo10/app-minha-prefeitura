@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useRef } from 'react';
 import {
   View,
@@ -9,8 +10,9 @@ import {
 } from 'react-native';
 
 import { useTheme } from '@/contexts/ThemeContext';
+import { CustomStatusBar } from '@/components/CustomStatusBar';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -115,136 +117,224 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   ]);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Animated.View
-        style={[
-          styles.logoContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
-      >
-        <Image
-          source={require('../../assets/splash-icon.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </Animated.View>
+    <>
+      <CustomStatusBar
+        barStyle="light-content"
+        backgroundColor={colors.primary}
+        translucent={false}
+      />
+      <View style={[styles.container, { backgroundColor: colors.primary }]}>
+        {/* Background Pattern */}
+        <View style={styles.backgroundPattern}>
+          <View
+            style={[styles.circle1, { backgroundColor: colors.onPrimary }]}
+          />
+          <View
+            style={[styles.circle2, { backgroundColor: colors.onPrimary }]}
+          />
+          <View
+            style={[styles.circle3, { backgroundColor: colors.onPrimary }]}
+          />
+        </View>
 
-      <Animated.View
-        style={[
-          styles.textContainer,
-          {
-            opacity: textFadeAnim,
-          },
-        ]}
-      >
-        <Text style={[styles.title, { color: colors.text }]}>
-          Minha Prefeitura
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Conectando você à sua cidade
-        </Text>
-      </Animated.View>
+        {/* Main Content */}
+        <View style={styles.content}>
+          <Animated.View
+            style={[
+              styles.logoContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ scale: scaleAnim }],
+              },
+            ]}
+          >
+            <View
+              style={[styles.logoCircle, { backgroundColor: colors.onPrimary }]}
+            >
+              <Ionicons name="business" size={60} color={colors.primary} />
+            </View>
+          </Animated.View>
 
-      <View style={styles.loadingContainer}>
-        <Animated.View
-          style={[
-            styles.loadingDot,
-            {
-              backgroundColor: colors.primary,
-              opacity: dotAnim1,
-              transform: [
+          <Animated.View
+            style={[
+              styles.textContainer,
+              {
+                opacity: textFadeAnim,
+              },
+            ]}
+          >
+            <Text style={[styles.title, { color: colors.onPrimary }]}>
+              Minha Prefeitura
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.onPrimary }]}>
+              Conectando você à sua cidade
+            </Text>
+          </Animated.View>
+
+          {/* Loading Animation */}
+          <View style={styles.loadingContainer}>
+            <Animated.View
+              style={[
+                styles.loadingDot,
                 {
-                  scale: dotAnim1.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.8, 1.2],
-                  }),
+                  backgroundColor: colors.onPrimary,
+                  opacity: dotAnim1,
+                  transform: [
+                    {
+                      scale: dotAnim1.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.8, 1.2],
+                      }),
+                    },
+                  ],
                 },
-              ],
-            },
-          ]}
-        />
-        <Animated.View
-          style={[
-            styles.loadingDot,
-            {
-              backgroundColor: colors.primary,
-              opacity: dotAnim2,
-              transform: [
+              ]}
+            />
+            <Animated.View
+              style={[
+                styles.loadingDot,
                 {
-                  scale: dotAnim2.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.8, 1.2],
-                  }),
+                  backgroundColor: colors.onPrimary,
+                  opacity: dotAnim2,
+                  transform: [
+                    {
+                      scale: dotAnim2.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.8, 1.2],
+                      }),
+                    },
+                  ],
                 },
-              ],
-            },
-          ]}
-        />
-        <Animated.View
-          style={[
-            styles.loadingDot,
-            {
-              backgroundColor: colors.primary,
-              opacity: dotAnim3,
-              transform: [
+              ]}
+            />
+            <Animated.View
+              style={[
+                styles.loadingDot,
                 {
-                  scale: dotAnim3.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.8, 1.2],
-                  }),
+                  backgroundColor: colors.onPrimary,
+                  opacity: dotAnim3,
+                  transform: [
+                    {
+                      scale: dotAnim3.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.8, 1.2],
+                      }),
+                    },
+                  ],
                 },
-              ],
-            },
-          ]}
-        />
+              ]}
+            />
+          </View>
+
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={[styles.footerText, { color: colors.onPrimary }]}>
+              Carregando...
+            </Text>
+          </View>
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundPattern: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  circle1: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    top: -50,
+    right: -50,
+    opacity: 0.1,
+  },
+  circle2: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    bottom: height * 0.3,
+    left: -30,
+    opacity: 0.08,
+  },
+  circle3: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    top: height * 0.2,
+    right: 50,
+    opacity: 0.06,
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   logoContainer: {
     alignItems: 'center',
     marginBottom: 40,
   },
-  logo: {
-    width: width * 0.4,
-    height: width * 0.4,
-    maxWidth: 150,
-    maxHeight: 150,
+  logoCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 12,
   },
   textContainer: {
     alignItems: 'center',
     marginBottom: 60,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 12,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
-    opacity: 0.8,
+    opacity: 0.9,
   },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 40,
   },
   loadingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-    opacity: 0.6,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginHorizontal: 6,
+    opacity: 0.8,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: height * 0.1,
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 14,
+    opacity: 0.8,
   },
 });

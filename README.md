@@ -1,6 +1,8 @@
-# App Minha Prefeitura
+# Minha Prefeitura
 
 Aplicativo React Native com Expo para gestão de solicitações municipais, desenvolvido com TypeScript, Supabase e React Hook Form.
+
+**Versão:** 1.0.0
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -26,7 +28,7 @@ Aplicativo React Native com Expo para gestão de solicitações municipais, dese
 
    ```bash
    git clone <url-do-repositorio>
-   cd app-minha-prefeitura
+   cd minha-prefeitura
    ```
 
 2. **Instale as dependências**
