@@ -8,11 +8,13 @@ import { CategoriasScreen } from '@/screens/CategoriasScreen';
 import { ComunicacaoScreen } from '@/screens/ComunicacaoScreen';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { PerfilScreen } from '@/screens/PerfilScreen';
+import { SolicitacoesScreen } from '@/screens/SolicitacoesScreen';
 
 export type BottomTabParamList = {
   Inicio: undefined;
   Categorias: undefined;
   Comunicacao: undefined;
+  Solicitacoes: undefined;
   Perfil: undefined;
 };
 
@@ -44,6 +46,8 @@ export const BottomTabNavigator: React.FC = () => {
             iconName = focused
               ? 'chatbubble-ellipses'
               : 'chatbubble-ellipses-outline';
+          } else if (route.name === 'Solicitacoes') {
+            iconName = focused ? 'list' : 'list-outline';
           } else if (route.name === 'Perfil') {
             iconName = focused ? 'person-circle' : 'person-circle-outline';
           } else {
@@ -108,6 +112,13 @@ export const BottomTabNavigator: React.FC = () => {
         component={ComunicacaoScreen}
         options={{
           title: 'Comunicação',
+        }}
+      />
+      <Tab.Screen
+        name="Solicitacoes"
+        component={SolicitacoesScreen}
+        options={{
+          title: 'Solicitações',
         }}
       />
       <Tab.Screen
