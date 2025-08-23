@@ -2,14 +2,25 @@
 
 Este guia explica como fazer o deployment automatizado do app "Minha Prefeitura" para Google Play Store e Apple App Store usando EAS (Expo Application Services).
 
+git add .
+git commit -m "Bump version to 1.0.1"
+git push origin master
+
+# 3. Tag para produção
+
+git tag v1.0.1
+git push origin v1.0.1
+
 ## 📋 Pré-requisitos
 
 ### 1. Contas Necessárias
+
 - **Expo Account**: [expo.dev](https://expo.dev)
 - **Google Play Console**: [play.google.com/console](https://play.google.com/console) ($25 taxa única)
 - **Apple Developer Program**: [developer.apple.com](https://developer.apple.com) ($99/ano)
 
 ### 2. Ferramentas
+
 - Node.js 16+
 - EAS CLI
 - Git
@@ -17,22 +28,27 @@ Este guia explica como fazer o deployment automatizado do app "Minha Prefeitura"
 ## 🚀 Configuração Inicial
 
 ### 1. Instalar EAS CLI
+
 ```bash
 npm install -g @expo/eas-cli
 ```
 
 ### 2. Fazer Login no Expo
+
 ```bash
 eas login
 ```
 
 ### 3. Configurar EAS no Projeto
+
 ```bash
 eas build:configure
 ```
 
 ### 4. Configurar Variáveis de Ambiente
+
 Criar arquivo `.env`:
+
 ```env
 EXPO_PUBLIC_SUPABASE_URL=sua_url_do_supabase
 EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
@@ -43,6 +59,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
 ### 1. Configurar EAS para Android
 
 Criar arquivo `eas.json`:
+
 ```json
 {
   "cli": {
@@ -96,11 +113,13 @@ Criar arquivo `eas.json`:
 ### 3. Build e Deploy Automatizado
 
 #### Build de Produção
+
 ```bash
 eas build --platform android --profile production
 ```
 
 #### Submit Automático
+
 ```bash
 eas submit --platform android
 ```
@@ -108,6 +127,7 @@ eas submit --platform android
 ### 4. GitHub Actions (Automatização)
 
 Criar arquivo `.github/workflows/deploy-android.yml`:
+
 ```yaml
 name: Deploy to Google Play
 
@@ -121,26 +141,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm install
-      
+
       - name: Install EAS CLI
         run: npm install -g @expo/eas-cli
-      
+
       - name: Setup Expo
         run: |
           echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-      
+
       - name: Build Android
         run: eas build --platform android --profile production --non-interactive
-      
+
       - name: Submit to Google Play
         run: eas submit --platform android --non-interactive
         env:
@@ -152,6 +172,7 @@ jobs:
 ### 1. Configurar EAS para iOS
 
 Atualizar `eas.json`:
+
 ```json
 {
   "cli": {
@@ -200,11 +221,13 @@ Atualizar `eas.json`:
 ### 3. Build e Deploy Automatizado
 
 #### Build de Produção
+
 ```bash
 eas build --platform ios --profile production
 ```
 
 #### Submit Automático
+
 ```bash
 eas submit --platform ios
 ```
@@ -212,6 +235,7 @@ eas submit --platform ios
 ### 4. GitHub Actions (Automatização)
 
 Criar arquivo `.github/workflows/deploy-ios.yml`:
+
 ```yaml
 name: Deploy to App Store
 
@@ -225,26 +249,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm install
-      
+
       - name: Install EAS CLI
         run: npm install -g @expo/eas-cli
-      
+
       - name: Setup Expo
         run: |
           echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-      
+
       - name: Build iOS
         run: eas build --platform ios --profile production --non-interactive
-      
+
       - name: Submit to App Store
         run: eas submit --platform ios --non-interactive
         env:
@@ -255,6 +279,7 @@ jobs:
 ## 🔄 Workflow de Release
 
 ### 1. Versionamento
+
 ```bash
 # Atualizar versão
 npm version patch  # 1.0.0 -> 1.0.1
@@ -267,6 +292,7 @@ git push origin v1.0.0
 ```
 
 ### 2. Deploy Manual
+
 ```bash
 # Build e deploy para ambas as plataformas
 eas build --platform all --profile production
@@ -274,6 +300,7 @@ eas submit --platform all
 ```
 
 ### 3. Deploy Automatizado
+
 ```bash
 # Push para main com tag
 git tag v1.0.0
@@ -283,27 +310,32 @@ git push origin v1.0.0
 ## 🔐 Configuração de Secrets
 
 ### GitHub Secrets Necessários
+
 - `EXPO_TOKEN`: Token do Expo (gerado em expo.dev/accounts/[username]/settings/access-tokens)
 - `GOOGLE_SERVICE_ACCOUNT_KEY`: Conteúdo do arquivo google-service-account.json
 - `APPLE_ID`: Apple ID para App Store Connect
 - `APPLE_APP_SPECIFIC_PASSWORD`: Senha específica do app
 
 ### Como Configurar
+
 1. Ir em Settings > Secrets and variables > Actions
 2. Adicionar cada secret com o valor correspondente
 
 ## 📊 Monitoramento
 
 ### 1. EAS Dashboard
+
 - [expo.dev](https://expo.dev) > Seu projeto > Builds
 - Monitorar builds e deployments
 
 ### 2. Google Play Console
+
 - Analytics de downloads
 - Crash reports
 - User feedback
 
 ### 3. App Store Connect
+
 - Analytics de downloads
 - Crash reports
 - User reviews
@@ -313,15 +345,17 @@ git push origin v1.0.0
 ### Problemas Comuns
 
 1. **Build Falha**
+
    ```bash
    # Limpar cache
    eas build:clean
-   
+
    # Rebuild
    eas build --platform android --profile production
    ```
 
 2. **Submit Falha**
+
    ```bash
    # Verificar logs
    eas submit --platform android --latest
@@ -335,6 +369,7 @@ git push origin v1.0.0
    ```
 
 ### Logs e Debug
+
 ```bash
 # Ver logs do build
 eas build:list
@@ -346,6 +381,7 @@ eas build:view [BUILD_ID]
 ## 📝 Checklist de Release
 
 ### Antes do Deploy
+
 - [ ] Testar em dispositivo físico
 - [ ] Verificar todas as funcionalidades
 - [ ] Atualizar changelog
@@ -354,11 +390,13 @@ eas build:view [BUILD_ID]
 - [ ] Verificar integração com Supabase
 
 ### Durante o Deploy
+
 - [ ] Build bem-sucedido
 - [ ] Submit bem-sucedido
 - [ ] Verificar na loja (pode levar algumas horas)
 
 ### Após o Deploy
+
 - [ ] Monitorar crash reports
 - [ ] Responder reviews
 - [ ] Analisar métricas
@@ -367,6 +405,7 @@ eas build:view [BUILD_ID]
 ## 🔄 CI/CD Completo
 
 Para um workflow completo, criar `.github/workflows/ci-cd.yml`:
+
 ```yaml
 name: CI/CD Pipeline
 
