@@ -98,7 +98,11 @@ export const SobreAppScreen: React.FC = () => {
       style={[styles.container, { backgroundColor: theme.colors.primary }]}
       edges={['top']}
     >
-      <AppBar title="Sobre o App" />
+      <AppBar
+        title="Sobre o App"
+        showBackButton
+        onBackPress={() => navigation.goBack()}
+      />
       <View
         style={[
           styles.contentContainer,
@@ -106,6 +110,26 @@ export const SobreAppScreen: React.FC = () => {
         ]}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Header Section */}
+          <View style={styles.headerSection}>
+            <Ionicons
+              name="information-circle-outline"
+              size={40}
+              color={theme.colors.primary}
+            />
+            <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+              Sobre o Aplicativo
+            </Text>
+            <Text
+              style={[
+                styles.headerSubtitle,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Conheça mais sobre o aplicativo e suas funcionalidades
+            </Text>
+          </View>
+
           {/* App Header */}
           <View
             style={[
@@ -241,12 +265,25 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: 20,
   },
   scrollContent: {
     padding: 20,
+  },
+  headerSection: {
+    alignItems: 'center',
+    marginBottom: 32,
+    paddingVertical: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   appHeader: {
     flexDirection: 'row',

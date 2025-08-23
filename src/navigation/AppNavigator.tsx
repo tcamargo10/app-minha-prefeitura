@@ -4,6 +4,7 @@ import React from 'react';
 
 import { BottomTabNavigator } from '@/navigation/BottomTabNavigator';
 import { EditarPerfilScreen } from '@/screens/PerfilScreen/EditarPerfilScreen';
+import { EnderecosScreen } from '@/screens/PerfilScreen/EnderecosScreen';
 import { NotificacoesScreen } from '@/screens/PerfilScreen/NotificacoesScreen';
 import { PrivacidadeScreen } from '@/screens/PerfilScreen/PrivacidadeScreen';
 import { AjudaSuporteScreen } from '@/screens/PerfilScreen/AjudaSuporteScreen';
@@ -16,6 +17,7 @@ export type RootStackParamList = {
   Register: undefined;
   Main: undefined;
   EditarPerfil: undefined;
+  Enderecos: undefined;
   Notificacoes: undefined;
   Privacidade: undefined;
   AjudaSuporte: undefined;
@@ -44,6 +46,7 @@ export const AppNavigator: React.FC = () => {
           }}
         />
         <Stack.Screen name="EditarPerfil" component={EditarPerfilScreen} />
+        <Stack.Screen name="Enderecos" component={EnderecosScreen} />
         <Stack.Screen name="Notificacoes" component={NotificacoesScreen} />
         <Stack.Screen name="Privacidade" component={PrivacidadeScreen} />
         <Stack.Screen name="AjudaSuporte" component={AjudaSuporteScreen} />
