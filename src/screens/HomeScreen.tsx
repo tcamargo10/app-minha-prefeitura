@@ -4,10 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { AppBar } from '@/components/AppBar';
 import { BannerSection } from '@/components/BannerSection';
 import { CategoriesGrid } from '@/components/CategoriesGrid';
 import { ServicesGrid } from '@/components/ServicesGrid';
+import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { RootStackParamList } from '@/navigation/AppNavigator';
@@ -160,11 +160,7 @@ export const HomeScreen: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.primary }]}
-      edges={['top']}
-    >
-      <AppBar title="Minha Prefeitura" />
+    <ScreenWrapper showCitySelector>
       <View
         style={[
           styles.contentContainer,
@@ -195,7 +191,7 @@ export const HomeScreen: React.FC = () => {
           />
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 };
 

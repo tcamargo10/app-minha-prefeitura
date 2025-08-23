@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,13 +10,18 @@ import {
   Alert,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 
 import { AppBar } from '@/components/AppBar';
+import { SelectInput, SelectOption } from '@/components/SelectInput';
 import { useTheme } from '@/contexts/ThemeContext';
+import {
+  municipalityService,
+  State,
+  City,
+} from '@/services/municipalityService';
 
 interface Endereco {
   id: string;
@@ -59,6 +66,61 @@ export const EnderecosScreen: React.FC = () => {
     estado: '',
     principal: false,
   });
+
+  // Estados para dados do Supabase
+  const [states, setStates] = useState<State[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+
+  // Converter dados para formato do SelectInput
+  const stateOptions: SelectOption[] = states.map(state => ({
+    label: state.state,
+    value: state.state,
+  }));
+
+  const cityOptions: SelectOption[] = cities.map(city => ({
+    label: city.city,
+    value: city.city,
+  }));
+
+  // Carregar estados ao montar o componente
+  useEffect(() => {
+    loadStates();
+  }, []);
+
+  // Carregar cidades quando o estado for selecionado
+  useEffect(() => {
+    if (formData.estado) {
+      loadCitiesByState(formData.estado);
+    } else {
+      setCities([]);
+    }
+  }, [formData.estado]);
+
+  const loadStates = async () => {
+    setLoadingStates(true);
+    try {
+      const statesData = await municipalityService.getStates();
+      setStates(statesData);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar os estados');
+    } finally {
+      setLoadingStates(false);
+    }
+  };
+
+  const loadCitiesByState = async (state: string) => {
+    setLoadingCities(true);
+    try {
+      const citiesData = await municipalityService.getCitiesByState(state);
+      setCities(citiesData);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar as cidades');
+    } finally {
+      setLoadingCities(false);
+    }
+  };
 
   const handleAddEndereco = () => {
     setEditingEndereco(null);
@@ -535,52 +597,36 @@ export const EnderecosScreen: React.FC = () => {
                 />
               </View>
 
-              {/* Cidade e Estado */}
-              <View style={styles.row}>
-                <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
-                  <Text style={[styles.label, { color: theme.colors.text }]}>
-                    Cidade *
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      {
-                        backgroundColor: theme.colors.surface,
-                        borderColor: theme.colors.border,
-                        color: theme.colors.text,
-                      },
-                    ]}
-                    value={formData.cidade}
-                    onChangeText={text =>
-                      setFormData({ ...formData, cidade: text })
-                    }
-                    placeholder="Nome da cidade"
-                    placeholderTextColor={theme.colors.textSecondary}
-                  />
-                </View>
-                <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
-                  <Text style={[styles.label, { color: theme.colors.text }]}>
-                    Estado *
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      {
-                        backgroundColor: theme.colors.surface,
-                        borderColor: theme.colors.border,
-                        color: theme.colors.text,
-                      },
-                    ]}
-                    value={formData.estado}
-                    onChangeText={text =>
-                      setFormData({ ...formData, estado: text })
-                    }
-                    placeholder="SP"
-                    placeholderTextColor={theme.colors.textSecondary}
-                    maxLength={2}
-                  />
-                </View>
-              </View>
+                             {/* Estado e Cidade */}
+               <View style={styles.row}>
+                 <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
+                   <SelectInput
+                     label="Estado"
+                     placeholder="Selecione o estado"
+                     value={formData.estado}
+                     options={stateOptions}
+                     onSelect={(value) => {
+                       setFormData({ ...formData, estado: value, cidade: '' });
+                     }}
+                     loading={loadingStates}
+                     required
+                   />
+                 </View>
+                 <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
+                   <SelectInput
+                     label="Cidade"
+                     placeholder="Selecione a cidade"
+                     value={formData.cidade}
+                     options={cityOptions}
+                     onSelect={(value) => {
+                       setFormData({ ...formData, cidade: value });
+                     }}
+                     loading={loadingCities}
+                     disabled={!formData.estado}
+                     required
+                   />
+                 </View>
+               </View>
 
               {/* Endereço Principal */}
               <View style={styles.formSection}>
@@ -644,6 +690,8 @@ export const EnderecosScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      
     </SafeAreaView>
   );
 };
@@ -841,8 +889,8 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: '#007AFF',
   },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+     modalButtonText: {
+     fontSize: 16,
+     fontWeight: '600',
+   },
+ });

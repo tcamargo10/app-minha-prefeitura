@@ -1,8 +1,8 @@
 # Minha Prefeitura
 
-Aplicativo React Native com Expo para gestão de solicitações municipais, desenvolvido com TypeScript, Supabase e React Hook Form.
+Aplicativo React Native com Expo para gestão de solicitações municipais, desenvolvido com TypeScript, Supabase e React Navigation.
 
-**Versão:** 1.0.0
+**Versão:** 1.0.1
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -10,10 +10,9 @@ Aplicativo React Native com Expo para gestão de solicitações municipais, dese
 - **Expo** - Plataforma para desenvolvimento React Native
 - **TypeScript** - Linguagem de programação tipada
 - **Supabase** - Backend-as-a-Service (BaaS)
-- **React Hook Form** - Gerenciamento de formulários
-- **Zod** - Validação de esquemas
-- **Axios** - Cliente HTTP
 - **React Navigation** - Navegação entre telas
+- **EAS Build** - Build e deploy automatizado
+- **GitHub Actions** - CI/CD pipeline
 
 ## 📋 Pré-requisitos
 
@@ -21,6 +20,7 @@ Aplicativo React Native com Expo para gestão de solicitações municipais, dese
 - npm ou yarn
 - Expo CLI
 - Conta no Supabase
+- Conta no EAS (Expo Application Services)
 
 ## 🛠️ Instalação
 
@@ -28,7 +28,7 @@ Aplicativo React Native com Expo para gestão de solicitações municipais, dese
 
    ```bash
    git clone <url-do-repositorio>
-   cd minha-prefeitura
+   cd app-minha-prefeitura
    ```
 
 2. **Instale as dependências**
@@ -39,48 +39,12 @@ Aplicativo React Native com Expo para gestão de solicitações municipais, dese
 
 3. **Configure as variáveis de ambiente**
 
-   **Opção 1 - Script automático (recomendado):**
-
-   ```bash
-   npm run setup-env
-   ```
-
-   **Opção 2 - Manual:**
-   Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+   As variáveis de ambiente já estão configuradas no `eas.json` para produção:
 
    ```env
-   # Supabase Configuration
-   # Obtenha essas credenciais em: https://supabase.com/dashboard/project/[SEU_PROJETO]/settings/api
-   EXPO_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
-   EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima_aqui
-
-   # App Configuration
-   EXPO_PUBLIC_APP_NAME=Minha Prefeitura
-   EXPO_PUBLIC_APP_VERSION=1.0.0
+   EXPO_PUBLIC_SUPABASE_URL=https://tgtldslsqytoynhyybew.supabase.co
+   EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRndGxkc2xzcXl0b3luaHl5YmV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkxNTAwMDEsImV4cCI6MjA2NDcyNjAwMX0.iYGi4Fxsw53Fa0r5JEeRpa9JTqd7dt5vpwaL3McyfI
    ```
-
-   **⚠️ IMPORTANTE:**
-   - Substitua `https://seu-projeto.supabase.co` pela URL real do seu projeto Supabase
-   - Substitua `sua_chave_anonima_aqui` pela chave anônima real do seu projeto
-   - Nunca commite o arquivo `.env` no repositório (já está no .gitignore)
-   - O arquivo `.env` deve estar na raiz do projeto, no mesmo nível do `package.json`
-
-## 🔧 Configuração do Supabase
-
-1. **Crie um projeto no Supabase**
-   - Acesse [supabase.com](https://supabase.com)
-   - Crie uma nova conta ou faça login
-   - Crie um novo projeto
-
-2. **Configure a autenticação**
-   - No dashboard do Supabase, vá para Authentication > Settings
-   - Configure as URLs de redirecionamento para seu app
-   - Ative a autenticação por email/senha
-
-3. **Obtenha as credenciais**
-   - Vá para Settings > API
-   - Copie a URL do projeto e a chave anônima
-   - Cole essas informações no arquivo `.env`
 
 ## 🚀 Executando o Projeto
 
@@ -97,72 +61,170 @@ Aplicativo React Native com Expo para gestão de solicitações municipais, dese
 
 ## 📱 Deploy para App Stores
 
-Para fazer deploy automatizado para Google Play e Apple App Store, consulte o [guia completo de deployment](DEPLOYMENT.md).
+### Deploy Automatizado (GitHub Actions)
 
-### Deploy Rápido
+O projeto está configurado com pipeline automatizado:
+
+- **Branch `master`**: Deploy automático para Google Play Store
+- **Tags**: Deploy de produção com versionamento automático
+
+### Deploy Manual
 
 ```bash
-# Windows (PowerShell)
-.\scripts\deploy.ps1
+# Build para Android
+eas build --platform android --profile production
 
-# Linux/Mac
-./scripts/deploy.sh
-
-# Manual
-eas build --platform all --profile production
-eas submit --platform all
+# Submit para Google Play
+eas submit --platform android --profile production
 ```
 
 ## 📱 Funcionalidades
 
 ### Telas Implementadas
 
+- **Splash Screen** - Tela de carregamento inicial
 - **Login** - Autenticação de usuários
 - **Registro** - Criação de novas contas
-- **Home** - Área logada com informações do usuário
+- **Home** - Dashboard principal com informações da cidade
+- **Categorias** - Lista de categorias de serviços
+- **Comunicação** - Comunicados e notícias municipais
+- **Solicitações** - Histórico de solicitações do usuário
+- **Perfil** - Gerenciamento de perfil e endereços
 
-### Recursos
+### Recursos Implementados
 
 - ✅ Autenticação com Supabase
-- ✅ Validação de formulários com Zod
-- ✅ Navegação entre telas
-- ✅ Interface moderna e responsiva
-- ✅ Gerenciamento de estado de autenticação
-- ✅ Persistência de sessão
+- ✅ Navegação com React Navigation (Stack + Bottom Tabs)
+- ✅ Interface moderna com tema claro/escuro
+- ✅ Gerenciamento de estado com React Context
+- ✅ Componentes reutilizáveis (SelectInput, AppBar, etc.)
+- ✅ Integração com tabela `municipalities` do Supabase
+- ✅ Sistema de seleção de cidades
+- ✅ Gerenciamento de endereços
+- ✅ Deploy automatizado para Google Play Store
+- ✅ CI/CD com GitHub Actions
 
 ## 🏗️ Estrutura do Projeto
 
 ```
 src/
 ├── components/          # Componentes reutilizáveis
+│   ├── Alert.tsx
+│   ├── AppBar.tsx
+│   ├── BannerCard.tsx
+│   ├── BannerSection.tsx
 │   ├── Button.tsx
-│   └── Input.tsx
+│   ├── CategoriesGrid.tsx
+│   ├── CategoryCard.tsx
+│   ├── CustomStatusBar.tsx
+│   ├── GenericModal.tsx
+│   ├── Input.tsx
+│   ├── ScreenWrapper.tsx
+│   ├── SelectInput.tsx
+│   ├── ServiceCard.tsx
+│   ├── ServicesGrid.tsx
+│   ├── ThemeToggle.tsx
+│   └── CitySelectorModal.tsx
+├── contexts/           # Contextos React
+│   ├── ThemeContext.tsx
+│   └── CityContext.tsx
 ├── hooks/              # Hooks personalizados
 │   └── useAuth.ts
 ├── navigation/         # Configuração de navegação
-│   └── AppNavigator.tsx
+│   ├── AppNavigator.tsx
+│   └── BottomTabNavigator.tsx
 ├── screens/           # Telas da aplicação
-│   ├── LoginScreen/   # Tela de login
-│   │   ├── index.tsx
-│   │   └── schema.ts
-│   ├── RegisterScreen/ # Tela de registro
-│   │   ├── index.tsx
-│   │   └── schema.ts
-│   └── HomeScreen.tsx
+│   ├── SplashScreen.tsx
+│   ├── LoginScreen/
+│   ├── RegisterScreen/
+│   ├── HomeScreen.tsx
+│   ├── CategoriasScreen/
+│   ├── ComunicacaoScreen/
+│   ├── SolicitacoesScreen/
+│   └── PerfilScreen/
 ├── services/          # Serviços e APIs
-│   └── authService.ts
+│   ├── authService.ts
+│   └── municipalityService.ts
+├── theme/             # Configuração de temas
+│   └── colors.ts
 ├── types/             # Definições de tipos TypeScript
-│   └── auth.ts
+│   ├── auth.ts
+│   └── theme.ts
 └── utils/             # Utilitários
+    ├── errorHandler.ts
     └── supabase.ts
 ```
 
+## 🎨 Componentes Principais
+
+### SelectInput
+
+Componente genérico para seleção de opções via modal:
+
+```tsx
+<SelectInput
+  label="Estado"
+  placeholder="Selecione o estado"
+  value={selectedState}
+  options={stateOptions}
+  onSelect={setSelectedState}
+  loading={loadingStates}
+  required
+/>
+```
+
+### AppBar
+
+Barra de navegação superior com logo e seletor de cidade:
+
+```tsx
+<AppBar title="Título da Tela" showBackButton showCitySelector />
+```
+
+### ScreenWrapper
+
+Wrapper para telas com AppBar consistente:
+
+```tsx
+<ScreenWrapper showCitySelector>{/* Conteúdo da tela */}</ScreenWrapper>
+```
+
+## 🔧 Configuração do Supabase
+
+### Tabelas Utilizadas
+
+- **`municipalities`**: Estados e cidades brasileiras
+  - `state`: Nome do estado
+  - `city`: Nome da cidade
+  - `active`: Status ativo/inativo
+
+### Autenticação
+
+- Autenticação por email/senha
+- Sessão persistente
+- Gerenciamento de estado de autenticação
+
+## 📱 Deploy e CI/CD
+
+### GitHub Actions
+
+- **Workflow**: `.github/workflows/deploy.yml`
+- **Trigger**: Push para branch `master`
+- **Plataforma**: Android (Google Play Store)
+- **Automação**: Build + Submit automático
+
+### EAS Configuration
+
+- **Build Profiles**: `development`, `preview`, `production`
+- **Submit Profiles**: Configurado para Google Play Store
+- **Service Account**: Google Service Account para submissão automática
+
 ## 🔒 Segurança
 
-- Todas as credenciais do Supabase são armazenadas em variáveis de ambiente
-- Autenticação segura com refresh automático de tokens
-- Validação de dados no frontend e backend
-- Row Level Security (RLS) habilitado no Supabase
+- Credenciais do Supabase em variáveis de ambiente
+- Google Service Account para deploy automatizado
+- Row Level Security (RLS) no Supabase
+- Validação de dados no frontend
 
 ## 📝 Scripts Disponíveis
 
@@ -170,7 +232,8 @@ src/
 - `npm run android` - Executa no Android
 - `npm run ios` - Executa no iOS
 - `npm run web` - Executa na web
-- `npm run setup-env` - Cria o arquivo .env com template
+- `eas build` - Build para produção
+- `eas submit` - Submit para app stores
 
 ## 🤝 Contribuição
 

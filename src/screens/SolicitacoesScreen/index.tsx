@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { AppBar } from '@/components/AppBar';
+import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
 import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
 
@@ -227,11 +227,7 @@ export const SolicitacoesScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.primary }]}
-      edges={['top']}
-    >
-      <AppBar title="Minhas Solicitações" />
+    <ScreenWrapper showCitySelector>
       <View
         style={[
           styles.contentContainer,
@@ -341,7 +337,7 @@ export const SolicitacoesScreen: React.FC = () => {
           )}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 };
 

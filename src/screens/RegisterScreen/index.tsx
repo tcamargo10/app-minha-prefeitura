@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   View,
@@ -14,15 +14,28 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 
 import { useAlert } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { CustomStatusBar } from '@/components/CustomStatusBar';
 import { Input } from '@/components/Input';
+import { SelectInput, SelectOption } from '@/components/SelectInput';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { RootStackParamList } from '@/navigation/AppNavigator';
+import {
+  municipalityService,
+  State,
+  City,
+} from '@/services/municipalityService';
+import {
+  formatCPF,
+  formatCEP,
+  formatPhone,
+  formatDate,
+} from '@/utils/masks';
 
 import { registerSchema, RegisterFormData } from './schema';
 
@@ -39,19 +52,90 @@ export const RegisterScreen: React.FC = () => {
   const { theme } = useTheme();
   const { showError, showSuccess } = useAlert();
 
+  // Estados para dados do Supabase
+  const [states, setStates] = useState<State[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+
+  // Converter dados para formato do SelectInput
+  const stateOptions: SelectOption[] = states.map(state => ({
+    label: state.state,
+    value: state.state,
+  }));
+
+  const cityOptions: SelectOption[] = cities.map(city => ({
+    label: city.city,
+    value: city.city,
+  }));
+
   const {
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
       email: '',
+      dataNascimento: '',
+      telefone: '',
+      cpf: '',
+      cep: '',
+      logradouro: '',
+      numero: '',
+      complemento: '',
+      bairro: '',
+      estado: '',
+      cidade: '',
       password: '',
       confirmPassword: '',
     },
   });
+
+  const watchedEstado = watch('estado');
+
+  // Carregar estados ao montar o componente
+  useEffect(() => {
+    loadStates();
+  }, []);
+
+  // Carregar cidades quando o estado for selecionado
+  useEffect(() => {
+    if (watchedEstado) {
+      loadCitiesByState(watchedEstado);
+      // Limpar cidade quando estado mudar
+      setValue('cidade', '');
+    } else {
+      setCities([]);
+    }
+  }, [watchedEstado, setValue]);
+
+  const loadStates = async () => {
+    setLoadingStates(true);
+    try {
+      const statesData = await municipalityService.getStates();
+      setStates(statesData);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar os estados');
+    } finally {
+      setLoadingStates(false);
+    }
+  };
+
+  const loadCitiesByState = async (state: string) => {
+    setLoadingCities(true);
+    try {
+      const citiesData = await municipalityService.getCitiesByState(state);
+      setCities(citiesData);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar as cidades');
+    } finally {
+      setLoadingCities(false);
+    }
+  };
 
   const onSubmit = async (data: RegisterFormData) => {
     const result = await signUp(data);
@@ -136,7 +220,7 @@ export const RegisterScreen: React.FC = () => {
                     <Text
                       style={[styles.formTitle, { color: theme.colors.text }]}
                     >
-                      Dados pessoais
+                      Criar Conta
                     </Text>
                     <Text
                       style={[
@@ -149,71 +233,265 @@ export const RegisterScreen: React.FC = () => {
                   </View>
 
                   <View style={styles.form}>
-                    <Controller
-                      control={control}
-                      name="name"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
-                          label="Nome completo"
-                          placeholder="Digite seu nome completo"
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          autoCapitalize="words"
-                          error={errors.name?.message}
-                        />
-                      )}
-                    />
+                    {/* Seção: Dados Pessoais */}
+                    <View style={styles.sectionContainer}>
+                      <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
+                        Dados Pessoais
+                      </Text>
 
-                    <Controller
-                      control={control}
-                      name="email"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
-                          label="Email"
-                          placeholder="Digite seu email"
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          keyboardType="email-address"
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                          error={errors.email?.message}
-                        />
-                      )}
-                    />
+                      <Controller
+                        control={control}
+                        name="name"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Input
+                            label="Nome completo"
+                            placeholder="Digite seu nome completo"
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            autoCapitalize="words"
+                            error={errors.name?.message}
+                          />
+                        )}
+                      />
 
-                    <Controller
-                      control={control}
-                      name="password"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
-                          label="Senha"
-                          placeholder="Digite sua senha"
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          secureTextEntry
-                          error={errors.password?.message}
-                        />
-                      )}
-                    />
+                      <Controller
+                        control={control}
+                        name="email"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Input
+                            label="Email"
+                            placeholder="Digite seu email"
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            error={errors.email?.message}
+                          />
+                        )}
+                      />
 
-                    <Controller
-                      control={control}
-                      name="confirmPassword"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
-                          label="Confirmar senha"
-                          placeholder="Confirme sua senha"
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          secureTextEntry
-                          error={errors.confirmPassword?.message}
-                        />
-                      )}
-                    />
+                      <Controller
+                        control={control}
+                        name="cpf"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Input
+                            label="CPF"
+                            placeholder="000.000.000-00"
+                            value={value}
+                            onChangeText={(text) => onChange(formatCPF(text))}
+                            onBlur={onBlur}
+                            keyboardType="numeric"
+                            error={errors.cpf?.message}
+                          />
+                        )}
+                      />
+
+                      <View style={styles.row}>
+                        <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
+                          <Controller
+                            control={control}
+                            name="dataNascimento"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                              <Input
+                                label="Data de nascimento"
+                                placeholder="DD/MM/AAAA"
+                                value={value}
+                                onChangeText={(text) => onChange(formatDate(text))}
+                                onBlur={onBlur}
+                                keyboardType="numeric"
+                                error={errors.dataNascimento?.message}
+                              />
+                            )}
+                          />
+                        </View>
+                        <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
+                          <Controller
+                            control={control}
+                            name="telefone"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                              <Input
+                                label="Telefone"
+                                placeholder="(11) 99999-9999"
+                                value={value}
+                                onChangeText={(text) => onChange(formatPhone(text))}
+                                onBlur={onBlur}
+                                keyboardType="phone-pad"
+                                error={errors.telefone?.message}
+                              />
+                            )}
+                          />
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* Seção: Endereço */}
+                    <View style={styles.sectionContainer}>
+                      <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
+                        Endereço
+                      </Text>
+
+                      <Controller
+                        control={control}
+                        name="cep"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Input
+                            label="CEP"
+                            placeholder="12345-678"
+                            value={value}
+                            onChangeText={(text) => onChange(formatCEP(text))}
+                            onBlur={onBlur}
+                            keyboardType="numeric"
+                            error={errors.cep?.message}
+                          />
+                        )}
+                      />
+
+                      <Controller
+                        control={control}
+                        name="logradouro"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Input
+                            label="Logradouro"
+                            placeholder="Rua, Avenida, etc."
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            error={errors.logradouro?.message}
+                          />
+                        )}
+                      />
+
+                      <View style={styles.row}>
+                        <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
+                          <Controller
+                            control={control}
+                            name="numero"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                              <Input
+                                label="Número"
+                                placeholder="123"
+                                value={value}
+                                onChangeText={onChange}
+                                onBlur={onBlur}
+                                keyboardType="numeric"
+                                error={errors.numero?.message}
+                              />
+                            )}
+                          />
+                        </View>
+                        <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
+                          <Controller
+                            control={control}
+                            name="complemento"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                              <Input
+                                label="Complemento"
+                                placeholder="Apto, Casa, etc."
+                                value={value}
+                                onChangeText={onChange}
+                                onBlur={onBlur}
+                                error={errors.complemento?.message}
+                              />
+                            )}
+                          />
+                        </View>
+                      </View>
+
+                      <Controller
+                        control={control}
+                        name="bairro"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Input
+                            label="Bairro"
+                            placeholder="Nome do bairro"
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            error={errors.bairro?.message}
+                          />
+                        )}
+                      />
+
+                      <View style={styles.row}>
+                        <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
+                          <Controller
+                            control={control}
+                            name="estado"
+                            render={({ field: { onChange, value } }) => (
+                              <SelectInput
+                                label="Estado"
+                                placeholder="Selecione o estado"
+                                value={value}
+                                options={stateOptions}
+                                onSelect={onChange}
+                                loading={loadingStates}
+                                required
+                              />
+                            )}
+                          />
+                        </View>
+                        <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
+                          <Controller
+                            control={control}
+                            name="cidade"
+                            render={({ field: { onChange, value } }) => (
+                              <SelectInput
+                                label="Cidade"
+                                placeholder="Selecione a cidade"
+                                value={value}
+                                options={cityOptions}
+                                onSelect={onChange}
+                                loading={loadingCities}
+                                disabled={!watchedEstado}
+                                required
+                              />
+                            )}
+                          />
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* Seção: Segurança */}
+                    <View style={styles.sectionContainer}>
+                      <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
+                        Segurança
+                      </Text>
+
+                      <Controller
+                        control={control}
+                        name="password"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Input
+                            label="Senha"
+                            placeholder="Digite sua senha"
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            secureTextEntry
+                            error={errors.password?.message}
+                          />
+                        )}
+                      />
+
+                      <Controller
+                        control={control}
+                        name="confirmPassword"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Input
+                            label="Confirmar senha"
+                            placeholder="Confirme sua senha"
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            secureTextEntry
+                            error={errors.confirmPassword?.message}
+                          />
+                        )}
+                      />
+                    </View>
 
                     <Button
                       title="Criar conta"
@@ -355,6 +633,20 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
+  },
+  sectionContainer: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 16,
+  },
+  formSection: {
+    marginBottom: 16,
+  },
+  row: {
+    flexDirection: 'row',
   },
   registerButton: {
     marginTop: 24,

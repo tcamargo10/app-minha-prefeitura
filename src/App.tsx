@@ -3,6 +3,7 @@ import { View, ActivityIndicator, StyleSheet, AppState } from 'react-native';
 
 import { CustomStatusBar } from '@/components/CustomStatusBar';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { CityProvider } from '@/contexts/CityContext';
 import { useAuth } from '@/hooks/useAuth';
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { SplashScreen } from '@/screens/SplashScreen';
@@ -78,7 +79,9 @@ const AppContent: React.FC = () => {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <CityProvider>
+        <AppContent />
+      </CityProvider>
     </ThemeProvider>
   );
 }

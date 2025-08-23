@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-import { AppBar } from '@/components/AppBar';
+import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -145,11 +145,7 @@ export const PerfilScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.primary }]}
-      edges={['top']}
-    >
-      <AppBar title="Perfil" />
+    <ScreenWrapper showCitySelector>
       <View
         style={[
           styles.contentContainer,
@@ -275,7 +271,7 @@ export const PerfilScreen: React.FC = () => {
           </View>
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 };
 

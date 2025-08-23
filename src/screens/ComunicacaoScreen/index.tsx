@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/navigation/AppNavigator';
 
-import { AppBar } from '@/components/AppBar';
+import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface Comunicado {
@@ -318,11 +318,7 @@ export const ComunicacaoScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.primary }]}
-      edges={['top']}
-    >
-      <AppBar title="Comunicação" />
+    <ScreenWrapper showCitySelector>
       <View
         style={[
           styles.contentContainer,
@@ -387,7 +383,7 @@ export const ComunicacaoScreen: React.FC = () => {
           )}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 };
 

@@ -31,6 +31,16 @@ export class AuthService {
         options: {
           data: {
             name: data.name,
+            data_nascimento: data.dataNascimento,
+            telefone: data.telefone,
+            cpf: data.cpf,
+            cep: data.cep,
+            logradouro: data.logradouro,
+            numero: data.numero,
+            complemento: data.complemento || '',
+            bairro: data.bairro,
+            estado: data.estado,
+            cidade: data.cidade,
           },
         },
       });

@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { AppBar } from '@/components/AppBar';
 import { CategoriesGrid } from '@/components/CategoriesGrid';
+import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
 import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
 
@@ -184,11 +184,7 @@ export const CategoriasScreen: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.primary }]}
-      edges={['top']}
-    >
-      <AppBar title="Categorias" />
+    <ScreenWrapper showCitySelector>
       <View
         style={[
           styles.contentContainer,
@@ -221,7 +217,7 @@ export const CategoriasScreen: React.FC = () => {
           <CategoriesGrid title="Animais" categories={animaisCategories} />
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 };
 
