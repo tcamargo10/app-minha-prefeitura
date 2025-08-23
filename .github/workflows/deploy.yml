@@ -5,6 +5,9 @@ on:
     branches: [master]
     tags: ['v*']
 
+env:
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
 jobs:
   deploy-android:
     runs-on: ubuntu-latest
@@ -23,11 +26,6 @@ jobs:
 
       - name: Install EAS CLI
         run: npm install -g eas-cli
-
-      - name: Setup Expo
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login
 
       - name: Build and Submit Android
         run: eas build --platform android --profile production --auto-submit --non-interactive
@@ -51,11 +49,6 @@ jobs:
 
       - name: Install EAS CLI
         run: npm install -g eas-cli
-
-      - name: Setup Expo
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login
 
       - name: Build iOS
         run: eas build --platform ios --profile production --non-interactive
@@ -83,11 +76,6 @@ jobs:
 
       - name: Install EAS CLI
         run: npm install -g eas-cli
-
-      - name: Setup Expo
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login
 
       - name: Build Preview
         run: eas build --platform all --profile preview --non-interactive
