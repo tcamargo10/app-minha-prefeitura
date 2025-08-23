@@ -3,13 +3,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
 import { BottomTabNavigator } from '@/navigation/BottomTabNavigator';
+import { ComunicacaoDetalhesScreen } from '@/screens/ComunicacaoScreen/DetalhesScreen';
+import { LoginScreen } from '@/screens/LoginScreen';
+import { AjudaSuporteScreen } from '@/screens/PerfilScreen/AjudaSuporteScreen';
 import { EditarPerfilScreen } from '@/screens/PerfilScreen/EditarPerfilScreen';
 import { EnderecosScreen } from '@/screens/PerfilScreen/EnderecosScreen';
 import { NotificacoesScreen } from '@/screens/PerfilScreen/NotificacoesScreen';
 import { PrivacidadeScreen } from '@/screens/PerfilScreen/PrivacidadeScreen';
-import { AjudaSuporteScreen } from '@/screens/PerfilScreen/AjudaSuporteScreen';
 import { SobreAppScreen } from '@/screens/PerfilScreen/SobreAppScreen';
-import { LoginScreen } from '@/screens/LoginScreen';
 import { RegisterScreen } from '@/screens/RegisterScreen';
 
 export type RootStackParamList = {
@@ -22,6 +23,7 @@ export type RootStackParamList = {
   Privacidade: undefined;
   AjudaSuporte: undefined;
   SobreApp: undefined;
+  ComunicacaoDetalhes: { comunicado: any };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -51,6 +53,10 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Privacidade" component={PrivacidadeScreen} />
         <Stack.Screen name="AjudaSuporte" component={AjudaSuporteScreen} />
         <Stack.Screen name="SobreApp" component={SobreAppScreen} />
+        <Stack.Screen
+          name="ComunicacaoDetalhes"
+          component={ComunicacaoDetalhesScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

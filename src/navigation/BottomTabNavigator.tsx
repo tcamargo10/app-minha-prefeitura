@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 
 import { useTheme } from '@/contexts/ThemeContext';
 import { CategoriasScreen } from '@/screens/CategoriasScreen';
-import { ComunicacaoScreen } from '@/screens/ComunicacaoScreen';
+import { ComunicacaoScreen } from '@/screens/ComunicacaoScreen/index';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { PerfilScreen } from '@/screens/PerfilScreen';
 import { SolicitacoesScreen } from '@/screens/SolicitacoesScreen';
@@ -79,8 +79,6 @@ export const BottomTabNavigator: React.FC = () => {
           paddingBottom: Platform.OS === 'ios' ? 16 : 8,
           paddingTop: 8,
           height: Platform.OS === 'ios' ? 76 : 60,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
         },
         tabBarLabelStyle: {
           fontSize: 11,
