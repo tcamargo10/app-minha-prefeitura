@@ -36,6 +36,10 @@ export interface ThemeColors {
 
   // Shadow colors
   shadow: string;
+
+  // Base colors
+  white: string;
+  black: string;
 }
 
 export interface Theme {

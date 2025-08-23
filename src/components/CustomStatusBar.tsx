@@ -3,14 +3,24 @@ import { StatusBar, Platform } from 'react-native';
 
 import { useTheme } from '@/contexts/ThemeContext';
 
-export const CustomStatusBar: React.FC = () => {
+interface CustomStatusBarProps {
+  barStyle?: 'default' | 'light-content' | 'dark-content';
+  backgroundColor?: string;
+  translucent?: boolean;
+}
+
+export const CustomStatusBar: React.FC<CustomStatusBarProps> = ({
+  barStyle = 'light-content',
+  backgroundColor,
+  translucent = true,
+}) => {
   const { theme } = useTheme();
 
   return (
     <StatusBar
-      barStyle="light-content"
-      backgroundColor={theme.colors.primary}
-      translucent={true}
+      barStyle={barStyle}
+      backgroundColor={backgroundColor || theme.colors.primary}
+      translucent={translucent}
     />
   );
 };
