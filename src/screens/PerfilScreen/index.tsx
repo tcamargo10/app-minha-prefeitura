@@ -45,31 +45,38 @@ export const PerfilScreen: React.FC = () => {
     },
     {
       id: 2,
+      icon: 'location',
+      title: 'Endereços',
+      subtitle: 'Gerenciar endereços cadastrados',
+      onPress: () => navigation.navigate('Enderecos' as never),
+    },
+    {
+      id: 3,
       icon: 'notifications',
       title: 'Notificações',
       subtitle: 'Configurar alertas e notificações',
       onPress: () => navigation.navigate('Notificacoes' as never),
     },
     {
-      id: 3,
+      id: 4,
       icon: 'shield-checkmark',
       title: 'Privacidade',
       subtitle: 'Configurações de segurança',
       onPress: () => navigation.navigate('Privacidade' as never),
     },
     {
-      id: 4,
+      id: 5,
       icon: 'help-circle',
       title: 'Ajuda e Suporte',
       subtitle: 'Central de ajuda e contato',
       onPress: () => navigation.navigate('AjudaSuporte' as never),
     },
     {
-      id: 5,
+      id: 6,
       icon: 'information-circle',
       title: 'Sobre o App',
       subtitle: 'Versão e informações',
-      onPress: () => console.log('Sobre'),
+      onPress: () => navigation.navigate('SobreApp' as never),
     },
   ];
 
