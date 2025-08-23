@@ -8,6 +8,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 interface ScreenWrapperProps {
   children: React.ReactNode;
   showCitySelector?: boolean;
+  showProfileIcon?: boolean;
   title?: string;
   showBackButton?: boolean;
   onBackPress?: () => void;
@@ -17,6 +18,7 @@ interface ScreenWrapperProps {
 export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   children,
   showCitySelector = false,
+  showProfileIcon = false,
   title,
   showBackButton = false,
   onBackPress,
@@ -35,6 +37,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
         onBackPress={onBackPress}
         rightComponent={rightComponent}
         showCitySelector={showCitySelector}
+        showProfileIcon={showProfileIcon}
       />
       <View style={styles.content}>{children}</View>
     </SafeAreaView>

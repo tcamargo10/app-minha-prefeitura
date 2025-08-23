@@ -1,9 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 import { useCity } from '@/contexts/CityContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
 
 import { CitySelectorModal } from './CitySelectorModal';
 
@@ -14,6 +17,7 @@ interface AppBarProps {
   rightComponent?: React.ReactNode;
   showLogo?: boolean;
   showCitySelector?: boolean;
+  showProfileIcon?: boolean;
 }
 
 export const AppBar: React.FC<AppBarProps> = ({
@@ -23,10 +27,17 @@ export const AppBar: React.FC<AppBarProps> = ({
   rightComponent,
   showLogo = true,
   showCitySelector = false,
+  showProfileIcon = false,
 }) => {
   const { theme } = useTheme();
   const { currentCity } = useCity();
   const [cityModalVisible, setCityModalVisible] = useState(false);
+  const navigation =
+    useNavigation<BottomTabNavigationProp<BottomTabParamList>>();
+
+  const handleProfilePress = () => {
+    navigation.navigate('Perfil');
+  };
 
   return (
     <View
@@ -94,7 +105,22 @@ export const AppBar: React.FC<AppBarProps> = ({
           )}
         </View>
 
-        <View style={styles.rightSection}>{rightComponent}</View>
+        <View style={styles.rightSection}>
+          {rightComponent}
+          {showProfileIcon && (
+            <TouchableOpacity
+              style={styles.profileButton}
+              onPress={handleProfilePress}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="person-circle"
+                size={30}
+                color={theme.colors.onPrimary}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <CitySelectorModal
@@ -134,7 +160,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   logo: {
-    width: 110,
+    width: 90,
     marginLeft: -4,
   },
   title: {
@@ -167,5 +193,8 @@ const styles = StyleSheet.create({
   },
   cityIcon: {
     marginLeft: 4,
+  },
+  profileButton: {
+    padding: 8,
   },
 });

@@ -227,7 +227,7 @@ export const SolicitacoesScreen: React.FC = () => {
   };
 
   return (
-    <ScreenWrapper showCitySelector>
+    <ScreenWrapper showCitySelector showProfileIcon>
       <View
         style={[
           styles.contentContainer,

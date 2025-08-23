@@ -1,13 +1,13 @@
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { BannerSection } from '@/components/BannerSection';
 import { CategoriesGrid } from '@/components/CategoriesGrid';
-import { ServicesGrid } from '@/components/ServicesGrid';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
+import { ServicesGrid } from '@/components/ServicesGrid';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { RootStackParamList } from '@/navigation/AppNavigator';
@@ -147,20 +147,20 @@ export const HomeScreen: React.FC = () => {
   const banners = [
     {
       id: 1,
-      imageUrl: 'https://picsum.photos/400/150?blur=1&random=1',
+      imageUrl: require('../../assets/banner-1.png'),
     },
     {
       id: 2,
-      imageUrl: 'https://picsum.photos/400/150?blur=2&random=2',
+      imageUrl: require('../../assets/banner-2.png'),
     },
     {
       id: 3,
-      imageUrl: 'https://picsum.photos/400/150?blur=3&random=3',
+      imageUrl: require('../../assets/banner-3.png'),
     },
   ];
 
   return (
-    <ScreenWrapper showCitySelector>
+    <ScreenWrapper showCitySelector showProfileIcon>
       <View
         style={[
           styles.contentContainer,

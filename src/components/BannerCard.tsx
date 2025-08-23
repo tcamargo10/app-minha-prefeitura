@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Linking } from 'react-native';
 
 interface BannerCardProps {
-  imageUrl: string;
+  imageUrl: string | any; // string para URLs, any para require()
   externalLink?: string;
   internalLink?: () => void;
 }
@@ -29,7 +29,7 @@ export const BannerCard: React.FC<BannerCardProps> = ({
 
   const BannerContent = () => (
     <Image
-      source={{ uri: imageUrl }}
+      source={typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl}
       style={styles.bannerImage}
       resizeMode="cover"
     />
@@ -52,11 +52,10 @@ export const BannerCard: React.FC<BannerCardProps> = ({
 
 const styles = StyleSheet.create({
   bannerCard: {
-    width: 320,
-    height: 150,
+    width: '100%',
+    height: 200,
     borderRadius: 12,
     overflow: 'hidden',
-    marginRight: 12,
   },
   bannerImage: {
     width: '100%',
