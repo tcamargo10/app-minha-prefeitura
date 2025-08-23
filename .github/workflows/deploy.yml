@@ -25,8 +25,9 @@ jobs:
         run: npm install -g eas-cli
 
       - name: Setup Expo
-        run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas login --non-interactive
 
       - name: Build and Submit Android
         run: eas build --platform android --profile production --auto-submit --non-interactive
@@ -52,8 +53,9 @@ jobs:
         run: npm install -g eas-cli
 
       - name: Setup Expo
-        run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas login --non-interactive
 
       - name: Build iOS
         run: eas build --platform ios --profile production --non-interactive
@@ -83,8 +85,9 @@ jobs:
         run: npm install -g eas-cli
 
       - name: Setup Expo
-        run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas login --non-interactive
 
       - name: Build Preview
         run: eas build --platform all --profile preview --non-interactive
