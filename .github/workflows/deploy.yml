@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Setup Expo
         run: |
@@ -52,7 +52,7 @@ jobs:
         run: npm install
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Setup Expo
         run: |
@@ -83,7 +83,7 @@ jobs:
         run: npm install
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Setup Expo
         run: |
