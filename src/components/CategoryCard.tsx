@@ -1,6 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 interface CategoryCardProps {
   icon: string;
@@ -21,7 +21,10 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       onPress={onPress}
     >
       <Ionicons name={icon as any} size={20} color="white" />
-      <Text style={[styles.categoryTitle, { color: 'white' }]} numberOfLines={2}>
+      <Text
+        style={[styles.categoryTitle, { color: 'white' }]}
+        numberOfLines={2}
+      >
         {title}
       </Text>
     </TouchableOpacity>
@@ -30,13 +33,14 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
 
 const styles = StyleSheet.create({
   categoryCard: {
-    width: '23%',
-    aspectRatio: 1,
+    width: '24%', // 4 cards por linha (25% - 1% para margem)
+    aspectRatio: 1.2, // Altura menor (era 1, agora 1.2 = mais largo que alto)
     borderRadius: 8,
     padding: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12, // Aumentado de 8 para 12
+    marginRight: '1%', // Pequena margem entre os cards
   },
   categoryTitle: {
     fontSize: 10,

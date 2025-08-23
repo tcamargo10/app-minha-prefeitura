@@ -46,7 +46,7 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: 32,
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,
@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
   categoriesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
 });
