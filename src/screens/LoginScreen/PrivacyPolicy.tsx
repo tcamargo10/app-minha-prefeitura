@@ -13,7 +13,7 @@ export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({
 }) => {
   const content = `1. INFORMAÇÕES COLETADAS
 
-Coletamos as seguintes informações quando você usa o aplicativo "Minha Prefeitura":
+Coletamos as seguintes informações quando você usa o aplicativo "Minha Cidade":
 
 • Informações de identificação pessoal (nome, email, CPF)
 • Dados de localização (endereços cadastrados)

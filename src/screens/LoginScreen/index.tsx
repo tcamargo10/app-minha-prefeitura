@@ -24,9 +24,9 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { RootStackParamList } from '@/navigation/AppNavigator';
 
+import { PrivacyPolicy } from './PrivacyPolicy';
 import { loginSchema, LoginFormData } from './schema';
 import { TermsOfUse } from './TermsOfUse';
-import { PrivacyPolicy } from './PrivacyPolicy';
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -130,7 +130,7 @@ export const LoginScreen: React.FC = () => {
                   <Text
                     style={[styles.title, { color: theme.colors.onPrimary }]}
                   >
-                    Minha Prefeitura
+                    Minha Cidade
                   </Text>
                   <Text
                     style={[styles.subtitle, { color: theme.colors.onPrimary }]}
@@ -300,15 +300,9 @@ export const LoginScreen: React.FC = () => {
         </SafeAreaView>
       </View>
 
-      <TermsOfUse
-        visible={termsVisible}
-        onClose={handleCloseTerms}
-      />
-      
-      <PrivacyPolicy
-        visible={privacyVisible}
-        onClose={handleClosePrivacy}
-      />
+      <TermsOfUse visible={termsVisible} onClose={handleCloseTerms} />
+
+      <PrivacyPolicy visible={privacyVisible} onClose={handleClosePrivacy} />
     </>
   );
 };

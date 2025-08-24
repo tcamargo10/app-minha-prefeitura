@@ -9,8 +9,8 @@ import {
   Image,
 } from 'react-native';
 
-import { useTheme } from '@/contexts/ThemeContext';
 import { CustomStatusBar } from '@/components/CustomStatusBar';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -164,7 +164,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
             ]}
           >
             <Text style={[styles.title, { color: colors.onPrimary }]}>
-              Minha Prefeitura
+              Minha Cidade
             </Text>
             <Text style={[styles.subtitle, { color: colors.onPrimary }]}>
               Conectando você à sua cidade

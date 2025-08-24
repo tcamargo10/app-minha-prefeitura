@@ -10,11 +10,11 @@ interface TermsOfUseProps {
 export const TermsOfUse: React.FC<TermsOfUseProps> = ({ visible, onClose }) => {
   const content = `1. ACEITAÇÃO DOS TERMOS
 
-Ao acessar e usar o aplicativo "Minha Prefeitura", você concorda em cumprir e estar vinculado a estes Termos de Uso.
+Ao acessar e usar o aplicativo "Minha Cidade", você concorda em cumprir e estar vinculado a estes Termos de Uso.
 
 2. DESCRIÇÃO DO SERVIÇO
 
-O aplicativo "Minha Prefeitura" é uma plataforma digital que permite aos cidadãos:
+O aplicativo "Minha Cidade" é uma plataforma digital que permite aos cidadãos:
 • Acessar informações sobre serviços municipais
 • Realizar solicitações e acompanhar demandas
 • Receber comunicados oficiais da prefeitura

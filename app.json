@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Minha Prefeitura",
-    "slug": "minha-prefeitura",
-    "version": "1.0.3",
+    "name": "Minha Cidade",
+    "slug": "minha-cidade",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

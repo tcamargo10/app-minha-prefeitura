@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
   View,
@@ -8,8 +10,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 
 import { AppBar } from '@/components/AppBar';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -19,7 +19,7 @@ export const SobreAppScreen: React.FC = () => {
   const navigation = useNavigation();
 
   const appInfo = {
-    name: 'Minha Prefeitura',
+    name: 'Minha Cidade',
     version: '1.0.0',
     description:
       'Aplicativo oficial da prefeitura para facilitar o acesso aos serviços municipais.',

@@ -7,6 +7,7 @@ import { ServicosScreen } from '@/screens/CategoriasScreen/ServicosScreen';
 import { ServicoDetalhesScreen } from '@/screens/CategoriasScreen/ServicoDetalhesScreen';
 import { ComunicacaoDetalhesScreen } from '@/screens/ComunicacaoScreen/DetalhesScreen';
 import { LoginScreen } from '@/screens/LoginScreen';
+import { PerfilScreen } from '@/screens/PerfilScreen';
 import { AjudaSuporteScreen } from '@/screens/PerfilScreen/AjudaSuporteScreen';
 import { EditarPerfilScreen } from '@/screens/PerfilScreen/EditarPerfilScreen';
 import { EnderecosScreen } from '@/screens/PerfilScreen/EnderecosScreen';
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   Main: undefined;
+  Perfil: undefined;
   EditarPerfil: undefined;
   Enderecos: undefined;
   Notificacoes: undefined;
@@ -42,7 +44,7 @@ export const AppNavigator: React.FC<AppNavigatorProps> = ({ user }) => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={user ? "Main" : "Login"}
+        initialRouteName={user ? 'Main' : 'Login'}
         screenOptions={{
           headerShown: false,
         }}
@@ -57,6 +59,7 @@ export const AppNavigator: React.FC<AppNavigatorProps> = ({ user }) => {
             headerLeft: () => null,
           }}
         />
+        <Stack.Screen name="Perfil" component={PerfilScreen} />
         <Stack.Screen name="EditarPerfil" component={EditarPerfilScreen} />
         <Stack.Screen name="Enderecos" component={EnderecosScreen} />
         <Stack.Screen name="Notificacoes" component={NotificacoesScreen} />

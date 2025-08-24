@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 import { useCity } from '@/contexts/CityContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
+import { RootStackParamList } from '@/navigation/AppNavigator';
 
 import { CitySelectorModal } from './CitySelectorModal';
 
@@ -32,8 +32,7 @@ export const AppBar: React.FC<AppBarProps> = ({
   const { theme } = useTheme();
   const { currentCity } = useCity();
   const [cityModalVisible, setCityModalVisible] = useState(false);
-  const navigation =
-    useNavigation<BottomTabNavigationProp<BottomTabParamList>>();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const handleProfilePress = () => {
     navigation.navigate('Perfil');
