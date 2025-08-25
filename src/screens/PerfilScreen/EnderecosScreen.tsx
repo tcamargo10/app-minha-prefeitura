@@ -11,17 +11,21 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppBar } from '@/components/AppBar';
 import { SelectInput, SelectOption } from '@/components/SelectInput';
+import { useCity } from '@/contexts/CityContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
   municipalityService,
   State,
   City,
 } from '@/services/municipalityService';
+import { citizenService, CitizenAddress } from '@/services/citizenService';
+import { supabase } from '@/utils/supabase';
 
 interface Endereco {
   id: string;
@@ -34,25 +38,16 @@ interface Endereco {
   cidade: string;
   estado: string;
   principal: boolean;
+  municipality_id: string;
 }
 
 export const EnderecosScreen: React.FC = () => {
   const { theme } = useTheme();
+  const { refreshCities } = useCity();
   const navigation = useNavigation();
-  const [enderecos, setEnderecos] = useState<Endereco[]>([
-    {
-      id: '1',
-      tipo: 'residencial',
-      cep: '12345-678',
-      logradouro: 'Rua das Flores',
-      numero: '123',
-      complemento: 'Apto 45',
-      bairro: 'Centro',
-      cidade: 'São Paulo',
-      estado: 'SP',
-      principal: true,
-    },
-  ]);
+  const [enderecos, setEnderecos] = useState<Endereco[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEndereco, setEditingEndereco] = useState<Endereco | null>(null);
   const [formData, setFormData] = useState({
@@ -84,9 +79,10 @@ export const EnderecosScreen: React.FC = () => {
     value: city.city,
   }));
 
-  // Carregar estados ao montar o componente
+  // Carregar estados e endereços ao montar o componente
   useEffect(() => {
     loadStates();
+    loadUserAddresses();
   }, []);
 
   // Carregar cidades quando o estado for selecionado
@@ -122,6 +118,86 @@ export const EnderecosScreen: React.FC = () => {
     }
   };
 
+  // Carregar endereços do usuário logado
+  const loadUserAddresses = async (isRefreshing = false) => {
+    if (isRefreshing) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      // Verificar se há usuário logado
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setEnderecos([]);
+        return;
+      }
+
+      // Buscar cidadão pelo email
+      const citizen = await citizenService.getCitizenByEmail(user.email || '');
+
+      if (!citizen) {
+        setEnderecos([]);
+        return;
+      }
+
+      // Buscar endereços do cidadão
+      const addresses = await citizenService.getCitizenAddresses(citizen.id);
+
+      if (!addresses || addresses.length === 0) {
+        setEnderecos([]);
+        return;
+      }
+
+      // Converter CitizenAddress para Endereco format
+      const enderecosData = await Promise.all(
+        addresses.map(async (address: CitizenAddress) => {
+          // Buscar informações do município
+          const { data: municipality } = await supabase
+            .from('municipalities')
+            .select('city, state')
+            .eq('id', address.municipality_id)
+            .single();
+
+          return {
+            id: address.id,
+            tipo: 'residencial' as const, // Por enquanto fixo, pode ser expandido depois
+            cep: address.postal_code,
+            logradouro: address.street,
+            numero: address.number,
+            complemento: address.complement || '',
+            bairro: address.neighborhood,
+            cidade: municipality?.city || '',
+            estado: municipality?.state || '',
+            principal: address.is_primary,
+            municipality_id: address.municipality_id,
+          };
+        })
+      );
+
+      setEnderecos(enderecosData);
+    } catch (error) {
+      console.error('Erro ao carregar endereços:', error);
+      Alert.alert('Erro', 'Não foi possível carregar seus endereços');
+      setEnderecos([]);
+    } finally {
+      if (isRefreshing) {
+        setRefreshing(false);
+      } else {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Função para atualizar dados (pull-to-refresh)
+  const onRefresh = () => {
+    loadUserAddresses(true);
+  };
+
   const handleAddEndereco = () => {
     setEditingEndereco(null);
     setFormData({
@@ -155,6 +231,18 @@ export const EnderecosScreen: React.FC = () => {
   };
 
   const handleDeleteEndereco = (id: string) => {
+    // Verificar se é o endereço principal
+    const enderecoToDelete = enderecos.find(e => e.id === id);
+
+    if (enderecoToDelete?.principal) {
+      Alert.alert(
+        'Não é possível excluir',
+        'O endereço principal não pode ser excluído. Defina outro endereço como principal primeiro.',
+        [{ text: 'OK', style: 'default' }]
+      );
+      return;
+    }
+
     Alert.alert(
       'Excluir Endereço',
       'Tem certeza que deseja excluir este endereço?',
@@ -214,6 +302,7 @@ export const EnderecosScreen: React.FC = () => {
         id: Date.now().toString(),
         ...formData,
         tipo: formData.tipo as 'residencial' | 'comercial' | 'outro',
+        municipality_id: '', // Será preenchido quando implementar salvamento no Supabase
       };
       setEnderecos([
         ...enderecos.map(e => ({
@@ -226,6 +315,9 @@ export const EnderecosScreen: React.FC = () => {
 
     setModalVisible(false);
     setEditingEndereco(null);
+
+    // Atualizar a lista de cidades disponíveis no contexto
+    refreshCities();
   };
 
   const getTipoLabel = (tipo: string) => {
@@ -346,7 +438,17 @@ export const EnderecosScreen: React.FC = () => {
           { backgroundColor: theme.colors.surface },
         ]}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+        >
           {/* Header Section */}
           <View style={styles.headerSection}>
             <Ionicons
@@ -368,7 +470,19 @@ export const EnderecosScreen: React.FC = () => {
           </View>
 
           {/* Endereços List */}
-          {enderecos.length > 0 ? (
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text
+                style={[
+                  styles.loadingText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Carregando seus endereços...
+              </Text>
+            </View>
+          ) : enderecos.length > 0 ? (
             <View style={styles.enderecosList}>
               {enderecos.map(renderEndereco)}
             </View>
@@ -597,36 +711,36 @@ export const EnderecosScreen: React.FC = () => {
                 />
               </View>
 
-                             {/* Estado e Cidade */}
-               <View style={styles.row}>
-                 <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
-                   <SelectInput
-                     label="Estado"
-                     placeholder="Selecione o estado"
-                     value={formData.estado}
-                     options={stateOptions}
-                     onSelect={(value) => {
-                       setFormData({ ...formData, estado: value, cidade: '' });
-                     }}
-                     loading={loadingStates}
-                     required
-                   />
-                 </View>
-                 <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
-                   <SelectInput
-                     label="Cidade"
-                     placeholder="Selecione a cidade"
-                     value={formData.cidade}
-                     options={cityOptions}
-                     onSelect={(value) => {
-                       setFormData({ ...formData, cidade: value });
-                     }}
-                     loading={loadingCities}
-                     disabled={!formData.estado}
-                     required
-                   />
-                 </View>
-               </View>
+              {/* Estado e Cidade */}
+              <View style={styles.row}>
+                <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
+                  <SelectInput
+                    label="Estado"
+                    placeholder="Selecione o estado"
+                    value={formData.estado}
+                    options={stateOptions}
+                    onSelect={value => {
+                      setFormData({ ...formData, estado: value, cidade: '' });
+                    }}
+                    loading={loadingStates}
+                    required
+                  />
+                </View>
+                <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
+                  <SelectInput
+                    label="Cidade"
+                    placeholder="Selecione a cidade"
+                    value={formData.cidade}
+                    options={cityOptions}
+                    onSelect={value => {
+                      setFormData({ ...formData, cidade: value });
+                    }}
+                    loading={loadingCities}
+                    disabled={!formData.estado}
+                    required
+                  />
+                </View>
+              </View>
 
               {/* Endereço Principal */}
               <View style={styles.formSection}>
@@ -690,8 +804,6 @@ export const EnderecosScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-
-      
     </SafeAreaView>
   );
 };
@@ -787,6 +899,17 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: 14,
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
     textAlign: 'center',
   },
   addButton: {
@@ -889,8 +1012,8 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: '#007AFF',
   },
-     modalButtonText: {
-     fontSize: 16,
-     fontWeight: '600',
-   },
- });
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -31,7 +32,7 @@ export const CitySelectorModal: React.FC<CitySelectorModalProps> = ({
   onClose,
 }) => {
   const { theme } = useTheme();
-  const { currentCity, setCurrentCity, availableCities } = useCity();
+  const { currentCity, setCurrentCity, availableCities, loading, error } = useCity();
   const navigation = useNavigation<CitySelectorModalNavigationProp>();
 
   const handleCitySelect = (city: City) => {
@@ -131,13 +132,39 @@ export const CitySelectorModal: React.FC<CitySelectorModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          <FlatList
-            data={availableCities}
-            renderItem={renderCityItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.citiesList}
-            showsVerticalScrollIndicator={false}
-          />
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text style={[styles.loadingText, { color: theme.colors.textSecondary }]}>
+                Carregando suas cidades...
+              </Text>
+            </View>
+          ) : error ? (
+            <View style={styles.errorContainer}>
+              <Ionicons name="alert-circle" size={24} color={theme.colors.error} />
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>
+                {error}
+              </Text>
+            </View>
+          ) : availableCities.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="location-outline" size={48} color={theme.colors.textSecondary} />
+              <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
+                Você ainda não tem endereços cadastrados
+              </Text>
+              <Text style={[styles.emptySubtext, { color: theme.colors.textSecondary }]}>
+                Cadastre seu primeiro endereço para começar
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={availableCities}
+              renderItem={renderCityItem}
+              keyExtractor={item => item.id}
+              contentContainerStyle={styles.citiesList}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
 
           {/* Add New Address Section */}
           <View style={styles.addAddressSection}>
@@ -279,5 +306,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  emptySubtext: {
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
+    opacity: 0.8,
   },
 });

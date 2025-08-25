@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,11 +16,39 @@ import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { citizenService, Citizen } from '@/services/citizenService';
 
 export const PerfilScreen: React.FC = () => {
   const { theme } = useTheme();
   const { user, signOut } = useAuth();
   const navigation = useNavigation();
+
+  const [loadingData, setLoadingData] = useState(true);
+  const [citizen, setCitizen] = useState<Citizen | null>(null);
+
+  // Carregar dados do cidadão
+  const loadCitizenData = async () => {
+    if (!user?.email) {
+      setLoadingData(false);
+      return;
+    }
+
+    try {
+      const citizenData = await citizenService.getCitizenByEmail(user.email);
+      if (citizenData) {
+        setCitizen(citizenData);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados do cidadão:', error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  // Carregar dados ao montar o componente
+  useEffect(() => {
+    loadCitizenData();
+  }, [user?.email]);
 
   const handleSignOut = async () => {
     Alert.alert('Sair da Aplicação', 'Tem certeza que deseja sair?', [
@@ -152,124 +181,143 @@ export const PerfilScreen: React.FC = () => {
           { backgroundColor: theme.colors.surface },
         ]}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* User Profile Section */}
-          <View
-            style={[
-              styles.profileSection,
-              {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <View style={styles.profileHeader}>
-              <View
-                style={[
-                  styles.profileAvatar,
-                  { backgroundColor: theme.colors.primary },
-                ]}
-              >
-                <Ionicons
-                  name="person"
-                  size={40}
-                  color={theme.colors.onPrimary}
-                />
-              </View>
-              <View style={styles.profileInfo}>
-                <Text
-                  style={[styles.profileName, { color: theme.colors.text }]}
-                >
-                  {user?.user_metadata?.name || 'Usuário'}
-                </Text>
-                <Text
-                  style={[
-                    styles.profileEmail,
-                    { color: theme.colors.textSecondary },
-                  ]}
-                >
-                  {user?.email}
-                </Text>
-                <Text
-                  style={[
-                    styles.profileStatus,
-                    { color: theme.colors.primary },
-                  ]}
-                >
-                  Conta Ativa
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Theme Toggle Section */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Aparência
+        {/* Loading State */}
+        {loadingData ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color={theme.colors.primary}
+              style={styles.loadingSpinner}
+            />
+            <Text
+              style={[
+                styles.loadingText,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Carregando dados do perfil...
             </Text>
+          </View>
+        ) : (
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {/* User Profile Section */}
             <View
               style={[
-                styles.themeCard,
+                styles.profileSection,
                 {
                   backgroundColor: theme.colors.surface,
                   borderColor: theme.colors.border,
                 },
               ]}
             >
-              <View style={styles.themeCardContent}>
-                <View style={styles.themeCardLeft}>
+              <View style={styles.profileHeader}>
+                <View
+                  style={[
+                    styles.profileAvatar,
+                    { backgroundColor: theme.colors.primary },
+                  ]}
+                >
                   <Ionicons
-                    name="moon"
-                    size={20}
-                    color={theme.colors.textSecondary}
+                    name="person"
+                    size={40}
+                    color={theme.colors.onPrimary}
                   />
+                </View>
+                <View style={styles.profileInfo}>
+                  <Text
+                    style={[styles.profileName, { color: theme.colors.text }]}
+                  >
+                    {citizen?.name || user?.user_metadata?.name || 'Usuário'}
+                  </Text>
                   <Text
                     style={[
-                      styles.themeCardTitle,
-                      { color: theme.colors.text },
+                      styles.profileEmail,
+                      { color: theme.colors.textSecondary },
                     ]}
                   >
-                    Modo Escuro
+                    {user?.email}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.profileStatus,
+                      { color: theme.colors.primary },
+                    ]}
+                  >
+                    Conta Ativa
                   </Text>
                 </View>
-                <ThemeToggle />
               </View>
             </View>
-          </View>
 
-          {/* Menu Items Section */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Configurações
-            </Text>
-            {menuItems.map(renderMenuItem)}
-          </View>
-
-          {/* Sign Out Section */}
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={[
-                styles.signOutButton,
-                { backgroundColor: theme.colors.error },
-              ]}
-              onPress={handleSignOut}
-            >
-              <Ionicons
-                name="log-out-outline"
-                size={20}
-                color={theme.colors.onError}
-              />
-              <Text
+            {/* Theme Toggle Section */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                Aparência
+              </Text>
+              <View
                 style={[
-                  styles.signOutButtonText,
-                  { color: theme.colors.onError },
+                  styles.themeCard,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
                 ]}
               >
-                Sair da Aplicação
+                <View style={styles.themeCardContent}>
+                  <View style={styles.themeCardLeft}>
+                    <Ionicons
+                      name="moon"
+                      size={20}
+                      color={theme.colors.textSecondary}
+                    />
+                    <Text
+                      style={[
+                        styles.themeCardTitle,
+                        { color: theme.colors.text },
+                      ]}
+                    >
+                      Modo Escuro
+                    </Text>
+                  </View>
+                  <ThemeToggle />
+                </View>
+              </View>
+            </View>
+
+            {/* Menu Items Section */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                Configurações
               </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+              {menuItems.map(renderMenuItem)}
+            </View>
+
+            {/* Sign Out Section */}
+            <View style={styles.section}>
+              <TouchableOpacity
+                style={[
+                  styles.signOutButton,
+                  { backgroundColor: theme.colors.error },
+                ]}
+                onPress={handleSignOut}
+              >
+                <Ionicons
+                  name="log-out-outline"
+                  size={20}
+                  color={theme.colors.onError}
+                />
+                <Text
+                  style={[
+                    styles.signOutButtonText,
+                    { color: theme.colors.onError },
+                  ]}
+                >
+                  Sair da Aplicação
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        )}
       </View>
     </ScreenWrapper>
   );
@@ -391,5 +439,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingSpinner: {
+    marginBottom: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

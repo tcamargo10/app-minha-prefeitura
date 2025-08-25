@@ -84,7 +84,7 @@ export const AppBar: React.FC<AppBarProps> = ({
                   style={[styles.cityName, { color: theme.colors.onPrimary }]}
                   numberOfLines={1}
                 >
-                  {currentCity.name} - {currentCity.state}
+                  {currentCity ? `${currentCity.name} - ${currentCity.state}` : 'Selecionar cidade'}
                 </Text>
               </View>
               <Ionicons
