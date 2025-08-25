@@ -25,7 +25,7 @@ type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Main'>;
 
 export const HomeScreen: React.FC = () => {
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const { user, citizen } = useAuth();
   const { currentCity } = useCity();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [highlightCategories, setHighlightCategories] = useState<Category[]>(
@@ -47,6 +47,12 @@ export const HomeScreen: React.FC = () => {
         setLoading(true);
       }
       setError(null);
+
+      // Verificar se há uma cidade selecionada
+      if (!currentCity) {
+        setError('Nenhuma cidade selecionada');
+        return;
+      }
 
       // Buscar categorias em destaque da cidade selecionada
       const data = await categoryService.getHighlightCategories(currentCity.id);
@@ -154,7 +160,7 @@ export const HomeScreen: React.FC = () => {
           {/* Greeting Section */}
           <View style={styles.greetingSection}>
             <Text style={[styles.greetingText, { color: theme.colors.text }]}>
-              Olá, {user?.user_metadata?.name?.split(' ')[0] || 'Usuário'}
+              Olá, {citizen?.name?.split(' ')[0] || 'Usuário'}
             </Text>
           </View>
 
