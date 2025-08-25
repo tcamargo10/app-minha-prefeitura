@@ -70,12 +70,15 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
+      - name: Create Google Service Account file
+        run: |
+          mkdir -p config
+          echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}' > config/google-service-account.json
+
       - name: Build and Submit to Google Play Production
         run: |
           echo "Deploying version ${{ needs.check-version.outputs.current-version }} to Google Play Production"
           eas build --platform android --profile production --auto-submit --non-interactive
-        env:
-          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
 
   deploy-development:
     runs-on: ubuntu-latest
@@ -96,12 +99,15 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
+      - name: Create Google Service Account file
+        run: |
+          mkdir -p config
+          echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}' > config/google-service-account.json
+
       - name: Build and Submit to Google Play Internal Testing
         run: |
           echo "Deploying version ${{ needs.check-version.outputs.current-version }} to Google Play Internal Testing"
           eas build --platform android --profile development --auto-submit --non-interactive
-        env:
-          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
 
   skip-deploy:
     runs-on: ubuntu-latest
