@@ -29,10 +29,6 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      - name: Setup Expo
-        run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-
       - name: Check if version changed
         id: check
         run: |
@@ -74,10 +70,6 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      - name: Setup Expo
-        run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-
       - name: Build and Submit to Google Play Production
         run: |
           echo "Deploying version ${{ needs.check-version.outputs.current-version }} to Google Play Production"
@@ -103,10 +95,6 @@ jobs:
 
       - name: Install EAS CLI
         run: npm install -g eas-cli
-
-      - name: Setup Expo
-        run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
 
       - name: Build and Submit to Google Play Internal Testing
         run: |
