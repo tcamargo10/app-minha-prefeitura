@@ -46,6 +46,11 @@ export const CategoriasScreen: React.FC = () => {
       setError(null);
       const data = await categoryService.getCategories(currentCity.id);
       setCategories(data);
+
+      // Se não há dados, não é erro, apenas estado vazio
+      if (data.length === 0) {
+        setError(null);
+      }
     } catch (err) {
       setError('Erro ao carregar categorias');
       console.error('Erro ao carregar categorias:', err);

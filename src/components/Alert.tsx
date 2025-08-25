@@ -93,12 +93,14 @@ export const showAlert = ({
     });
   }
 
-  // Adiciona botão de cancelar/fechar
-  buttons.push({
-    text: defaultCancelText,
-    onPress: onDismiss,
-    style: 'cancel',
-  });
+  // Adiciona botão de cancelar/fechar apenas se onDismiss for fornecido
+  if (onDismiss) {
+    buttons.push({
+      text: defaultCancelText,
+      onPress: onDismiss,
+      style: 'cancel',
+    });
+  }
 
   RNAlert.alert(defaultTitle, message, buttons);
 };

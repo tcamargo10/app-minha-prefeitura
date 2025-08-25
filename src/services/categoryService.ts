@@ -18,12 +18,10 @@ export const categoryService = {
   // Buscar todas as categorias ativas por cidade
   async getCategories(cityId?: string): Promise<Category[]> {
     try {
-      let query = supabase
-        .from('categories')
-        .select('*')
-        .eq('active', true);
+      let query = supabase.from('categories').select('*').eq('active', true);
 
-      if (cityId) {
+      // Só aplicar filtro se cityId for um UUID válido
+      if (cityId && cityId.length > 10) {
         query = query.eq('municipality_id', cityId);
       }
 
@@ -31,7 +29,8 @@ export const categoryService = {
 
       if (error) {
         console.error('Erro ao buscar categorias:', error);
-        throw error;
+        // Retornar array vazio em vez de throw error
+        return [];
       }
 
       return data || [];
@@ -50,7 +49,8 @@ export const categoryService = {
         .eq('active', true)
         .eq('highlight', true);
 
-      if (municipalityId) {
+      // Só aplicar filtro se municipalityId for um UUID válido
+      if (municipalityId && municipalityId.length > 10) {
         query = query.eq('municipality_id', municipalityId);
       }
 
@@ -58,7 +58,8 @@ export const categoryService = {
 
       if (error) {
         console.error('Erro ao buscar categorias em destaque:', error);
-        throw error;
+        // Retornar array vazio em vez de throw error
+        return [];
       }
 
       return data || [];

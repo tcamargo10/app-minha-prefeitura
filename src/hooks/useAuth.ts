@@ -4,11 +4,15 @@ import { LoginFormData } from '@/screens/LoginScreen/schema';
 import { RegisterFormData } from '@/screens/RegisterScreen/schema';
 import { AuthService } from '@/services/authService';
 import { AuthState } from '@/types/auth';
+import { Citizen } from '@/services/citizenService';
 
 export const useAuth = () => {
-  const [authState, setAuthState] = useState<AuthState>({
+  const [authState, setAuthState] = useState<
+    AuthState & { citizen: Citizen | null }
+  >({
     user: null,
     session: null,
+    citizen: null,
     loading: true,
     error: null,
   });
@@ -19,7 +23,11 @@ export const useAuth = () => {
 
   const checkAuthState = async () => {
     try {
-      const { user, error: userError } = await AuthService.getCurrentUser();
+      const {
+        user,
+        citizen,
+        error: userError,
+      } = await AuthService.getCurrentUser();
       const { session, error: sessionError } =
         await AuthService.getCurrentSession();
 
@@ -35,6 +43,7 @@ export const useAuth = () => {
       setAuthState({
         user: userError ? null : user,
         session: sessionError ? null : session,
+        citizen: userError ? null : citizen,
         loading: false,
         error: null,
       });
@@ -46,6 +55,7 @@ export const useAuth = () => {
       setAuthState({
         user: null,
         session: null,
+        citizen: null,
         loading: false,
         error: 'Erro ao verificar autenticação. Tente novamente.',
       });
@@ -61,6 +71,7 @@ export const useAuth = () => {
       setAuthState({
         user: result.user,
         session: result.session,
+        citizen: result.citizen,
         loading: false,
         error: result.error,
       });
@@ -76,7 +87,7 @@ export const useAuth = () => {
         error: errorMessage,
       }));
 
-      return { user: null, session: null, error: errorMessage };
+      return { user: null, session: null, citizen: null, error: errorMessage };
     }
   };
 
@@ -89,6 +100,7 @@ export const useAuth = () => {
       setAuthState({
         user: result.user,
         session: result.session,
+        citizen: result.citizen,
         loading: false,
         error: result.error,
       });
@@ -105,7 +117,7 @@ export const useAuth = () => {
         error: errorMessage,
       }));
 
-      return { user: null, session: null, error: errorMessage };
+      return { user: null, session: null, citizen: null, error: errorMessage };
     }
   };
 
@@ -119,6 +131,7 @@ export const useAuth = () => {
       setAuthState({
         user: null,
         session: null,
+        citizen: null,
         loading: false,
         error: result.error,
       });
@@ -132,6 +145,7 @@ export const useAuth = () => {
       setAuthState({
         user: null,
         session: null,
+        citizen: null,
         loading: false,
         error: errorMessage,
       });

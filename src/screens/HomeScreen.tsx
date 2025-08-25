@@ -51,6 +51,11 @@ export const HomeScreen: React.FC = () => {
       // Buscar categorias em destaque da cidade selecionada
       const data = await categoryService.getHighlightCategories(currentCity.id);
       setHighlightCategories(data);
+
+      // Se não há dados, não é erro, apenas estado vazio
+      if (data.length === 0) {
+        setError(null);
+      }
     } catch (err) {
       setError('Erro ao carregar categorias em destaque');
       console.error('Erro ao carregar categorias em destaque:', err);

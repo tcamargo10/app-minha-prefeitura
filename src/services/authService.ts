@@ -2,6 +2,7 @@ import { LoginFormData } from '@/screens/LoginScreen/schema';
 import { RegisterFormData } from '@/screens/RegisterScreen/schema';
 import { handleError, logError } from '@/utils/errorHandler';
 import { supabase } from '@/utils/supabase';
+import { citizenService, Citizen } from './citizenService';
 
 export class AuthService {
   static async signIn(data: LoginFormData) {
@@ -15,45 +16,82 @@ export class AuthService {
         throw error;
       }
 
-      return { user: authData.user, session: authData.session, error: null };
+      // Buscar dados completos do cidadão
+      const citizen = await citizenService.getCitizenByEmail(
+        authData.user.email
+      );
+
+      // Verificar se o usuário é um cidadão cadastrado
+      if (!citizen) {
+        // Fazer logout do usuário que não é cidadão
+        await supabase.auth.signOut();
+        return {
+          user: null,
+          session: null,
+          citizen: null,
+          error:
+            'Este email não está cadastrado como cidadão. Apenas moradores podem acessar o app.',
+        };
+      }
+
+      return {
+        user: authData.user,
+        session: authData.session,
+        citizen,
+        error: null,
+      };
     } catch (error: any) {
       const appError = handleError(error);
       logError('AuthService.signIn', error, appError);
-      return { user: null, session: null, error: appError.message };
+      return {
+        user: null,
+        session: null,
+        citizen: null,
+        error: appError.message,
+      };
     }
   }
 
   static async signUp(data: RegisterFormData) {
     try {
-      const { data: authData, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            name: data.name,
-            data_nascimento: data.dataNascimento,
-            telefone: data.telefone,
-            cpf: data.cpf,
-            cep: data.cep,
-            logradouro: data.logradouro,
-            numero: data.numero,
-            complemento: data.complemento || '',
-            bairro: data.bairro,
-            estado: data.estado,
-            cidade: data.cidade,
-          },
-        },
-      });
+      // Usar o novo sistema de cidadãos
+      const result = await citizenService.createCitizen(data);
 
-      if (error) {
-        throw error;
+      if (result.error) {
+        console.error('Erro no cadastro de cidadão:', result.error);
+        console.log('AuthService retornando erro:', result.error);
+        return {
+          user: null,
+          session: null,
+          citizen: null,
+          error: result.error,
+        };
       }
 
-      return { user: authData.user, session: authData.session, error: null };
+      if (!result.citizen) {
+        return {
+          user: null,
+          session: null,
+          citizen: null,
+          error: 'Erro ao criar conta do cidadão',
+        };
+      }
+
+      return {
+        user: result.citizen,
+        session: null, // Será confirmado por email
+        citizen: result.citizen,
+        error: null,
+      };
     } catch (error: any) {
       const appError = handleError(error);
       logError('AuthService.signUp', error, appError);
-      return { user: null, session: null, error: appError.message };
+      return {
+        user: null,
+        session: null,
+        citizen: null,
+        error: appError.message,
+      };
     }
   }
 
@@ -86,11 +124,29 @@ export class AuthService {
         throw error;
       }
 
-      return { user, error: null };
+      // Buscar dados completos do cidadão
+      let citizen = null;
+      if (user) {
+        citizen = await citizenService.getCitizenByEmail(user.email);
+
+        // Verificar se o usuário é um cidadão cadastrado
+        if (!citizen) {
+          // Fazer logout do usuário que não é cidadão
+          await supabase.auth.signOut();
+          return {
+            user: null,
+            citizen: null,
+            error:
+              'Este email não está cadastrado como cidadão. Apenas moradores podem acessar o app.',
+          };
+        }
+      }
+
+      return { user, citizen, error: null };
     } catch (error: any) {
       const appError = handleError(error);
       logError('AuthService.getCurrentUser', error, appError);
-      return { user: null, error: appError.message };
+      return { user: null, citizen: null, error: appError.message };
     }
   }
 

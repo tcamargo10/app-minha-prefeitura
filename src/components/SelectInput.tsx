@@ -30,6 +30,7 @@ interface SelectInputProps {
   loading?: boolean;
   disabled?: boolean;
   required?: boolean;
+  error?: string;
 }
 
 export const SelectInput: React.FC<SelectInputProps> = ({
@@ -41,6 +42,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
   loading = false,
   disabled = false,
   required = false,
+  error,
 }) => {
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
@@ -63,7 +65,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
             styles.selectInput,
             {
               backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
+              borderColor: error ? theme.colors.error : theme.colors.border,
               opacity: disabled ? 0.5 : 1,
             },
           ]}
@@ -92,6 +94,12 @@ export const SelectInput: React.FC<SelectInputProps> = ({
             color={theme.colors.textSecondary}
           />
         </TouchableOpacity>
+
+        {error && (
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>
+            {error}
+          </Text>
+        )}
       </View>
 
       {/* Modal de Seleção */}
@@ -255,5 +263,10 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+  },
+  errorText: {
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
 });

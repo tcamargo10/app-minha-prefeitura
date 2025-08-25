@@ -30,12 +30,7 @@ import {
   State,
   City,
 } from '@/services/municipalityService';
-import {
-  formatCPF,
-  formatCEP,
-  formatPhone,
-  formatDate,
-} from '@/utils/masks';
+import { formatCPF, formatCEP, formatPhone, formatDate } from '@/utils/masks';
 
 import { registerSchema, RegisterFormData } from './schema';
 
@@ -138,16 +133,32 @@ export const RegisterScreen: React.FC = () => {
   };
 
   const onSubmit = async (data: RegisterFormData) => {
+    console.log('Iniciando cadastro com dados:', {
+      ...data,
+      password: '[HIDDEN]',
+    });
+
     const result = await signUp(data);
 
+    console.log('Resultado do cadastro:', {
+      success: !result.error,
+      error: result.error,
+      errorType: typeof result.error,
+      errorStringified: JSON.stringify(result.error),
+      user: result.user ? 'Usuário criado' : 'Sem usuário',
+      citizen: result.citizen ? 'Cidadão criado' : 'Sem cidadão',
+    });
+
     if (result.error) {
+      console.error('Erro no cadastro:', result.error);
       showError({
         message: result.error,
       });
     } else {
+      console.log('Cadastro realizado com sucesso!');
       showSuccess({
-        message:
-          'Conta criada com sucesso! Verifique seu email para confirmar a conta.',
+        message: 'Conta criada com sucesso!',
+        confirmText: 'OK',
         onConfirm: () => navigation.navigate('Login'),
       });
     }
@@ -235,7 +246,12 @@ export const RegisterScreen: React.FC = () => {
                   <View style={styles.form}>
                     {/* Seção: Dados Pessoais */}
                     <View style={styles.sectionContainer}>
-                      <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
+                      <Text
+                        style={[
+                          styles.sectionTitle,
+                          { color: theme.colors.primary },
+                        ]}
+                      >
                         Dados Pessoais
                       </Text>
 
@@ -281,7 +297,7 @@ export const RegisterScreen: React.FC = () => {
                             label="CPF"
                             placeholder="000.000.000-00"
                             value={value}
-                            onChangeText={(text) => onChange(formatCPF(text))}
+                            onChangeText={text => onChange(formatCPF(text))}
                             onBlur={onBlur}
                             keyboardType="numeric"
                             error={errors.cpf?.message}
@@ -290,16 +306,25 @@ export const RegisterScreen: React.FC = () => {
                       />
 
                       <View style={styles.row}>
-                        <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
+                        <View
+                          style={[
+                            styles.formSection,
+                            { flex: 1, marginRight: 8 },
+                          ]}
+                        >
                           <Controller
                             control={control}
                             name="dataNascimento"
-                            render={({ field: { onChange, onBlur, value } }) => (
+                            render={({
+                              field: { onChange, onBlur, value },
+                            }) => (
                               <Input
                                 label="Data de nascimento"
                                 placeholder="DD/MM/AAAA"
                                 value={value}
-                                onChangeText={(text) => onChange(formatDate(text))}
+                                onChangeText={text =>
+                                  onChange(formatDate(text))
+                                }
                                 onBlur={onBlur}
                                 keyboardType="numeric"
                                 error={errors.dataNascimento?.message}
@@ -307,16 +332,25 @@ export const RegisterScreen: React.FC = () => {
                             )}
                           />
                         </View>
-                        <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
+                        <View
+                          style={[
+                            styles.formSection,
+                            { flex: 1, marginLeft: 8 },
+                          ]}
+                        >
                           <Controller
                             control={control}
                             name="telefone"
-                            render={({ field: { onChange, onBlur, value } }) => (
+                            render={({
+                              field: { onChange, onBlur, value },
+                            }) => (
                               <Input
                                 label="Telefone"
                                 placeholder="(11) 99999-9999"
                                 value={value}
-                                onChangeText={(text) => onChange(formatPhone(text))}
+                                onChangeText={text =>
+                                  onChange(formatPhone(text))
+                                }
                                 onBlur={onBlur}
                                 keyboardType="phone-pad"
                                 error={errors.telefone?.message}
@@ -329,7 +363,12 @@ export const RegisterScreen: React.FC = () => {
 
                     {/* Seção: Endereço */}
                     <View style={styles.sectionContainer}>
-                      <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
+                      <Text
+                        style={[
+                          styles.sectionTitle,
+                          { color: theme.colors.primary },
+                        ]}
+                      >
                         Endereço
                       </Text>
 
@@ -341,7 +380,7 @@ export const RegisterScreen: React.FC = () => {
                             label="CEP"
                             placeholder="12345-678"
                             value={value}
-                            onChangeText={(text) => onChange(formatCEP(text))}
+                            onChangeText={text => onChange(formatCEP(text))}
                             onBlur={onBlur}
                             keyboardType="numeric"
                             error={errors.cep?.message}
@@ -365,11 +404,18 @@ export const RegisterScreen: React.FC = () => {
                       />
 
                       <View style={styles.row}>
-                        <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
+                        <View
+                          style={[
+                            styles.formSection,
+                            { flex: 1, marginRight: 8 },
+                          ]}
+                        >
                           <Controller
                             control={control}
                             name="numero"
-                            render={({ field: { onChange, onBlur, value } }) => (
+                            render={({
+                              field: { onChange, onBlur, value },
+                            }) => (
                               <Input
                                 label="Número"
                                 placeholder="123"
@@ -382,11 +428,18 @@ export const RegisterScreen: React.FC = () => {
                             )}
                           />
                         </View>
-                        <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
+                        <View
+                          style={[
+                            styles.formSection,
+                            { flex: 1, marginLeft: 8 },
+                          ]}
+                        >
                           <Controller
                             control={control}
                             name="complemento"
-                            render={({ field: { onChange, onBlur, value } }) => (
+                            render={({
+                              field: { onChange, onBlur, value },
+                            }) => (
                               <Input
                                 label="Complemento"
                                 placeholder="Apto, Casa, etc."
@@ -416,7 +469,12 @@ export const RegisterScreen: React.FC = () => {
                       />
 
                       <View style={styles.row}>
-                        <View style={[styles.formSection, { flex: 1, marginRight: 8 }]}>
+                        <View
+                          style={[
+                            styles.formSection,
+                            { flex: 1, marginRight: 8 },
+                          ]}
+                        >
                           <Controller
                             control={control}
                             name="estado"
@@ -429,11 +487,17 @@ export const RegisterScreen: React.FC = () => {
                                 onSelect={onChange}
                                 loading={loadingStates}
                                 required
+                                error={errors.estado?.message}
                               />
                             )}
                           />
                         </View>
-                        <View style={[styles.formSection, { flex: 1, marginLeft: 8 }]}>
+                        <View
+                          style={[
+                            styles.formSection,
+                            { flex: 1, marginLeft: 8 },
+                          ]}
+                        >
                           <Controller
                             control={control}
                             name="cidade"
@@ -447,6 +511,7 @@ export const RegisterScreen: React.FC = () => {
                                 loading={loadingCities}
                                 disabled={!watchedEstado}
                                 required
+                                error={errors.cidade?.message}
                               />
                             )}
                           />
@@ -456,7 +521,12 @@ export const RegisterScreen: React.FC = () => {
 
                     {/* Seção: Segurança */}
                     <View style={styles.sectionContainer}>
-                      <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
+                      <Text
+                        style={[
+                          styles.sectionTitle,
+                          { color: theme.colors.primary },
+                        ]}
+                      >
                         Segurança
                       </Text>
 
@@ -499,6 +569,27 @@ export const RegisterScreen: React.FC = () => {
                       loading={loading}
                       style={styles.registerButton}
                     />
+
+                    {/* Mensagem de erro geral do formulário */}
+                    {Object.keys(errors).length > 0 && (
+                      <View style={styles.formErrorContainer}>
+                        <Ionicons
+                          name="alert-circle"
+                          size={20}
+                          color={theme.colors.error}
+                          style={styles.formErrorIcon}
+                        />
+                        <Text
+                          style={[
+                            styles.formErrorText,
+                            { color: theme.colors.error },
+                          ]}
+                        >
+                          Existem dados incorretos no formulário. Verifique os
+                          campos destacados.
+                        </Text>
+                      </View>
+                    )}
 
                     <View style={styles.dividerContainer}>
                       <View
@@ -679,5 +770,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginRight: 8,
+  },
+  formErrorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 0, 0, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 0, 0, 0.2)',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  formErrorIcon: {
+    marginRight: 8,
+  },
+  formErrorText: {
+    fontSize: 14,
+    flex: 1,
+    lineHeight: 20,
   },
 });
