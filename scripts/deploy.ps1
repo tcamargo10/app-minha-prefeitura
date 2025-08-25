@@ -1,5 +1,8 @@
 # Script de Deploy Automatizado - Minha Prefeitura (PowerShell)
 # Uso: .\scripts\deploy.ps1 [android|ios|all] [development|development-internal|preview|production] [version]
+# 
+# NOTA: Builds automáticos só acontecem com tags (v*). 
+# Para builds de desenvolvimento, use o workflow manual no GitHub Actions.
 
 param(
     [Parameter(Position=0)]

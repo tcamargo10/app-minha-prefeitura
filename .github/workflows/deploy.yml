@@ -2,7 +2,6 @@ name: Deploy to App Stores
 
 on:
   push:
-    branches: [master]
     tags: ['v*']
 
 env:
@@ -79,35 +78,6 @@ jobs:
         run: |
           echo "Deploying version ${{ needs.check-version.outputs.current-version }} to Google Play Production"
           eas build --platform android --profile production --auto-submit --non-interactive
-
-  deploy-development:
-    runs-on: ubuntu-latest
-    needs: check-version
-    if: github.ref == 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/v') && needs.check-version.outputs.version-changed == 'true'
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
-
-      - name: Create Google Service Account file
-        run: |
-          mkdir -p config
-          echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}' > config/google-service-account.json
-
-      - name: Build and Submit to Google Play Internal Testing
-        run: |
-          echo "Deploying version ${{ needs.check-version.outputs.current-version }} to Google Play Internal Testing"
-          eas build --platform android --profile development --auto-submit --non-interactive
 
   skip-deploy:
     runs-on: ubuntu-latest

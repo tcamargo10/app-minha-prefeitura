@@ -6,7 +6,7 @@ git add .
 git commit -m "Bump version to 1.0.1"
 git push origin master
 
-# 3. Tag para produção
+# 3. Tag para produção (dispara build automático)
 
 git tag v1.0.1
 git push origin v1.0.1
@@ -234,51 +234,56 @@ eas submit --platform ios
 
 ### 4. GitHub Actions (Automatização)
 
-Criar arquivo `.github/workflows/deploy-ios.yml`:
+#### Workflow de Produção (Automático)
+
+O workflow `.github/workflows/deploy.yml` é executado automaticamente quando uma tag é criada:
 
 ```yaml
-name: Deploy to App Store
-
 on:
   push:
-    branches: [main]
     tags: ['v*']
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
-
-      - name: Setup Expo
-        run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-
-      - name: Build iOS
-        run: eas build --platform ios --profile production --non-interactive
-
-      - name: Submit to App Store
-        run: eas submit --platform ios --non-interactive
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
 ```
+
+**Comportamento:**
+- ✅ Build automático quando tag é criada (ex: `v1.0.10`)
+- ✅ Deploy para Google Play Production
+- ❌ Não executa em push para master
+
+#### Workflow de Desenvolvimento (Manual)
+
+O workflow `.github/workflows/build-development.yml` pode ser executado manualmente:
+
+**Como usar:**
+1. Vá para GitHub Actions no repositório
+2. Selecione "Build Development"
+3. Clique em "Run workflow"
+4. Escolha a plataforma (android/ios/all)
+
+**Comportamento:**
+- ✅ Build manual para desenvolvimento
+- ✅ Não faz deploy automático
+- ✅ Útil para testes internos
 
 ## 🔄 Workflow de Release
 
-### 1. Versionamento
+### 1. Desenvolvimento (Sem Build Automático)
+
+```bash
+# Fazer alterações no código
+git add .
+git commit -m "feat: nova funcionalidade"
+git push origin master
+# ❌ Nenhum build automático acontece
+```
+
+### 2. Build de Desenvolvimento (Manual)
+
+Para builds de desenvolvimento, use o GitHub Actions manualmente:
+1. Vá para GitHub Actions → Build Development
+2. Clique em "Run workflow"
+3. Escolha a plataforma desejada
+
+### 3. Release para Produção
 
 ```bash
 # Atualizar versão
@@ -286,15 +291,20 @@ npm version patch  # 1.0.0 -> 1.0.1
 npm version minor  # 1.0.0 -> 1.1.0
 npm version major  # 1.0.0 -> 2.0.0
 
-# Criar tag
-git tag v1.0.0
-git push origin v1.0.0
+# Commit das mudanças de versão
+git add .
+git commit -m "chore: bump version to 1.0.1"
+
+# Criar tag (dispara build automático)
+git tag v1.0.1
+git push origin v1.0.1
+# ✅ Build automático para produção é executado
 ```
 
-### 2. Deploy Manual
+### 4. Deploy Manual (Opcional)
 
 ```bash
-# Build e deploy para ambas as plataformas
+# Build e deploy manual para ambas as plataformas
 eas build --platform all --profile production
 eas submit --platform all
 ```

@@ -1,0 +1,53 @@
+name: Build Development
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build for'
+        required: true
+        default: 'android'
+        type: choice
+        options:
+        - android
+        - ios
+        - all
+
+env:
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+jobs:
+  build-development:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Create Google Service Account file
+        if: inputs.platform == 'android' || inputs.platform == 'all'
+        run: |
+          mkdir -p config
+          echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}' > config/google-service-account.json
+
+      - name: Build Android Development
+        if: inputs.platform == 'android' || inputs.platform == 'all'
+        run: |
+          echo "Building Android development version"
+          eas build --platform android --profile development --non-interactive
+
+      - name: Build iOS Development
+        if: inputs.platform == 'ios' || inputs.platform == 'all'
+        run: |
+          echo "Building iOS development version"
+          eas build --platform ios --profile development --non-interactive
