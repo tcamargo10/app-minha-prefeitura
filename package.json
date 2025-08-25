@@ -1,6 +1,6 @@
 {
   "name": "app-minha-prefeitura",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "type": "module",
   "main": "index.ts",
   "scripts": {
@@ -19,6 +19,8 @@
     "@supabase/supabase-js": "^2.56.0",
     "axios": "^1.11.0",
     "expo": "53.0.22",
+    "expo-constants": "^17.1.7",
+    "expo-font": "~13.3.2",
     "expo-secure-store": "~14.2.4",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
@@ -28,8 +30,7 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-url-polyfill": "^2.0.0",
-    "zod": "^4.0.17",
-    "expo-font": "~13.3.2"
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

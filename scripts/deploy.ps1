@@ -42,7 +42,7 @@ try {
     Write-Host "✅ EAS CLI encontrado" -ForegroundColor Green
 } catch {
     Write-Host "❌ EAS CLI não encontrado. Instalando..." -ForegroundColor Yellow
-    npm install -g @expo/eas-cli
+    npm install -g eas-cli
 }
 
 # Verificar se está logado no Expo
@@ -55,11 +55,17 @@ try {
     exit 1
 }
 
+# Sincronizar versões entre package.json e app.json
+Write-Host "🔄 Sincronizando versões..." -ForegroundColor Yellow
+node scripts/sync-version.js sync
+
 # Atualizar versão apenas para produção
 if ($Profile -eq "production") {
     Write-Host "📝 Atualizando versão..." -ForegroundColor Yellow
-    npm version $Version --no-git-tag-version
-
+    
+    # Usar o script de sincronização para atualizar versão
+    node scripts/sync-version.js $Version
+    
     # Obter nova versão
     $packageJson = Get-Content "package.json" | ConvertFrom-Json
     $newVersion = $packageJson.version
@@ -67,7 +73,7 @@ if ($Profile -eq "production") {
 
     # Criar tag
     Write-Host "🏷️ Criando tag v$newVersion..." -ForegroundColor Yellow
-    git add package.json package-lock.json
+    git add package.json package-lock.json app.json
     git commit -m "chore: bump version to $newVersion"
     git tag "v$newVersion"
 

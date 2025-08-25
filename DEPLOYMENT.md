@@ -30,7 +30,7 @@ git push origin v1.0.1
 ### 1. Instalar EAS CLI
 
 ```bash
-npm install -g @expo/eas-cli
+npm install -g eas-cli
 ```
 
 ### 2. Fazer Login no Expo
@@ -152,7 +152,7 @@ jobs:
         run: npm install
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Setup Expo
         run: |
@@ -260,7 +260,7 @@ jobs:
         run: npm install
 
       - name: Install EAS CLI
-        run: npm install -g @expo/eas-cli
+        run: npm install -g eas-cli
 
       - name: Setup Expo
         run: |
@@ -439,7 +439,7 @@ jobs:
           node-version: '18'
           cache: 'npm'
       - run: npm install
-      - run: npm install -g @expo/eas-cli
+      - run: npm install -g eas-cli
       - run: echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
       - run: eas build --platform all --profile preview --non-interactive
 
@@ -454,7 +454,7 @@ jobs:
           node-version: '18'
           cache: 'npm'
       - run: npm install
-      - run: npm install -g @expo/eas-cli
+      - run: npm install -g eas-cli
       - run: echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
       - run: eas build --platform all --profile production --non-interactive
       - run: eas submit --platform all --non-interactive

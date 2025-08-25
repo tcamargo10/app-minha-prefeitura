@@ -13,20 +13,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppBar } from '@/components/AppBar';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAppInfo } from '@/hooks/useAppInfo';
 
 export const SobreAppScreen: React.FC = () => {
   const { theme } = useTheme();
   const navigation = useNavigation();
-
-  const appInfo = {
-    name: 'Minha Cidade',
-    version: '1.0.0',
-    description:
-      'Aplicativo oficial da prefeitura para facilitar o acesso aos serviços municipais.',
-    developer: 'Prefeitura Municipal',
-    contact: 'contato@prefeitura.gov.br',
-    website: 'https://www.prefeitura.gov.br',
-  };
+  const appInfo = useAppInfo();
 
   const features = [
     {
@@ -163,6 +155,7 @@ export const SobreAppScreen: React.FC = () => {
                 ]}
               >
                 Versão {appInfo.version}
+                {appInfo.buildNumber && ` (${appInfo.buildNumber})`}
               </Text>
               <Text
                 style={[
