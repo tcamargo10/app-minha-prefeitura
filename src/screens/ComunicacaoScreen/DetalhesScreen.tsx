@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   Linking,
   Dimensions,
+  Alert,
+  ActivityIndicator,
+  Image,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +18,11 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
 import { AppBar } from '@/components/AppBar';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  communicationService,
+  CommunicationWithLinks,
+} from '@/services/communicationService';
 
 interface ComunicadoDetalhes {
   id: string;
@@ -32,33 +41,41 @@ interface ComunicadoDetalhes {
   }>;
   destaque: boolean;
   autor?: string;
-  tags?: string[];
   local?: string;
   horario?: string;
 }
 
-type ComunicacaoDetalhesRouteProp = RouteProp<{
-  ComunicacaoDetalhes: { comunicado: ComunicadoDetalhes };
-}, 'ComunicacaoDetalhes'>;
+type ComunicacaoDetalhesRouteProp = RouteProp<
+  {
+    ComunicacaoDetalhes: { comunicado: ComunicadoDetalhes };
+  },
+  'ComunicacaoDetalhes'
+>;
 
 export const ComunicacaoDetalhesScreen: React.FC = () => {
   const { theme } = useTheme();
+  const { user, citizen } = useAuth();
   const navigation = useNavigation();
   const route = useRoute<ComunicacaoDetalhesRouteProp>();
-  const { comunicado } = route.params;
+  const { comunicado: initialComunicado } = route.params;
+
+  const [comunicado, setComunicado] =
+    useState<ComunicadoDetalhes>(initialComunicado);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const getTipoIcon = (tipo: string) => {
     switch (tipo) {
       case 'noticia':
-        return 'newspaper';
+        return 'newspaper-outline';
       case 'informacao':
-        return 'information-circle';
+        return 'information-circle-outline';
       case 'alerta':
-        return 'warning';
+        return 'warning-outline';
       case 'evento':
-        return 'calendar';
+        return 'calendar-outline';
       default:
-        return 'help-circle';
+        return 'help-circle-outline';
     }
   };
 
@@ -117,7 +134,27 @@ export const ComunicacaoDetalhesScreen: React.FC = () => {
   };
 
   const handleLinkPress = (url: string) => {
-    Linking.openURL(url);
+    Linking.openURL(url).catch(err => {
+      console.error('Erro ao abrir link:', err);
+      Alert.alert('Erro', 'Não foi possível abrir o link.');
+    });
+  };
+
+  // Função para extrair o ID do vídeo do YouTube da URL
+  const getYouTubeVideoId = (url: string): string | null => {
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  // Função para gerar a URL da thumbnail do YouTube
+  const getYouTubeThumbnail = (url: string): string => {
+    const videoId = getYouTubeVideoId(url);
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    }
+    return '';
   };
 
   const isExpired = (dataExpiracao?: string) => {
@@ -126,6 +163,102 @@ export const ComunicacaoDetalhesScreen: React.FC = () => {
     const hoje = new Date();
     return hoje > expiracao;
   };
+
+  // Função para converter dados do Supabase para o formato da interface
+  const convertCommunicationToComunicado = (
+    communication: CommunicationWithLinks
+  ): ComunicadoDetalhes => {
+    // Converter tipo do inglês para português
+    const mapTipo = (
+      type: string
+    ): 'noticia' | 'informacao' | 'alerta' | 'evento' => {
+      switch (type) {
+        case 'news':
+          return 'noticia';
+        case 'information':
+          return 'informacao';
+        case 'alert':
+          return 'alerta';
+        case 'event':
+          return 'evento';
+        default:
+          return 'noticia';
+      }
+    };
+
+    return {
+      id: communication.id,
+      tipo: mapTipo(communication.type),
+      titulo: communication.title,
+      resumo: communication.summary,
+      conteudo: communication.content,
+      dataPublicacao: communication.published_at,
+      dataExpiracao: communication.expires_at,
+      imagem: communication.image_url,
+      video: communication.video_url,
+      links: communication.communication_links?.map(link => ({
+        titulo: link.title,
+        url: link.url,
+        tipo: link.type as 'documento' | 'site' | 'formulario',
+      })),
+      destaque: communication.featured,
+      autor: communication.author,
+      local: communication.location,
+      horario: communication.schedule,
+    };
+  };
+
+  // Buscar dados atualizados do Supabase
+  const fetchCommunicationDetails = async () => {
+    try {
+      setLoading(true);
+      const communication = await communicationService.getCommunicationById(
+        comunicado.id
+      );
+
+      if (communication) {
+        const updatedComunicado =
+          convertCommunicationToComunicado(communication);
+        setComunicado(updatedComunicado);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da comunicação:', error);
+      Alert.alert(
+        'Erro',
+        'Não foi possível carregar os detalhes da comunicação.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Função para lidar com o pull-to-refresh
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await fetchCommunicationDetails();
+    } catch (error) {
+      console.error('Erro ao atualizar:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // Marcar como lida quando a tela for aberta
+  useEffect(() => {
+    if (citizen?.id) {
+      communicationService
+        .markAsRead(comunicado.id, citizen.id)
+        .catch(error => {
+          console.error('Erro ao marcar como lida:', error);
+        });
+    }
+  }, [comunicado.id, citizen?.id]);
+
+  // Buscar dados atualizados quando a tela for montada
+  useEffect(() => {
+    fetchCommunicationDetails();
+  }, []);
 
   return (
     <SafeAreaView
@@ -143,200 +276,297 @@ export const ComunicacaoDetalhesScreen: React.FC = () => {
           { backgroundColor: theme.colors.surface },
         ]}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Header Section */}
-          <View style={styles.headerSection}>
-            <View style={styles.tipoContainer}>
-              <Ionicons
-                name={getTipoIcon(comunicado.tipo) as any}
-                size={24}
-                color={getTipoColor(comunicado.tipo)}
-              />
-              <Text style={[styles.tipoText, { color: getTipoColor(comunicado.tipo) }]}>
-                {getTipoLabel(comunicado.tipo)}
-              </Text>
-              {comunicado.destaque && (
-                <View style={[styles.destaqueBadge, { backgroundColor: getTipoColor(comunicado.tipo) }]}>
-                  <Text style={styles.destaqueText}>Destaque</Text>
-                </View>
-              )}
-              {isExpired(comunicado.dataExpiracao) && (
-                <View style={[styles.expiradoBadge, { backgroundColor: theme.colors.error }]}>
-                  <Text style={styles.expiradoText}>Expirado</Text>
-                </View>
-              )}
-            </View>
-
-            <Text style={[styles.titulo, { color: theme.colors.text }]}>
-              {comunicado.titulo}
-            </Text>
-
-            <Text style={[styles.resumo, { color: theme.colors.textSecondary }]}>
-              {comunicado.resumo}
-            </Text>
-
-            <View style={styles.metaInfo}>
-              <View style={styles.metaItem}>
-                <Ionicons name="time-outline" size={16} color={theme.colors.textSecondary} />
-                <Text style={[styles.metaText, { color: theme.colors.textSecondary }]}>
-                  Publicado em {formatDate(comunicado.dataPublicacao)}
-                </Text>
-              </View>
-              {comunicado.autor && (
-                <View style={styles.metaItem}>
-                  <Ionicons name="person-outline" size={16} color={theme.colors.textSecondary} />
-                  <Text style={[styles.metaText, { color: theme.colors.textSecondary }]}>
-                    Por {comunicado.autor}
-                  </Text>
-                </View>
-              )}
-              {comunicado.dataExpiracao && (
-                <View style={styles.metaItem}>
-                  <Ionicons name="calendar-outline" size={16} color={theme.colors.textSecondary} />
-                  <Text style={[styles.metaText, { color: theme.colors.textSecondary }]}>
-                    Expira em {formatDate(comunicado.dataExpiracao)}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </View>
-
-          {/* Banner/Imagem */}
-          {comunicado.imagem && (
-            <View style={styles.bannerContainer}>
-              <View style={[styles.bannerPlaceholder, { backgroundColor: theme.colors.border }]}>
-                <Ionicons name="image" size={48} color={theme.colors.textSecondary} />
-                <Text style={[styles.bannerText, { color: theme.colors.textSecondary }]}>
-                  Banner da Notícia
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {/* Informações do Evento */}
-          {comunicado.tipo === 'evento' && (comunicado.local || comunicado.horario) && (
-            <View style={[styles.eventoInfo, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-              <Text style={[styles.eventoTitle, { color: theme.colors.text }]}>
-                Informações do Evento
-              </Text>
-              {comunicado.local && (
-                <View style={styles.eventoItem}>
-                  <Ionicons name="location-outline" size={20} color={getTipoColor(comunicado.tipo)} />
-                  <Text style={[styles.eventoText, { color: theme.colors.text }]}>
-                    {comunicado.local}
-                  </Text>
-                </View>
-              )}
-              {comunicado.horario && (
-                <View style={styles.eventoItem}>
-                  <Ionicons name="time-outline" size={20} color={getTipoColor(comunicado.tipo)} />
-                  <Text style={[styles.eventoText, { color: theme.colors.text }]}>
-                    {comunicado.horario}
-                  </Text>
-                </View>
-              )}
-            </View>
-          )}
-
-          {/* Conteúdo Principal */}
-          <View style={styles.conteudoSection}>
-            <Text style={[styles.conteudoTitle, { color: theme.colors.text }]}>
-              Conteúdo
-            </Text>
-            <Text style={[styles.conteudo, { color: theme.colors.text }]}>
-              {comunicado.conteudo}
-            </Text>
-          </View>
-
-          {/* Vídeo */}
-          {comunicado.video && (
-            <View style={styles.videoSection}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Vídeo Relacionado
-              </Text>
-              <TouchableOpacity
-                style={[styles.videoContainer, { backgroundColor: theme.colors.border }]}
-                onPress={() => handleLinkPress(comunicado.video!)}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+              title="Puxe para atualizar"
+              titleColor={theme.colors.textSecondary}
+            />
+          }
+        >
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text
+                style={[
+                  styles.loadingText,
+                  { color: theme.colors.textSecondary },
+                ]}
               >
-                <Ionicons name="play-circle" size={48} color={theme.colors.primary} />
-                <Text style={[styles.videoText, { color: theme.colors.textSecondary }]}>
-                  Assistir Vídeo
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Links Relacionados */}
-          {comunicado.links && comunicado.links.length > 0 && (
-            <View style={styles.linksSection}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Links Relacionados
+                Carregando detalhes...
               </Text>
-              {comunicado.links.map((link, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[styles.linkCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-                  onPress={() => handleLinkPress(link.url)}
-                >
+            </View>
+          ) : (
+            <>
+              {/* Header Section */}
+              <View style={styles.headerSection}>
+                <View style={styles.tipoContainer}>
                   <Ionicons
-                    name={getLinkIcon(link.tipo) as any}
+                    name={
+                      getTipoIcon(
+                        comunicado.tipo
+                      ) as keyof typeof Ionicons.glyphMap
+                    }
                     size={24}
-                    color={theme.colors.primary}
+                    color={getTipoColor(comunicado.tipo)}
                   />
-                  <View style={styles.linkContent}>
-                    <Text style={[styles.linkTitle, { color: theme.colors.text }]}>
-                      {link.titulo}
-                    </Text>
-                    <Text style={[styles.linkUrl, { color: theme.colors.textSecondary }]}>
-                      {link.url}
-                    </Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {/* Tags */}
-          {comunicado.tags && comunicado.tags.length > 0 && (
-            <View style={styles.tagsSection}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Tags
-              </Text>
-              <View style={styles.tagsContainer}>
-                {comunicado.tags.map((tag, index) => (
-                  <View
-                    key={index}
-                    style={[styles.tag, { backgroundColor: theme.colors.border }]}
+                  <Text
+                    style={[
+                      styles.tipoText,
+                      { color: getTipoColor(comunicado.tipo) },
+                    ]}
                   >
-                    <Text style={[styles.tagText, { color: theme.colors.textSecondary }]}>
-                      #{tag}
+                    {getTipoLabel(comunicado.tipo)}
+                  </Text>
+                  {comunicado.destaque && (
+                    <View
+                      style={[
+                        styles.destaqueBadge,
+                        { backgroundColor: getTipoColor(comunicado.tipo) },
+                      ]}
+                    >
+                      <Text style={styles.destaqueText}>Destaque</Text>
+                    </View>
+                  )}
+                  {isExpired(comunicado.dataExpiracao) && (
+                    <View
+                      style={[
+                        styles.expiradoBadge,
+                        { backgroundColor: theme.colors.error },
+                      ]}
+                    >
+                      <Text style={styles.expiradoText}>Expirado</Text>
+                    </View>
+                  )}
+                </View>
+
+                <Text style={[styles.titulo, { color: theme.colors.text }]}>
+                  {comunicado.titulo}
+                </Text>
+
+                <Text
+                  style={[styles.resumo, { color: theme.colors.textSecondary }]}
+                >
+                  {comunicado.resumo}
+                </Text>
+
+                <View style={styles.metaInfo}>
+                  <View style={styles.metaItem}>
+                    <Ionicons
+                      name="time-outline"
+                      size={16}
+                      color={theme.colors.textSecondary}
+                    />
+                    <Text
+                      style={[
+                        styles.metaText,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      Publicado em {formatDate(comunicado.dataPublicacao)}
                     </Text>
                   </View>
-                ))}
+                  {comunicado.autor && (
+                    <View style={styles.metaItem}>
+                      <Ionicons
+                        name="person-outline"
+                        size={16}
+                        color={theme.colors.textSecondary}
+                      />
+                      <Text
+                        style={[
+                          styles.metaText,
+                          { color: theme.colors.textSecondary },
+                        ]}
+                      >
+                        Por {comunicado.autor}
+                      </Text>
+                    </View>
+                  )}
+                  {comunicado.dataExpiracao && (
+                    <View style={styles.metaItem}>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={16}
+                        color={theme.colors.textSecondary}
+                      />
+                      <Text
+                        style={[
+                          styles.metaText,
+                          { color: theme.colors.textSecondary },
+                        ]}
+                      >
+                        Expira em {formatDate(comunicado.dataExpiracao)}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
-          )}
 
-          {/* Botões de Ação */}
-          <View style={styles.actionsSection}>
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
-            >
-              <Ionicons name="share-outline" size={20} color={theme.colors.onPrimary} />
-              <Text style={[styles.actionText, { color: theme.colors.onPrimary }]}>
-                Compartilhar
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-            >
-              <Ionicons name="bookmark-outline" size={20} color={theme.colors.text} />
-              <Text style={[styles.actionText, { color: theme.colors.text }]}>
-                Salvar
-              </Text>
-            </TouchableOpacity>
-          </View>
+              {/* Banner/Imagem */}
+              {comunicado.imagem && (
+                <View style={styles.bannerContainer}>
+                  <Image
+                    source={{ uri: comunicado.imagem }}
+                    style={styles.bannerImage}
+                    resizeMode="cover"
+                  />
+                </View>
+              )}
+
+              {/* Informações do Evento */}
+              {comunicado.tipo === 'evento' &&
+                (comunicado.local || comunicado.horario) && (
+                  <View
+                    style={[
+                      styles.eventoInfo,
+                      {
+                        backgroundColor: theme.colors.surface,
+                        borderColor: theme.colors.border,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[styles.eventoTitle, { color: theme.colors.text }]}
+                    >
+                      Informações do Evento
+                    </Text>
+                    {comunicado.local && (
+                      <View style={styles.eventoItem}>
+                        <Ionicons
+                          name="location-outline"
+                          size={20}
+                          color={getTipoColor(comunicado.tipo)}
+                        />
+                        <Text
+                          style={[
+                            styles.eventoText,
+                            { color: theme.colors.text },
+                          ]}
+                        >
+                          {comunicado.local}
+                        </Text>
+                      </View>
+                    )}
+                    {comunicado.horario && (
+                      <View style={styles.eventoItem}>
+                        <Ionicons
+                          name="time-outline"
+                          size={20}
+                          color={getTipoColor(comunicado.tipo)}
+                        />
+                        <Text
+                          style={[
+                            styles.eventoText,
+                            { color: theme.colors.text },
+                          ]}
+                        >
+                          {comunicado.horario}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+              {/* Conteúdo Principal */}
+              <View style={styles.conteudoSection}>
+                <Text
+                  style={[styles.conteudoTitle, { color: theme.colors.text }]}
+                >
+                  Conteúdo
+                </Text>
+                <Text style={[styles.conteudo, { color: theme.colors.text }]}>
+                  {comunicado.conteudo}
+                </Text>
+              </View>
+
+              {/* Vídeo */}
+              {comunicado.video && (
+                <View style={styles.videoSection}>
+                  <Text
+                    style={[styles.sectionTitle, { color: theme.colors.text }]}
+                  >
+                    Vídeo Relacionado
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.videoContainer}
+                    onPress={() => handleLinkPress(comunicado.video!)}
+                  >
+                    <Image
+                      source={{ uri: getYouTubeThumbnail(comunicado.video) }}
+                      style={styles.videoThumbnail}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.videoOverlay}>
+                      <Ionicons name="play-circle" size={64} color="white" />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Links Relacionados */}
+              {comunicado.links && comunicado.links.length > 0 && (
+                <View style={styles.linksSection}>
+                  <Text
+                    style={[styles.sectionTitle, { color: theme.colors.text }]}
+                  >
+                    Links Relacionados
+                  </Text>
+                  {comunicado.links.map((link, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.linkCard,
+                        {
+                          backgroundColor: theme.colors.surface,
+                          borderColor: theme.colors.border,
+                        },
+                      ]}
+                      onPress={() => handleLinkPress(link.url)}
+                    >
+                      <Ionicons
+                        name={
+                          getLinkIcon(
+                            link.tipo
+                          ) as keyof typeof Ionicons.glyphMap
+                        }
+                        size={24}
+                        color={theme.colors.primary}
+                      />
+                      <View style={styles.linkContent}>
+                        <Text
+                          style={[
+                            styles.linkTitle,
+                            { color: theme.colors.text },
+                          ]}
+                        >
+                          {link.titulo}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.linkUrl,
+                            { color: theme.colors.textSecondary },
+                          ]}
+                        >
+                          {link.url}
+                        </Text>
+                      </View>
+                      <Ionicons
+                        name="chevron-forward"
+                        size={20}
+                        color={theme.colors.textSecondary}
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </>
+          )}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -416,15 +646,10 @@ const styles = StyleSheet.create({
   bannerContainer: {
     marginBottom: 24,
   },
-  bannerPlaceholder: {
+  bannerImage: {
+    width: '100%',
     height: 200,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bannerText: {
-    fontSize: 16,
-    marginTop: 8,
   },
   eventoInfo: {
     padding: 16,
@@ -467,14 +692,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   videoContainer: {
-    height: 150,
+    height: 200,
     borderRadius: 12,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  videoThumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  videoOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  videoText: {
-    fontSize: 16,
-    marginTop: 8,
   },
   linksSection: {
     marginBottom: 24,
@@ -499,40 +734,16 @@ const styles = StyleSheet.create({
   linkUrl: {
     fontSize: 12,
   },
-  tagsSection: {
-    marginBottom: 24,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  tagText: {
-    fontSize: 14,
-  },
-  actionsSection: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-  },
-  actionButton: {
+
+  loadingContainer: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
+    alignItems: 'center',
+    paddingVertical: 40,
   },
-  actionText: {
+  loadingText: {
     fontSize: 16,
-    fontWeight: '500',
-    marginLeft: 8,
+    marginTop: 16,
+    textAlign: 'center',
   },
 });

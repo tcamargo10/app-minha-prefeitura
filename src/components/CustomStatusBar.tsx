@@ -20,7 +20,7 @@ export const CustomStatusBar: React.FC<CustomStatusBarProps> = ({
     <StatusBar
       barStyle={barStyle}
       backgroundColor={backgroundColor || theme.colors.primary}
-      translucent={translucent}
+      translucent={Platform.OS === 'android' ? true : translucent}
     />
   );
 };

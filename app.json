@@ -2,7 +2,7 @@
   "expo": {
     "name": "Minha Cidade",
     "slug": "minha-prefeitura",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,14 +16,12 @@
     },
     "android": {
       "package": "com.minhaprefeitura.app",
-      "versionCode": 6,
+      "versionCode": 7,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "screenOrientation": "portrait",
-      "resizeableActivity": false,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE",

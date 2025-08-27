@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,17 +9,21 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Image,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '@/navigation/AppNavigator';
 
 import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useCity } from '@/contexts/CityContext';
+import { useAuth } from '@/hooks/useAuth';
+import { RootStackParamList } from '@/navigation/AppNavigator';
+import {
+  communicationService,
+  CommunicationWithLinks,
+} from '@/services/communicationService';
 
+// Interface para compatibilidade com o código existente
 interface Comunicado {
   id: string;
   tipo: 'noticia' | 'informacao' | 'alerta' | 'evento';
@@ -35,7 +42,6 @@ interface Comunicado {
   destaque: boolean;
   lido: boolean;
   autor?: string;
-  tags?: string[];
   local?: string;
   horario?: string;
 }
@@ -47,150 +53,140 @@ type ComunicacaoScreenNavigationProp = StackNavigationProp<
 
 export const ComunicacaoScreen: React.FC = () => {
   const { theme } = useTheme();
+  const { currentCity } = useCity();
+  const { user, citizen } = useAuth();
   const navigation = useNavigation<ComunicacaoScreenNavigationProp>();
-  const [refreshing, setRefreshing] = useState(false);
-  const [comunicados, setComunicados] = useState<Comunicado[]>([
-    {
-      id: '1',
-      tipo: 'noticia',
-      titulo: 'Nova Praça Central Inaugurada',
-      resumo:
-        'A prefeitura inaugura a nova praça central com área de lazer e paisagismo',
-      conteudo:
-        'A prefeitura municipal inaugurou oficialmente a nova Praça Central, localizada no coração da cidade. O espaço conta com área de lazer, playground infantil, quadra poliesportiva e paisagismo completo. A obra foi realizada com recursos próprios do município e representa um importante marco para a qualidade de vida dos cidadãos.',
-      dataPublicacao: '2024-01-20',
-      imagem: 'https://example.com/praca-central.jpg',
-      destaque: true,
-      lido: false,
-    },
-    {
-      id: '2',
-      tipo: 'alerta',
-      titulo: 'Manutenção no Abastecimento de Água',
-      resumo:
-        'Interrupção programada no fornecimento de água em alguns bairros',
-      conteudo:
-        'A Companhia de Água informa que haverá interrupção programada no fornecimento de água nos bairros Centro, Jardim das Flores e Vila Nova, entre os dias 22 e 24 de janeiro, das 8h às 18h. A manutenção é necessária para melhorias no sistema de distribuição. Recomenda-se armazenar água para consumo durante o período.',
-      dataPublicacao: '2024-01-19',
-      dataExpiracao: '2024-01-24',
-      links: [
-        {
-          titulo: 'Mapa das Áreas Afetadas',
-          url: 'https://www.prefeitura.gov.br/mapa-manutencao',
-          tipo: 'site',
-        },
-        {
-          titulo: 'Formulário de Solicitação de Caminhão Pipa',
-          url: 'https://www.prefeitura.gov.br/caminhao-pipa',
-          tipo: 'formulario',
-        },
-      ],
-      destaque: true,
-      lido: true,
-    },
-    {
-      id: '3',
-      tipo: 'evento',
-      titulo: 'Festival de Cultura Popular',
-      resumo:
-        'Evento cultural com apresentações de música, dança e artesanato local',
-      conteudo:
-        'A prefeitura promove o Festival de Cultura Popular, que acontecerá nos dias 25, 26 e 27 de janeiro, na Praça da Matriz. O evento contará com apresentações de música regional, danças folclóricas, exposição de artesanato local e gastronomia típica. Entrada gratuita para toda a família.',
-      dataPublicacao: '2024-01-18',
-      dataExpiracao: '2024-01-27',
-      local: 'Praça da Matriz',
-      horario: '25 a 27 de janeiro, das 18h às 22h',
-      video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      links: [
-        {
-          titulo: 'Programação Completa',
-          url: 'https://www.prefeitura.gov.br/festival-programacao',
-          tipo: 'documento',
-        },
-        {
-          titulo: 'Inscrição para Expositores',
-          url: 'https://www.prefeitura.gov.br/festival-inscricao',
-          tipo: 'formulario',
-        },
-      ],
-      tags: ['cultura', 'evento', 'gratuito', 'música'],
-      destaque: false,
-      lido: false,
-    },
-    {
-      id: '4',
-      tipo: 'informacao',
-      titulo: 'Novo Horário de Funcionamento da Prefeitura',
-      resumo: 'Alteração no horário de atendimento ao público',
-      conteudo:
-        'A partir do próximo mês, a prefeitura municipal alterará seu horário de funcionamento. O atendimento ao público será realizado de segunda a sexta-feira, das 8h às 17h, sem fechamento para almoço. A medida visa melhorar o atendimento e facilitar o acesso dos cidadãos aos serviços municipais.',
-      dataPublicacao: '2024-01-17',
-      autor: 'Secretaria de Administração',
-      destaque: false,
-      lido: true,
-    },
-    {
-      id: '5',
-      tipo: 'noticia',
-      titulo: 'Programa de Reciclagem Ampliado',
-      resumo: 'Nova coleta seletiva será implementada em toda a cidade',
-      conteudo:
-        'A prefeitura anuncia a ampliação do programa de reciclagem para toda a cidade. A partir de março, a coleta seletiva será realizada em todos os bairros, com caminhões específicos para materiais recicláveis. A iniciativa faz parte do programa "Cidade Sustentável" e visa reduzir o impacto ambiental dos resíduos.',
-      dataPublicacao: '2024-01-16',
-      video: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
-      links: [
-        {
-          titulo: 'Guia de Reciclagem',
-          url: 'https://www.prefeitura.gov.br/guia-reciclagem.pdf',
-          tipo: 'documento',
-        },
-        {
-          titulo: 'Agenda de Coleta por Bairro',
-          url: 'https://www.prefeitura.gov.br/agenda-coleta',
-          tipo: 'site',
-        },
-      ],
-      tags: ['sustentabilidade', 'reciclagem', 'meio ambiente'],
-      destaque: false,
-      lido: false,
-    },
-    {
-      id: '6',
-      tipo: 'noticia',
-      titulo: 'Inauguração do Novo Hospital Municipal',
-      resumo: 'Hospital com 200 leitos e equipamentos de última geração',
-      conteudo:
-        'A prefeitura inaugurou o novo Hospital Municipal Dr. João Silva, com 200 leitos, 10 salas cirúrgicas e equipamentos de última geração. O hospital atenderá toda a região e representa um investimento de R$ 50 milhões em saúde pública. A inauguração contou com a presença do prefeito, secretários e autoridades locais.',
-      dataPublicacao: '2024-01-15',
-      imagem: 'https://example.com/hospital-municipal.jpg',
-      video: 'https://www.youtube.com/watch?v=J9gKyRmi20o',
-      autor: 'Secretaria de Saúde',
-      tags: ['saúde', 'hospital', 'inauguração'],
-      destaque: true,
-      lido: false,
-    },
-  ]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    // Simular atualização
-    setTimeout(() => {
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [comunicados, setComunicados] = useState<Comunicado[]>([]);
+
+  // Função para converter dados do Supabase para o formato da interface
+  const convertCommunicationToComunicado = (
+    communication: CommunicationWithLinks
+  ): Comunicado => {
+    // Converter tipo do inglês para português
+    const mapTipo = (type: string): 'noticia' | 'informacao' | 'alerta' | 'evento' => {
+      switch (type) {
+        case 'news':
+          return 'noticia';
+        case 'information':
+          return 'informacao';
+        case 'alert':
+          return 'alerta';
+        case 'event':
+          return 'evento';
+        default:
+          return 'noticia';
+      }
+    };
+
+    return {
+      id: communication.id,
+      tipo: mapTipo(communication.type),
+      titulo: communication.title,
+      resumo: communication.summary,
+      conteudo: communication.content,
+      dataPublicacao: communication.published_at,
+      dataExpiracao: communication.expires_at,
+      imagem: communication.image_url,
+      video: communication.video_url,
+      links: communication.links?.map(link => ({
+        titulo: link.title,
+        url: link.url,
+        tipo: link.type as 'documento' | 'site' | 'formulario',
+      })),
+      destaque: communication.featured,
+      lido: false, // Será atualizado quando implementarmos o status de leitura
+      autor: communication.author,
+      local: communication.location,
+      horario: communication.schedule,
+    };
+  };
+
+  // Função para buscar comunicações
+  const fetchCommunications = async () => {
+    if (!currentCity?.id) {
+      setComunicados([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const communications =
+        await communicationService.getCommunicationsByMunicipality(
+          currentCity.id
+        );
+
+      // Converter e verificar status de leitura para cada comunicação
+      const comunicadosWithReadStatus = await Promise.all(
+        communications.map(async communication => {
+          const comunicado = convertCommunicationToComunicado(communication);
+
+          // Verificar se foi lida (se o cidadão estiver logado)
+          if (citizen?.id) {
+            try {
+              const isRead = await communicationService.isRead(
+                communication.id,
+                citizen.id
+              );
+              comunicado.lido = isRead;
+            } catch (error) {
+              console.error('Erro ao verificar status de leitura:', error);
+              comunicado.lido = false;
+            }
+          }
+
+          return comunicado;
+        })
+      );
+
+      setComunicados(comunicadosWithReadStatus);
+    } catch (error) {
+      console.error('Erro ao buscar comunicações:', error);
+      Alert.alert(
+        'Erro',
+        'Não foi possível carregar as comunicações. Tente novamente.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Buscar comunicações quando a cidade mudar
+  useEffect(() => {
+    fetchCommunications();
+  }, [currentCity?.id]);
+
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await fetchCommunications();
+    } catch (error) {
+      console.error('Erro ao atualizar comunicações:', error);
+      Alert.alert(
+        'Erro',
+        'Não foi possível atualizar as comunicações. Tente novamente.'
+      );
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   };
 
   const getTipoIcon = (tipo: string) => {
     switch (tipo) {
       case 'noticia':
-        return 'newspaper';
+        return 'newspaper-outline';
       case 'informacao':
-        return 'information-circle';
+        return 'information-circle-outline';
       case 'alerta':
-        return 'warning';
+        return 'warning-outline';
       case 'evento':
-        return 'calendar';
+        return 'calendar-outline';
       default:
-        return 'help-circle';
+        return 'help-circle-outline';
     }
   };
 
@@ -256,7 +252,7 @@ export const ComunicacaoScreen: React.FC = () => {
         <View style={styles.comunicadoInfo}>
           <View style={styles.comunicadoTipo}>
             <Ionicons
-              name={getTipoIcon(comunicado.tipo) as any}
+              name={getTipoIcon(comunicado.tipo) as keyof typeof Ionicons.glyphMap}
               size={16}
               color={getTipoColor(comunicado.tipo)}
             />
@@ -328,7 +324,14 @@ export const ComunicacaoScreen: React.FC = () => {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+              title="Puxe para atualizar"
+              titleColor={theme.colors.textSecondary}
+            />
           }
         >
           {/* Header Section */}
@@ -349,37 +352,84 @@ export const ComunicacaoScreen: React.FC = () => {
             >
               Notícias, informações e comunicados da prefeitura
             </Text>
+            {currentCity && (
+              <Text style={[styles.cityInfo, { color: theme.colors.primary }]}>
+                📍 {currentCity.name} - {currentCity.state}
+              </Text>
+            )}
           </View>
 
-          {/* Comunicados List */}
-          {comunicados.length > 0 ? (
-            <View style={styles.comunicadosList}>
-              {comunicados.map(renderComunicado)}
+          {/* Loading State */}
+          {loading ? (
+            <View style={styles.loadingState}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text
+                style={[
+                  styles.loadingText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Carregando comunicações...
+              </Text>
             </View>
           ) : (
-            <View style={styles.emptyState}>
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={48}
-                color={theme.colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.emptyText,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                Nenhum comunicado encontrado
-              </Text>
-              <Text
-                style={[
-                  styles.emptySubtext,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                Os comunicados da prefeitura aparecerão aqui
-              </Text>
-            </View>
+            <>
+              {/* Comunicados List */}
+              {comunicados.length > 0 ? (
+                <View style={styles.comunicadosList}>
+                  {comunicados.map(renderComunicado)}
+                </View>
+              ) : (
+                <View style={styles.emptyState}>
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={48}
+                    color={theme.colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.emptyText,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Nenhum comunicado encontrado
+                  </Text>
+                  <Text
+                    style={[
+                      styles.emptySubtext,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    {currentCity
+                      ? 'Os comunicados da prefeitura aparecerão aqui'
+                      : 'Selecione uma cidade para ver as comunicações'}
+                  </Text>
+                  {!currentCity && (
+                    <TouchableOpacity
+                      style={[
+                        styles.selectCityButton,
+                        { backgroundColor: theme.colors.primary },
+                      ]}
+                      onPress={() => {
+                        Alert.alert(
+                          'Selecionar Cidade',
+                          'Navegue para a tela de perfil para selecionar uma cidade.'
+                        );
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.selectCityButtonText,
+                          { color: theme.colors.onPrimary },
+                        ]}
+                      >
+                        Selecionar Cidade
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </>
           )}
         </ScrollView>
       </View>
@@ -494,6 +544,31 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: 14,
+    textAlign: 'center',
+  },
+  loadingState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  cityInfo: {
+    fontSize: 14,
+    marginTop: 8,
+    fontWeight: '600',
+  },
+  selectCityButton: {
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  selectCityButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
     textAlign: 'center',
   },
 });

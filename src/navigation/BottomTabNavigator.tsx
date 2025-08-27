@@ -9,6 +9,7 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/contexts/ThemeContext';
 import { CategoriasScreen } from '@/screens/CategoriasScreen/index';
@@ -41,6 +42,7 @@ const PrefeituraButton: React.FC<{
 }> = ({ focused }) => {
   const { theme } = useTheme();
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const handlePress = () => {
     navigation.navigate('Prefeitura' as never);
@@ -53,6 +55,7 @@ const PrefeituraButton: React.FC<{
         {
           backgroundColor: theme.colors.primary,
           shadowColor: theme.colors.shadow,
+          bottom: Platform.OS === 'ios' ? -20 : -8 + insets.bottom,
         },
       ]}
       onPress={handlePress}
@@ -105,6 +108,7 @@ const styles = StyleSheet.create({
 
 export const BottomTabNavigator: React.FC = () => {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -150,9 +154,9 @@ export const BottomTabNavigator: React.FC = () => {
           },
           shadowOpacity: 0.1,
           shadowRadius: 8,
-          paddingBottom: Platform.OS === 'ios' ? 24 : 16,
+          paddingBottom: Platform.OS === 'ios' ? 24 : insets.bottom + 8,
           paddingTop: 8,
-          height: Platform.OS === 'ios' ? 84 : 68,
+          height: Platform.OS === 'ios' ? 84 : 68 + insets.bottom,
         },
         tabBarLabelStyle: {
           fontSize: 11,
