@@ -171,10 +171,6 @@ export const communicationService = {
         .single();
 
       if (citizenError || !citizen) {
-        console.warn(
-          'Cidadão não encontrado, retornando false para isRead:',
-          citizenId
-        );
         return false; // Se o cidadão não existe, considerar como não lida
       }
 

@@ -12,81 +12,68 @@ import {
 import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
 
-export const PrefeituraScreen: React.FC = () => {
+export const OrgaosPublicosScreen: React.FC = () => {
   const { theme } = useTheme();
   const navigation = useNavigation();
 
-  const services = [
+  const orgaos = [
     {
       id: 1,
-      title: 'Informações Municipais',
-      description: 'Acesse informações sobre o município',
-      icon: 'information-circle',
+      title: 'Secretarias',
+      description: 'Conheça as secretarias da administração municipal',
+      icon: 'business',
       color: '#007AFF',
+      route: 'Secretarias',
     },
     {
       id: 2,
-      title: 'Órgãos Públicos',
-      description: 'Conheça os órgãos da administração',
-      icon: 'business',
+      title: 'Educação',
+      description: 'Escolas e unidades educacionais da cidade',
+      icon: 'school',
       color: '#34C759',
+      route: 'Educacao',
     },
     {
       id: 3,
-      title: 'Transparência',
-      description: 'Portal da transparência municipal',
-      icon: 'eye',
+      title: 'Saúde',
+      description: 'Unidades de saúde e hospitais municipais',
+      icon: 'medical',
       color: '#FF9500',
+      route: 'Saude',
     },
     {
       id: 4,
-      title: 'Legislação',
-      description: 'Leis e decretos municipais',
-      icon: 'document-text',
-      color: '#AF52DE',
+      title: 'Segurança',
+      description: 'Unidades de segurança e policiamento',
+      icon: 'shield-checkmark',
+      color: '#FF3B30',
+      route: 'Seguranca',
     },
     {
       id: 5,
-      title: 'Agenda do Prefeito',
-      description: 'Compromissos e eventos oficiais',
-      icon: 'calendar',
-      color: '#FF3B30',
+      title: 'Trânsito',
+      description: 'Órgãos de trânsito e fiscalização',
+      icon: 'car',
+      color: '#AF52DE',
+      route: 'Transito',
     },
     {
       id: 6,
-      title: 'Ouvidoria',
-      description: 'Canal de comunicação com a população',
-      icon: 'megaphone',
+      title: 'Cultura e Lazer',
+      description: 'Espaços culturais e de lazer da cidade',
+      icon: 'color-palette',
       color: '#FF2D92',
+      route: 'CulturaLazer',
     },
   ];
 
-  const handleServicePress = (serviceId: number) => {
-    switch (serviceId) {
-      case 1:
-        navigation.navigate('InformacoesMunicipais' as never);
-        break;
-      case 2:
-        navigation.navigate('OrgaosPublicos' as never);
-        break;
-      case 3:
-        navigation.navigate('Transparencia' as never);
-        break;
-      case 4:
-        navigation.navigate('Legislacao' as never);
-        break;
-      case 5:
-        navigation.navigate('AgendaPrefeito' as never);
-        break;
-      case 6:
-        navigation.navigate('Ouvidoria' as never);
-        break;
-    }
+  const handleOrgaoPress = (orgao: any) => {
+    navigation.navigate(orgao.route as never);
   };
 
   return (
     <ScreenWrapper
-      title="Prefeitura"
+      title="Órgãos Públicos"
       showBackButton
       showCitySelector
       showProfileIcon
@@ -113,7 +100,7 @@ export const PrefeituraScreen: React.FC = () => {
               />
             </View>
             <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
-              Prefeitura Municipal
+              Órgãos Públicos
             </Text>
             <Text
               style={[
@@ -121,111 +108,76 @@ export const PrefeituraScreen: React.FC = () => {
                 { color: theme.colors.textSecondary },
               ]}
             >
-              Serviços e informações da administração pública
+              Acesse informações sobre os órgãos da administração municipal
             </Text>
           </View>
 
-          {/* Services Grid */}
-          <View style={styles.servicesSection}>
+          {/* Órgãos Grid */}
+          <View style={styles.orgaosSection}>
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Serviços Disponíveis
+              Categorias Disponíveis
             </Text>
 
-            <View style={styles.servicesGrid}>
-              {services.map(service => (
+            <View style={styles.orgaosGrid}>
+              {orgaos.map(orgao => (
                 <TouchableOpacity
-                  key={service.id}
+                  key={orgao.id}
                   style={[
-                    styles.serviceCard,
+                    styles.orgaoCard,
                     {
                       backgroundColor: theme.colors.background,
                       shadowColor: theme.colors.shadow,
                     },
                   ]}
-                  onPress={() => handleServicePress(service.id)}
+                  onPress={() => handleOrgaoPress(orgao)}
                   activeOpacity={0.7}
                 >
                   <View
-                    style={[
-                      styles.serviceIcon,
-                      { backgroundColor: service.color },
-                    ]}
+                    style={[styles.orgaoIcon, { backgroundColor: orgao.color }]}
                   >
                     <Ionicons
-                      name={service.icon as any}
+                      name={orgao.icon as any}
                       size={24}
                       color="white"
                     />
                   </View>
                   <Text
-                    style={[styles.serviceTitle, { color: theme.colors.text }]}
+                    style={[styles.orgaoTitle, { color: theme.colors.text }]}
                   >
-                    {service.title}
+                    {orgao.title}
                   </Text>
                   <Text
                     style={[
-                      styles.serviceDescription,
+                      styles.orgaoDescription,
                       { color: theme.colors.textSecondary },
                     ]}
                   >
-                    {service.description}
+                    {orgao.description}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
-          {/* Contact Section */}
-          <View style={styles.contactSection}>
+          {/* Informações Adicionais */}
+          <View style={styles.infoSection}>
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Informações de Contato
+              Informações Gerais
             </Text>
-
             <View
               style={[
-                styles.contactCard,
+                styles.infoCard,
                 { backgroundColor: theme.colors.background },
               ]}
             >
-              <View style={styles.contactItem}>
-                <Ionicons
-                  name="location"
-                  size={20}
-                  color={theme.colors.primary}
-                />
-                <Text
-                  style={[styles.contactText, { color: theme.colors.text }]}
-                >
-                  Endereço da Prefeitura
-                </Text>
-              </View>
-
-              <View style={styles.contactItem}>
-                <Ionicons name="call" size={20} color={theme.colors.primary} />
-                <Text
-                  style={[styles.contactText, { color: theme.colors.text }]}
-                >
-                  (13) 3000-0000
-                </Text>
-              </View>
-
-              <View style={styles.contactItem}>
-                <Ionicons name="mail" size={20} color={theme.colors.primary} />
-                <Text
-                  style={[styles.contactText, { color: theme.colors.text }]}
-                >
-                  contato@prefeitura.gov.br
-                </Text>
-              </View>
-
-              <View style={styles.contactItem}>
-                <Ionicons name="time" size={20} color={theme.colors.primary} />
-                <Text
-                  style={[styles.contactText, { color: theme.colors.text }]}
-                >
-                  Segunda a Sexta: 8h às 17h
-                </Text>
-              </View>
+              <Text
+                style={[styles.infoText, { color: theme.colors.textSecondary }]}
+              >
+                Os órgãos públicos municipais são responsáveis por executar as
+                políticas públicas definidas pela administração municipal. Cada
+                categoria possui atribuições específicas e trabalha em conjunto
+                para garantir o bem-estar da população.
+              </Text>
             </View>
           </View>
         </ScrollView>
@@ -267,7 +219,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  servicesSection: {
+  orgaosSection: {
     marginBottom: 32,
   },
   sectionTitle: {
@@ -275,16 +227,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 16,
   },
-  servicesGrid: {
+  orgaosGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  serviceCard: {
+  orgaoCard: {
     width: '48%',
-    padding: 16,
+    padding: 20,
     borderRadius: 12,
     marginBottom: 16,
+    alignItems: 'center',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -293,7 +246,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  serviceIcon: {
+  orgaoIcon: {
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -301,19 +254,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  serviceTitle: {
+  orgaoTitle: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 4,
+    textAlign: 'center',
+    marginBottom: 8,
   },
-  serviceDescription: {
-    fontSize: 14,
-    lineHeight: 20,
+  orgaoDescription: {
+    fontSize: 12,
+    textAlign: 'center',
+    lineHeight: 16,
   },
-  contactSection: {
+  infoSection: {
     marginBottom: 20,
   },
-  contactCard: {
+  infoCard: {
     padding: 20,
     borderRadius: 12,
     shadowOffset: {
@@ -324,14 +279,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  contactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  contactText: {
+  infoText: {
     fontSize: 16,
-    marginLeft: 12,
-    flex: 1,
+    lineHeight: 24,
   },
 });

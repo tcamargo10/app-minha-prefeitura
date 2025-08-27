@@ -343,19 +343,18 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
             { backgroundColor: theme.colors.surface },
           ]}
         >
-          <View style={styles.timelineHeader}>
-            <Text style={[styles.timelineStatus, { color: theme.colors.text }]}>
-              {item.status}
-            </Text>
-            <Text
-              style={[
-                styles.timelineDate,
-                { color: theme.colors.textSecondary },
-              ]}
-            >
-              {formatDateTime(item.data, item.hora)}
-            </Text>
-          </View>
+          <Text
+            style={[styles.timelineDate, { color: theme.colors.textSecondary }]}
+            numberOfLines={1}
+          >
+            {formatDateTime(item.data, item.hora)}
+          </Text>
+          <Text
+            style={[styles.timelineStatus, { color: theme.colors.text }]}
+            numberOfLines={2}
+          >
+            {item.status}
+          </Text>
           <Text
             style={[
               styles.timelineDescription,
@@ -677,22 +676,6 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
                 Enviar Mensagem
               </Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.actionButton,
-                styles.actionButtonOutline,
-                { borderColor: theme.colors.border },
-              ]}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="share" size={20} color={theme.colors.text} />
-              <Text
-                style={[styles.actionButtonText, { color: theme.colors.text }]}
-              >
-                Compartilhar
-              </Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -879,7 +862,6 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    marginTop: 4,
   },
   timelineLine: {
     width: 2,
@@ -890,19 +872,18 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 12,
+    paddingTop: 0,
   },
-  timelineHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
+
   timelineStatus: {
     fontSize: 16,
     fontWeight: '600',
+    marginBottom: 8,
   },
   timelineDate: {
     fontSize: 12,
+    marginBottom: 4,
+    marginTop: 0,
   },
   timelineDescription: {
     fontSize: 14,
@@ -930,7 +911,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 12,
-    flex: 0.48,
+    flex: 1,
   },
   actionButtonOutline: {
     backgroundColor: 'transparent',
