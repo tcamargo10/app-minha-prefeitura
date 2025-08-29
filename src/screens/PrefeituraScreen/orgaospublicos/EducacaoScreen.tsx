@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { ScreenWrapper } from '@/components/ScreenWrapper';
+import { CustomMapView } from '@/components/MapView';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export const EducacaoScreen: React.FC = () => {
@@ -21,87 +22,115 @@ export const EducacaoScreen: React.FC = () => {
   const escolas = [
     {
       id: 1,
-      nome: 'EMEF Professor João Silva',
+      nome: 'EMEF "Prof. José Antônio de Toledo"',
       tipo: 'Ensino Fundamental',
-      endereco: 'Rua das Flores, 123 - Centro',
-      telefone: '(11) 3333-1111',
-      email: 'emef.joao.silva@prefeitura.sp.gov.br',
-      horario: '7h às 17h',
-      alunos: 450,
-      professores: 25,
-      icon: 'school',
-      color: '#007AFF',
-      coordenadas: { latitude: -23.5505, longitude: -46.6333 },
-    },
-    {
-      id: 2,
-      nome: 'EMEI Maria Santos',
-      tipo: 'Educação Infantil',
-      endereco: 'Av. Paulista, 500 - Bela Vista',
-      telefone: '(11) 3333-2222',
-      email: 'emei.maria.santos@prefeitura.sp.gov.br',
-      horario: '7h às 18h',
-      alunos: 180,
-      professores: 12,
-      icon: 'school',
-      color: '#34C759',
-      coordenadas: { latitude: -23.5605, longitude: -46.6433 },
-    },
-    {
-      id: 3,
-      nome: 'EMEF Carlos Drummond',
-      tipo: 'Ensino Fundamental',
-      endereco: 'Rua Augusta, 789 - Consolação',
-      telefone: '(11) 3333-3333',
-      email: 'emef.carlos.drummond@prefeitura.sp.gov.br',
+      endereco: 'Rua XV de Novembro, 123 - Centro',
+      telefone: '(13) 3841-1234',
+      email: 'emef.toledo@prefeitura.iguape.sp.gov.br',
       horario: '7h às 17h',
       alunos: 320,
       professores: 18,
       icon: 'school',
-      color: '#FF9500',
-      coordenadas: { latitude: -23.5405, longitude: -46.6233 },
+      color: '#007AFF',
+      coordenadas: { latitude: -24.7081, longitude: -47.5553 },
     },
     {
-      id: 4,
-      nome: 'EMEI Ana Maria',
+      id: 2,
+      nome: 'EMEI "Maria das Dores"',
       tipo: 'Educação Infantil',
-      endereco: 'Rua Oscar Freire, 456 - Jardins',
-      telefone: '(11) 3333-4444',
-      email: 'emei.ana.maria@prefeitura.sp.gov.br',
+      endereco: 'Rua da Liberdade, 456 - Vila Nova',
+      telefone: '(13) 3841-2345',
+      email: 'emei.maria.dores@prefeitura.iguape.sp.gov.br',
       horario: '7h às 18h',
       alunos: 150,
       professores: 10,
       icon: 'school',
-      color: '#AF52DE',
-      coordenadas: { latitude: -23.5705, longitude: -46.6533 },
+      color: '#34C759',
+      coordenadas: { latitude: -24.7123, longitude: -47.5589 },
     },
     {
-      id: 5,
-      nome: 'EMEF Vinicius de Moraes',
+      id: 3,
+      nome: 'EMEF "Dr. João Baptista de Oliveira"',
       tipo: 'Ensino Fundamental',
-      endereco: 'Av. Brigadeiro Faria Lima, 1000 - Itaim Bibi',
-      telefone: '(11) 3333-5555',
-      email: 'emef.vinicius.moraes@prefeitura.sp.gov.br',
+      endereco: 'Rua São João, 789 - Bairro São João',
+      telefone: '(13) 3841-3456',
+      email: 'emef.joao.baptista@prefeitura.iguape.sp.gov.br',
       horario: '7h às 17h',
-      alunos: 380,
-      professores: 22,
+      alunos: 280,
+      professores: 16,
       icon: 'school',
-      color: '#FF2D92',
-      coordenadas: { latitude: -23.5805, longitude: -46.6633 },
+      color: '#FF9500',
+      coordenadas: { latitude: -24.7156, longitude: -47.5521 },
     },
     {
-      id: 6,
-      nome: 'EMEI Cecília Meireles',
+      id: 4,
+      nome: 'EMEI "Nossa Senhora das Neves"',
       tipo: 'Educação Infantil',
-      endereco: 'Rua Haddock Lobo, 200 - Cerqueira César',
-      telefone: '(11) 3333-6666',
-      email: 'emei.cecilia.meireles@prefeitura.sp.gov.br',
+      endereco: 'Rua das Palmeiras, 321 - Jardim das Palmeiras',
+      telefone: '(13) 3841-4567',
+      email: 'emei.nossa.senhora@prefeitura.iguape.sp.gov.br',
       horario: '7h às 18h',
       alunos: 120,
       professores: 8,
       icon: 'school',
+      color: '#AF52DE',
+      coordenadas: { latitude: -24.7098, longitude: -47.5602 },
+    },
+    {
+      id: 5,
+      nome: 'EMEF "Prof.ª Maria Aparecida Silva"',
+      tipo: 'Ensino Fundamental',
+      endereco: 'Rua do Comércio, 654 - Centro Histórico',
+      telefone: '(13) 3841-5678',
+      email: 'emef.maria.aparecida@prefeitura.iguape.sp.gov.br',
+      horario: '7h às 17h',
+      alunos: 250,
+      professores: 14,
+      icon: 'school',
+      color: '#FF2D92',
+      coordenadas: { latitude: -24.7067, longitude: -47.5534 },
+    },
+    {
+      id: 6,
+      nome: 'EMEI "São Miguel"',
+      tipo: 'Educação Infantil',
+      endereco: 'Rua São Miguel, 987 - Bairro São Miguel',
+      telefone: '(13) 3841-6789',
+      email: 'emei.sao.miguel@prefeitura.iguape.sp.gov.br',
+      horario: '7h às 18h',
+      alunos: 90,
+      professores: 6,
+      icon: 'school',
       color: '#FF3B30',
-      coordenadas: { latitude: -23.5905, longitude: -46.6733 },
+      coordenadas: { latitude: -24.7189, longitude: -47.5567 },
+    },
+    {
+      id: 7,
+      nome: 'EMEF "José Bonifácio"',
+      tipo: 'Ensino Fundamental',
+      endereco: 'Rua José Bonifácio, 147 - Vila Operária',
+      telefone: '(13) 3841-7890',
+      email: 'emef.jose.bonifacio@prefeitura.iguape.sp.gov.br',
+      horario: '7h às 17h',
+      alunos: 200,
+      professores: 12,
+      icon: 'school',
+      color: '#00CED1',
+      coordenadas: { latitude: -24.7201, longitude: -47.5498 },
+    },
+    {
+      id: 8,
+      nome: 'EMEI "Santa Rita"',
+      tipo: 'Educação Infantil',
+      endereco: 'Rua Santa Rita, 258 - Bairro Santa Rita',
+      telefone: '(13) 3841-8901',
+      email: 'emei.santa.rita@prefeitura.iguape.sp.gov.br',
+      horario: '7h às 18h',
+      alunos: 110,
+      professores: 7,
+      icon: 'school',
+      color: '#FF8C00',
+      coordenadas: { latitude: -24.7045, longitude: -47.5612 },
     },
   ];
 
@@ -120,17 +149,12 @@ export const EducacaoScreen: React.FC = () => {
 
   const renderEscolaCard = ({ item: escola }: { item: any }) => (
     <TouchableOpacity
-      style={[
-        styles.escolaCard,
-        { backgroundColor: theme.colors.background },
-      ]}
+      style={[styles.escolaCard, { backgroundColor: theme.colors.background }]}
       onPress={() => handleEscolaPress(escola)}
       activeOpacity={0.7}
     >
       <View style={styles.escolaHeader}>
-        <View
-          style={[styles.escolaIcon, { backgroundColor: escola.color }]}
-        >
+        <View style={[styles.escolaIcon, { backgroundColor: escola.color }]}>
           <Ionicons name={escola.icon as any} size={24} color="white" />
         </View>
         <View style={styles.escolaInfo}>
@@ -152,16 +176,9 @@ export const EducacaoScreen: React.FC = () => {
 
       <View style={styles.escolaDetails}>
         <View style={styles.detailItem}>
-          <Ionicons
-            name="location"
-            size={16}
-            color={theme.colors.primary}
-          />
+          <Ionicons name="location" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {escola.endereco}
           </Text>
@@ -170,10 +187,7 @@ export const EducacaoScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="call" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {escola.telefone}
           </Text>
@@ -182,10 +196,7 @@ export const EducacaoScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="time" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {escola.horario}
           </Text>
@@ -246,7 +257,7 @@ export const EducacaoScreen: React.FC = () => {
               { color: theme.colors.textSecondary },
             ]}
           >
-            Escolas municipais da cidade
+            Escolas municipais de Iguape - SP
           </Text>
         </View>
 
@@ -329,26 +340,20 @@ export const EducacaoScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <View style={styles.mapPlaceholder}>
-            <Ionicons
-              name="map"
-              size={64}
-              color={theme.colors.textSecondary}
-            />
-            <Text
-              style={[styles.mapText, { color: theme.colors.textSecondary }]}
-            >
-              Mapa das escolas
-            </Text>
-            <Text
-              style={[
-                styles.mapSubtext,
-                { color: theme.colors.textSecondary },
-              ]}
-            >
-              Aqui seria exibido o mapa com todas as escolas
-            </Text>
-          </View>
+          <CustomMapView
+            locations={escolas.map(escola => ({
+              id: escola.id,
+              nome: escola.nome,
+              coordenadas: escola.coordenadas,
+              color: escola.color,
+            }))}
+            initialRegion={{
+              latitude: -24.7081,
+              longitude: -47.5553,
+              latitudeDelta: 0.015,
+              longitudeDelta: 0.015,
+            }}
+          />
         )}
       </View>
     </ScreenWrapper>

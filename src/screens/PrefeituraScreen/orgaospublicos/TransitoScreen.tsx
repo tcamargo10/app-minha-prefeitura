@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { ScreenWrapper } from '@/components/ScreenWrapper';
+import { CustomMapView } from '@/components/MapView';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export const TransitoScreen: React.FC = () => {
@@ -21,93 +22,123 @@ export const TransitoScreen: React.FC = () => {
   const unidadesTransito = [
     {
       id: 1,
-      nome: 'CET - Centro de Engenharia de Tráfego',
+      nome: 'Departamento de Trânsito de Iguape',
       tipo: 'Órgão de Trânsito',
-      endereco: 'Rua das Flores, 123 - Centro',
-      telefone: '(11) 3333-1111',
-      email: 'cet@prefeitura.sp.gov.br',
-      horario: '24 horas',
+      endereco: 'Rua XV de Novembro, 147 - Centro',
+      telefone: '(13) 3841-1111',
+      email: 'detran.iguape@prefeitura.iguape.sp.gov.br',
+      horario: '8h às 17h',
       especialidades: ['Sinalização', 'Fiscalização', 'Engenharia de Tráfego'],
-      atendimentos: 2500,
-      funcionarios: 180,
+      atendimentos: 850,
+      funcionarios: 25,
       icon: 'car',
       color: '#007AFF',
-      coordenadas: { latitude: -23.5505, longitude: -46.6333 },
+      coordenadas: { latitude: -24.7081, longitude: -47.5553 },
     },
     {
       id: 2,
       nome: 'Posto de Fiscalização de Trânsito',
       tipo: 'Fiscalização',
-      endereco: 'Av. Paulista, 500 - Bela Vista',
-      telefone: '(11) 3333-2222',
-      email: 'fiscalizacao.paulista@prefeitura.sp.gov.br',
+      endereco: 'Rua da Liberdade, 258 - Vila Nova',
+      telefone: '(13) 3841-2222',
+      email: 'fiscalizacao.iguape@prefeitura.iguape.sp.gov.br',
       horario: '6h às 22h',
       especialidades: ['Multas', 'Apreensões', 'Educação'],
-      atendimentos: 1200,
-      funcionarios: 45,
+      atendimentos: 450,
+      funcionarios: 15,
       icon: 'traffic-light',
       color: '#FF3B30',
-      coordenadas: { latitude: -23.5605, longitude: -46.6433 },
+      coordenadas: { latitude: -24.7123, longitude: -47.5589 },
     },
     {
       id: 3,
-      nome: 'Centro de Controle Operacional',
+      nome: 'Centro de Controle de Tráfego',
       tipo: 'Controle de Tráfego',
-      endereco: 'Rua Augusta, 789 - Consolação',
-      telefone: '(11) 3333-3333',
-      email: 'cco@prefeitura.sp.gov.br',
+      endereco: 'Rua São João, 369 - Bairro São João',
+      telefone: '(13) 3841-3333',
+      email: 'cct.iguape@prefeitura.iguape.sp.gov.br',
       horario: '24 horas',
       especialidades: ['Semáforos', 'Câmeras', 'Monitoramento'],
       atendimentos: 0,
-      funcionarios: 25,
+      funcionarios: 8,
       icon: 'videocam',
       color: '#34C759',
-      coordenadas: { latitude: -23.5405, longitude: -46.6233 },
+      coordenadas: { latitude: -24.7156, longitude: -47.5521 },
     },
     {
       id: 4,
       nome: 'Escola Pública de Trânsito',
       tipo: 'Educação',
-      endereco: 'Rua Oscar Freire, 456 - Jardins',
-      telefone: '(11) 3333-4444',
-      email: 'escola.transito@prefeitura.sp.gov.br',
+      endereco: 'Rua das Palmeiras, 741 - Jardim das Palmeiras',
+      telefone: '(13) 3841-4444',
+      email: 'escola.transito.iguape@prefeitura.iguape.sp.gov.br',
       horario: '8h às 18h',
       especialidades: ['Cursos', 'Palestras', 'Conscientização'],
-      atendimentos: 450,
-      funcionarios: 15,
+      atendimentos: 280,
+      funcionarios: 8,
       icon: 'school',
       color: '#AF52DE',
-      coordenadas: { latitude: -23.5705, longitude: -46.6533 },
+      coordenadas: { latitude: -24.7098, longitude: -47.5602 },
     },
     {
       id: 5,
       nome: 'Pátio de Apreensão de Veículos',
       tipo: 'Apreensão',
-      endereco: 'Av. Brigadeiro Faria Lima, 1000 - Itaim Bibi',
-      telefone: '(11) 3333-5555',
-      email: 'patio.apreensao@prefeitura.sp.gov.br',
+      endereco: 'Rua do Comércio, 963 - Centro Histórico',
+      telefone: '(13) 3841-5555',
+      email: 'patio.iguape@prefeitura.iguape.sp.gov.br',
       horario: '24 horas',
       especialidades: ['Veículos Apreendidos', 'Liberação', 'Documentação'],
-      atendimentos: 320,
-      funcionarios: 20,
+      atendimentos: 180,
+      funcionarios: 6,
       icon: 'car-sport',
       color: '#FF9500',
-      coordenadas: { latitude: -23.5805, longitude: -46.6633 },
+      coordenadas: { latitude: -24.7067, longitude: -47.5534 },
     },
     {
       id: 6,
       nome: 'Centro de Atendimento ao Cidadão - Trânsito',
       tipo: 'Atendimento',
-      endereco: 'Rua Haddock Lobo, 200 - Cerqueira César',
-      telefone: '(11) 3333-6666',
-      email: 'cac.transito@prefeitura.sp.gov.br',
+      endereco: 'Rua São Miguel, 852 - Bairro São Miguel',
+      telefone: '(13) 3841-6666',
+      email: 'cac.transito.iguape@prefeitura.iguape.sp.gov.br',
       horario: '8h às 18h',
       especialidades: ['Licenciamento', 'Documentação', 'Consultas'],
-      atendimentos: 1800,
-      funcionarios: 30,
+      atendimentos: 650,
+      funcionarios: 12,
       icon: 'people',
       color: '#FF2D92',
-      coordenadas: { latitude: -23.5905, longitude: -46.6733 },
+      coordenadas: { latitude: -24.7189, longitude: -47.5567 },
+    },
+    {
+      id: 7,
+      nome: 'Posto de Vistoria Veicular',
+      tipo: 'Vistoria',
+      endereco: 'Rua José Bonifácio, 456 - Vila Operária',
+      telefone: '(13) 3841-7777',
+      email: 'vistoria.iguape@prefeitura.iguape.sp.gov.br',
+      horario: '8h às 17h',
+      especialidades: ['Vistoria', 'Inspeção', 'Laudos'],
+      atendimentos: 320,
+      funcionarios: 5,
+      icon: 'car-outline',
+      color: '#00CED1',
+      coordenadas: { latitude: -24.7201, longitude: -47.5498 },
+    },
+    {
+      id: 8,
+      nome: 'Escritório Regional do DETRAN',
+      tipo: 'DETRAN',
+      endereco: 'Rua Santa Rita, 159 - Bairro Santa Rita',
+      telefone: '(13) 3841-8888',
+      email: 'detran.regional.iguape@prefeitura.iguape.sp.gov.br',
+      horario: '8h às 17h',
+      especialidades: ['Licenciamento', 'Documentação', 'Transferências'],
+      atendimentos: 420,
+      funcionarios: 10,
+      icon: 'document',
+      color: '#FF8C00',
+      coordenadas: { latitude: -24.7045, longitude: -47.5612 },
     },
   ];
 
@@ -126,17 +157,12 @@ export const TransitoScreen: React.FC = () => {
 
   const renderUnidadeCard = ({ item: unidade }: { item: any }) => (
     <TouchableOpacity
-      style={[
-        styles.unidadeCard,
-        { backgroundColor: theme.colors.background },
-      ]}
+      style={[styles.unidadeCard, { backgroundColor: theme.colors.background }]}
       onPress={() => handleUnidadePress(unidade)}
       activeOpacity={0.7}
     >
       <View style={styles.unidadeHeader}>
-        <View
-          style={[styles.unidadeIcon, { backgroundColor: unidade.color }]}
-        >
+        <View style={[styles.unidadeIcon, { backgroundColor: unidade.color }]}>
           <Ionicons name={unidade.icon as any} size={24} color="white" />
         </View>
         <View style={styles.unidadeInfo}>
@@ -158,16 +184,9 @@ export const TransitoScreen: React.FC = () => {
 
       <View style={styles.unidadeDetails}>
         <View style={styles.detailItem}>
-          <Ionicons
-            name="location"
-            size={16}
-            color={theme.colors.primary}
-          />
+          <Ionicons name="location" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.endereco}
           </Text>
@@ -176,10 +195,7 @@ export const TransitoScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="call" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.telefone}
           </Text>
@@ -188,10 +204,7 @@ export const TransitoScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="time" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.horario}
           </Text>
@@ -199,32 +212,31 @@ export const TransitoScreen: React.FC = () => {
 
         <View style={styles.especialidadesContainer}>
           <Text
-            style={[
-              styles.especialidadesTitle,
-              { color: theme.colors.text },
-            ]}
+            style={[styles.especialidadesTitle, { color: theme.colors.text }]}
           >
             Serviços:
           </Text>
           <View style={styles.especialidadesList}>
-            {unidade.especialidades.map((especialidade: string, index: number) => (
-              <View
-                key={index}
-                style={[
-                  styles.especialidadeTag,
-                  { backgroundColor: theme.colors.primary + '20' },
-                ]}
-              >
-                <Text
+            {unidade.especialidades.map(
+              (especialidade: string, index: number) => (
+                <View
+                  key={index}
                   style={[
-                    styles.especialidadeText,
-                    { color: theme.colors.primary },
+                    styles.especialidadeTag,
+                    { backgroundColor: theme.colors.primary + '20' },
                   ]}
                 >
-                  {especialidade}
-                </Text>
-              </View>
-            ))}
+                  <Text
+                    style={[
+                      styles.especialidadeText,
+                      { color: theme.colors.primary },
+                    ]}
+                  >
+                    {especialidade}
+                  </Text>
+                </View>
+              )
+            )}
           </View>
         </View>
 
@@ -283,7 +295,7 @@ export const TransitoScreen: React.FC = () => {
               { color: theme.colors.textSecondary },
             ]}
           >
-            Unidades de trânsito da cidade
+            Unidades de trânsito de Iguape - SP
           </Text>
         </View>
 
@@ -366,26 +378,20 @@ export const TransitoScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <View style={styles.mapPlaceholder}>
-            <Ionicons
-              name="map"
-              size={64}
-              color={theme.colors.textSecondary}
-            />
-            <Text
-              style={[styles.mapText, { color: theme.colors.textSecondary }]}
-            >
-              Mapa das unidades de trânsito
-            </Text>
-            <Text
-              style={[
-                styles.mapSubtext,
-                { color: theme.colors.textSecondary },
-              ]}
-            >
-              Aqui seria exibido o mapa com todas as unidades
-            </Text>
-          </View>
+          <CustomMapView
+            locations={unidadesTransito.map(unidade => ({
+              id: unidade.id,
+              nome: unidade.nome,
+              coordenadas: unidade.coordenadas,
+              color: unidade.color,
+            }))}
+            initialRegion={{
+              latitude: -24.7081,
+              longitude: -47.5553,
+              latitudeDelta: 0.015,
+              longitudeDelta: 0.015,
+            }}
+          />
         )}
       </View>
     </ScreenWrapper>

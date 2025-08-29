@@ -117,6 +117,146 @@ export const ServicoDetalhesScreen: React.FC = () => {
           },
         ],
       },
+      '1-4': {
+        id: '1-4',
+        titulo: 'Coleta de Poda',
+        descricao:
+          'Solicitação de coleta de galhos e resíduos provenientes de poda de árvores em vias públicas e particulares.',
+        icon: 'leaf',
+        categoria: 'Limpeza',
+        tipo: 'INFO',
+        tempoEstimado: '3-5 dias úteis',
+        documentosNecessarios: [
+          'Endereço completo',
+          'Foto dos resíduos',
+          'Quantidade aproximada',
+        ],
+        informacoes: [
+          'Este serviço é gratuito para todos os cidadãos',
+          'Os resíduos devem estar organizados e acessíveis',
+          'Não inclui poda de árvores, apenas coleta dos resíduos',
+          'Em caso de grandes quantidades, o prazo pode ser estendido',
+        ],
+        links: [
+          {
+            titulo: 'Normas para Coleta de Poda',
+            url: 'https://exemplo.com/normas-poda',
+            tipo: 'documento',
+          },
+        ],
+        imagens: [
+          {
+            titulo: 'Exemplo de Resíduos de Poda',
+            url: 'https://via.placeholder.com/400x200/27AE60/FFFFFF?text=Coleta+Poda',
+          },
+        ],
+        videos: [],
+      },
+      '1-5': {
+        id: '1-5',
+        titulo: 'Cata-Treco',
+        descricao:
+          'Coleta de móveis velhos, eletrodomésticos e objetos grandes que não podem ser descartados no lixo comum.',
+        icon: 'home',
+        categoria: 'Limpeza',
+        tipo: 'INFO',
+        tempoEstimado: '7-10 dias úteis',
+        documentosNecessarios: [
+          'Comprovante de residência',
+          'Lista dos objetos',
+          'Foto dos itens',
+        ],
+        informacoes: [
+          'Serviço gratuito para moradores da cidade',
+          'Os objetos devem estar em local acessível',
+          'Não aceitamos objetos com vazamentos ou muito danificados',
+          'Agende com antecedência para melhor planejamento',
+        ],
+        links: [
+          {
+            titulo: 'Guia do Cata-Treco',
+            url: 'https://exemplo.com/guia-cata-treco',
+            tipo: 'documento',
+          },
+        ],
+        imagens: [
+          {
+            titulo: 'Exemplo de Objetos Aceitos',
+            url: 'https://via.placeholder.com/400x200/FF9500/FFFFFF?text=Cata+Treco',
+          },
+        ],
+        videos: [],
+      },
+      '1-6': {
+        id: '1-6',
+        titulo: 'Denúncia de Descarte Irregular de Resíduos',
+        descricao:
+          'Denúncia de descarte inadequado de lixo, entulho ou outros resíduos em vias públicas ou locais inapropriados.',
+        icon: 'alert-circle',
+        categoria: 'Limpeza',
+        tipo: 'INFO',
+        tempoEstimado: '24-48 horas',
+        documentosNecessarios: [
+          'Localização exata',
+          'Foto da irregularidade',
+          'Descrição da situação',
+        ],
+        informacoes: [
+          'Denúncias são tratadas com prioridade',
+          'Suas informações são mantidas em sigilo',
+          'A fiscalização será realizada em até 48 horas',
+          'Em casos graves, a ação pode ser imediata',
+        ],
+        links: [
+          {
+            titulo: 'Lei de Crimes Ambientais',
+            url: 'https://exemplo.com/lei-ambiental',
+            tipo: 'documento',
+          },
+        ],
+        imagens: [
+          {
+            titulo: 'Exemplo de Descarte Irregular',
+            url: 'https://via.placeholder.com/400x200/E74C3C/FFFFFF?text=Descarte+Irregular',
+          },
+        ],
+        videos: [],
+      },
+      '1-7': {
+        id: '1-7',
+        titulo: 'Coleta de Animais Mortos',
+        descricao:
+          'Remoção de animais mortos encontrados em vias públicas, praças e outros locais públicos.',
+        icon: 'paw',
+        categoria: 'Limpeza',
+        tipo: 'INFO',
+        tempoEstimado: '2-4 horas',
+        documentosNecessarios: [
+          'Localização exata',
+          'Foto do animal (se possível)',
+          'Descrição da situação',
+        ],
+        informacoes: [
+          'Serviço de urgência com atendimento prioritário',
+          'Não inclui animais de estimação particulares',
+          'A remoção é feita por equipe especializada',
+          'Em caso de risco à saúde pública, a ação é imediata',
+        ],
+        links: [
+          {
+            titulo: 'Protocolo de Remoção de Animais',
+            url: 'https://exemplo.com/protocolo-animais',
+            tipo: 'documento',
+          },
+        ],
+        imagens: [
+          {
+            titulo: 'Equipe de Remoção',
+            url: 'https://via.placeholder.com/400x200/8E44AD/FFFFFF?text=Coleta+Animais',
+          },
+        ],
+        videos: [],
+      },
       '5-1': {
         id: '5-1',
         titulo: 'Solicitação de Cartão SUS',

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { ScreenWrapper } from '@/components/ScreenWrapper';
+import { CustomMapView } from '@/components/MapView';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export const SegurancaScreen: React.FC = () => {
@@ -21,93 +22,123 @@ export const SegurancaScreen: React.FC = () => {
   const unidadesSeguranca = [
     {
       id: 1,
-      nome: 'Delegacia de Polícia Civil',
+      nome: 'Delegacia de Polícia Civil de Iguape',
       tipo: 'Delegacia',
-      endereco: 'Rua das Flores, 123 - Centro',
-      telefone: '(11) 3333-1111',
-      email: 'delegacia.centro@prefeitura.sp.gov.br',
+      endereco: 'Rua XV de Novembro, 789 - Centro',
+      telefone: '(13) 3841-1111',
+      email: 'delegacia.iguape@prefeitura.iguape.sp.gov.br',
       horario: '24 horas',
       especialidades: ['Roubos', 'Furtos', 'Violência Doméstica'],
-      atendimentos: 850,
-      policiais: 25,
+      atendimentos: 450,
+      policiais: 15,
       icon: 'shield',
       color: '#007AFF',
-      coordenadas: { latitude: -23.5505, longitude: -46.6333 },
+      coordenadas: { latitude: -24.7081, longitude: -47.5553 },
     },
     {
       id: 2,
       nome: 'Base Comunitária de Segurança',
       tipo: 'Base Comunitária',
-      endereco: 'Av. Paulista, 500 - Bela Vista',
-      telefone: '(11) 3333-2222',
-      email: 'bcs.bela.vista@prefeitura.sp.gov.br',
+      endereco: 'Rua da Liberdade, 321 - Vila Nova',
+      telefone: '(13) 3841-2222',
+      email: 'bcs.iguape@prefeitura.iguape.sp.gov.br',
       horario: '6h às 22h',
       especialidades: ['Prevenção', 'Patrulhamento', 'Orientação'],
-      atendimentos: 320,
-      policiais: 8,
+      atendimentos: 180,
+      policiais: 5,
       icon: 'shield-checkmark',
       color: '#34C759',
-      coordenadas: { latitude: -23.5605, longitude: -46.6433 },
+      coordenadas: { latitude: -24.7123, longitude: -47.5589 },
     },
     {
       id: 3,
-      nome: 'Guarda Civil Metropolitana',
+      nome: 'Guarda Civil Municipal de Iguape',
       tipo: 'Guarda Municipal',
-      endereco: 'Rua Augusta, 789 - Consolação',
-      telefone: '(11) 3333-3333',
-      email: 'gcm.consolacao@prefeitura.sp.gov.br',
+      endereco: 'Rua São João, 654 - Bairro São João',
+      telefone: '(13) 3841-3333',
+      email: 'gcm.iguape@prefeitura.iguape.sp.gov.br',
       horario: '24 horas',
       especialidades: ['Trânsito', 'Proteção Patrimonial', 'Fiscalização'],
-      atendimentos: 1200,
-      policiais: 45,
+      atendimentos: 650,
+      policiais: 25,
       icon: 'shield-half',
       color: '#FF9500',
-      coordenadas: { latitude: -23.5405, longitude: -46.6233 },
+      coordenadas: { latitude: -24.7156, longitude: -47.5521 },
     },
     {
       id: 4,
-      nome: 'Centro de Operações da Defesa Civil',
+      nome: 'Defesa Civil de Iguape',
       tipo: 'Defesa Civil',
-      endereco: 'Rua Oscar Freire, 456 - Jardins',
-      telefone: '(11) 3333-4444',
-      email: 'defesa.civil@prefeitura.sp.gov.br',
+      endereco: 'Rua das Palmeiras, 147 - Jardim das Palmeiras',
+      telefone: '(13) 3841-4444',
+      email: 'defesa.civil.iguape@prefeitura.iguape.sp.gov.br',
       horario: '24 horas',
       especialidades: ['Emergências', 'Desastres', 'Prevenção'],
-      atendimentos: 150,
-      policiais: 12,
+      atendimentos: 80,
+      policiais: 8,
       icon: 'warning',
       color: '#FF3B30',
-      coordenadas: { latitude: -23.5705, longitude: -46.6533 },
+      coordenadas: { latitude: -24.7098, longitude: -47.5602 },
     },
     {
       id: 5,
       nome: 'Posto de Policiamento Comunitário',
       tipo: 'Posto Comunitário',
-      endereco: 'Av. Brigadeiro Faria Lima, 1000 - Itaim Bibi',
-      telefone: '(11) 3333-5555',
-      email: 'ppc.itaim.bibi@prefeitura.sp.gov.br',
+      endereco: 'Rua do Comércio, 258 - Centro Histórico',
+      telefone: '(13) 3841-5555',
+      email: 'ppc.iguape@prefeitura.iguape.sp.gov.br',
       horario: '8h às 18h',
       especialidades: ['Atendimento Local', 'Prevenção', 'Orientação'],
-      atendimentos: 280,
-      policiais: 6,
+      atendimentos: 150,
+      policiais: 4,
       icon: 'home',
       color: '#AF52DE',
-      coordenadas: { latitude: -23.5805, longitude: -46.6633 },
+      coordenadas: { latitude: -24.7067, longitude: -47.5534 },
     },
     {
       id: 6,
-      nome: 'Centro de Monitoramento',
+      nome: 'Centro de Monitoramento Municipal',
       tipo: 'Monitoramento',
-      endereco: 'Rua Haddock Lobo, 200 - Cerqueira César',
-      telefone: '(11) 3333-6666',
-      email: 'monitoramento@prefeitura.sp.gov.br',
+      endereco: 'Rua São Miguel, 369 - Bairro São Miguel',
+      telefone: '(13) 3841-6666',
+      email: 'monitoramento.iguape@prefeitura.iguape.sp.gov.br',
       horario: '24 horas',
       especialidades: ['Câmeras', 'Alarmes', 'Controle de Acesso'],
       atendimentos: 0,
-      policiais: 15,
+      policiais: 8,
       icon: 'videocam',
       color: '#FF2D92',
-      coordenadas: { latitude: -23.5905, longitude: -46.6733 },
+      coordenadas: { latitude: -24.7189, longitude: -47.5567 },
+    },
+    {
+      id: 7,
+      nome: 'Corpo de Bombeiros de Iguape',
+      tipo: 'Bombeiros',
+      endereco: 'Rua José Bonifácio, 987 - Vila Operária',
+      telefone: '(13) 3841-7777',
+      email: 'bombeiros.iguape@prefeitura.iguape.sp.gov.br',
+      horario: '24 horas',
+      especialidades: ['Incêndios', 'Resgate', 'Emergências'],
+      atendimentos: 120,
+      policiais: 12,
+      icon: 'flame',
+      color: '#00CED1',
+      coordenadas: { latitude: -24.7201, longitude: -47.5498 },
+    },
+    {
+      id: 8,
+      nome: 'Posto de Polícia Rodoviária',
+      tipo: 'Polícia Rodoviária',
+      endereco: 'Rua Santa Rita, 741 - Bairro Santa Rita',
+      telefone: '(13) 3841-8888',
+      email: 'pr.iguape@prefeitura.iguape.sp.gov.br',
+      horario: '24 horas',
+      especialidades: ['Trânsito', 'Fiscalização', 'Acidentes'],
+      atendimentos: 200,
+      policiais: 10,
+      icon: 'car',
+      color: '#FF8C00',
+      coordenadas: { latitude: -24.7045, longitude: -47.5612 },
     },
   ];
 
@@ -126,17 +157,12 @@ export const SegurancaScreen: React.FC = () => {
 
   const renderUnidadeCard = ({ item: unidade }: { item: any }) => (
     <TouchableOpacity
-      style={[
-        styles.unidadeCard,
-        { backgroundColor: theme.colors.background },
-      ]}
+      style={[styles.unidadeCard, { backgroundColor: theme.colors.background }]}
       onPress={() => handleUnidadePress(unidade)}
       activeOpacity={0.7}
     >
       <View style={styles.unidadeHeader}>
-        <View
-          style={[styles.unidadeIcon, { backgroundColor: unidade.color }]}
-        >
+        <View style={[styles.unidadeIcon, { backgroundColor: unidade.color }]}>
           <Ionicons name={unidade.icon as any} size={24} color="white" />
         </View>
         <View style={styles.unidadeInfo}>
@@ -158,16 +184,9 @@ export const SegurancaScreen: React.FC = () => {
 
       <View style={styles.unidadeDetails}>
         <View style={styles.detailItem}>
-          <Ionicons
-            name="location"
-            size={16}
-            color={theme.colors.primary}
-          />
+          <Ionicons name="location" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.endereco}
           </Text>
@@ -176,10 +195,7 @@ export const SegurancaScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="call" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.telefone}
           </Text>
@@ -188,10 +204,7 @@ export const SegurancaScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="time" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.horario}
           </Text>
@@ -199,32 +212,31 @@ export const SegurancaScreen: React.FC = () => {
 
         <View style={styles.especialidadesContainer}>
           <Text
-            style={[
-              styles.especialidadesTitle,
-              { color: theme.colors.text },
-            ]}
+            style={[styles.especialidadesTitle, { color: theme.colors.text }]}
           >
             Atuação:
           </Text>
           <View style={styles.especialidadesList}>
-            {unidade.especialidades.map((especialidade: string, index: number) => (
-              <View
-                key={index}
-                style={[
-                  styles.especialidadeTag,
-                  { backgroundColor: theme.colors.primary + '20' },
-                ]}
-              >
-                <Text
+            {unidade.especialidades.map(
+              (especialidade: string, index: number) => (
+                <View
+                  key={index}
                   style={[
-                    styles.especialidadeText,
-                    { color: theme.colors.primary },
+                    styles.especialidadeTag,
+                    { backgroundColor: theme.colors.primary + '20' },
                   ]}
                 >
-                  {especialidade}
-                </Text>
-              </View>
-            ))}
+                  <Text
+                    style={[
+                      styles.especialidadeText,
+                      { color: theme.colors.primary },
+                    ]}
+                  >
+                    {especialidade}
+                  </Text>
+                </View>
+              )
+            )}
           </View>
         </View>
 
@@ -283,7 +295,7 @@ export const SegurancaScreen: React.FC = () => {
               { color: theme.colors.textSecondary },
             ]}
           >
-            Unidades de segurança da cidade
+            Unidades de segurança de Iguape - SP
           </Text>
         </View>
 
@@ -366,26 +378,20 @@ export const SegurancaScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <View style={styles.mapPlaceholder}>
-            <Ionicons
-              name="map"
-              size={64}
-              color={theme.colors.textSecondary}
-            />
-            <Text
-              style={[styles.mapText, { color: theme.colors.textSecondary }]}
-            >
-              Mapa das unidades de segurança
-            </Text>
-            <Text
-              style={[
-                styles.mapSubtext,
-                { color: theme.colors.textSecondary },
-              ]}
-            >
-              Aqui seria exibido o mapa com todas as unidades
-            </Text>
-          </View>
+          <CustomMapView
+            locations={unidadesSeguranca.map(unidade => ({
+              id: unidade.id,
+              nome: unidade.nome,
+              coordenadas: unidade.coordenadas,
+              color: unidade.color,
+            }))}
+            initialRegion={{
+              latitude: -24.7081,
+              longitude: -47.5553,
+              latitudeDelta: 0.015,
+              longitudeDelta: 0.015,
+            }}
+          />
         )}
       </View>
     </ScreenWrapper>

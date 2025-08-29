@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { ScreenWrapper } from '@/components/ScreenWrapper';
+import { CustomMapView } from '@/components/MapView';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export const CulturaLazerScreen: React.FC = () => {
@@ -21,93 +22,123 @@ export const CulturaLazerScreen: React.FC = () => {
   const unidadesCulturaLazer = [
     {
       id: 1,
-      nome: 'Teatro Municipal',
+      nome: 'Teatro Municipal de Iguape',
       tipo: 'Teatro',
-      endereco: 'Rua das Flores, 123 - Centro',
-      telefone: '(11) 3333-1111',
-      email: 'teatro.municipal@prefeitura.sp.gov.br',
+      endereco: 'Rua XV de Novembro, 852 - Centro',
+      telefone: '(13) 3841-1111',
+      email: 'teatro.iguape@prefeitura.iguape.sp.gov.br',
       horario: 'Terça a Domingo: 14h às 22h',
       especialidades: ['Ópera', 'Balé', 'Concertos', 'Teatro'],
-      capacidade: 1500,
-      funcionarios: 45,
+      capacidade: 800,
+      funcionarios: 25,
       icon: 'theater-masks',
       color: '#007AFF',
-      coordenadas: { latitude: -23.5505, longitude: -46.6333 },
+      coordenadas: { latitude: -24.7081, longitude: -47.5553 },
     },
     {
       id: 2,
-      nome: 'Museu de Arte Moderna',
+      nome: 'Museu Histórico de Iguape',
       tipo: 'Museu',
-      endereco: 'Av. Paulista, 500 - Bela Vista',
-      telefone: '(11) 3333-2222',
-      email: 'mam@prefeitura.sp.gov.br',
+      endereco: 'Rua da Liberdade, 456 - Vila Nova',
+      telefone: '(13) 3841-2222',
+      email: 'museu.iguape@prefeitura.iguape.sp.gov.br',
       horario: 'Terça a Domingo: 10h às 18h',
-      especialidades: ['Arte Moderna', 'Exposições', 'Educação'],
-      capacidade: 800,
-      funcionarios: 25,
+      especialidades: ['História Local', 'Exposições', 'Educação'],
+      capacidade: 400,
+      funcionarios: 12,
       icon: 'color-palette',
       color: '#34C759',
-      coordenadas: { latitude: -23.5605, longitude: -46.6433 },
+      coordenadas: { latitude: -24.7123, longitude: -47.5589 },
     },
     {
       id: 3,
-      nome: 'Centro Cultural',
+      nome: 'Centro Cultural "Vale do Ribeira"',
       tipo: 'Centro Cultural',
-      endereco: 'Rua Augusta, 789 - Consolação',
-      telefone: '(11) 3333-3333',
-      email: 'centro.cultural@prefeitura.sp.gov.br',
+      endereco: 'Rua São João, 741 - Bairro São João',
+      telefone: '(13) 3841-3333',
+      email: 'centro.cultural.iguape@prefeitura.iguape.sp.gov.br',
       horario: 'Segunda a Domingo: 9h às 21h',
       especialidades: ['Cursos', 'Oficinas', 'Apresentações'],
-      capacidade: 300,
-      funcionarios: 15,
+      capacidade: 200,
+      funcionarios: 8,
       icon: 'library',
       color: '#FF9500',
-      coordenadas: { latitude: -23.5405, longitude: -46.6233 },
+      coordenadas: { latitude: -24.7156, longitude: -47.5521 },
     },
     {
       id: 4,
-      nome: 'Parque Municipal',
+      nome: 'Parque Municipal "Praia do Leste"',
       tipo: 'Parque',
-      endereco: 'Rua Oscar Freire, 456 - Jardins',
-      telefone: '(11) 3333-4444',
-      email: 'parque.municipal@prefeitura.sp.gov.br',
+      endereco: 'Rua das Palmeiras, 963 - Jardim das Palmeiras',
+      telefone: '(13) 3841-4444',
+      email: 'parque.iguape@prefeitura.iguape.sp.gov.br',
       horario: 'Diariamente: 6h às 22h',
       especialidades: ['Lazer', 'Esportes', 'Natureza'],
-      capacidade: 5000,
-      funcionarios: 30,
+      capacidade: 2000,
+      funcionarios: 15,
       icon: 'leaf',
       color: '#AF52DE',
-      coordenadas: { latitude: -23.5705, longitude: -46.6533 },
+      coordenadas: { latitude: -24.7098, longitude: -47.5602 },
     },
     {
       id: 5,
-      nome: 'Biblioteca Pública',
+      nome: 'Biblioteca Pública Municipal',
       tipo: 'Biblioteca',
-      endereco: 'Av. Brigadeiro Faria Lima, 1000 - Itaim Bibi',
-      telefone: '(11) 3333-5555',
-      email: 'biblioteca@prefeitura.sp.gov.br',
+      endereco: 'Rua do Comércio, 147 - Centro Histórico',
+      telefone: '(13) 3841-5555',
+      email: 'biblioteca.iguape@prefeitura.iguape.sp.gov.br',
       horario: 'Segunda a Sexta: 8h às 20h',
       especialidades: ['Livros', 'Estudos', 'Internet'],
-      capacidade: 200,
-      funcionarios: 12,
+      capacidade: 150,
+      funcionarios: 6,
       icon: 'book',
       color: '#FF3B30',
-      coordenadas: { latitude: -23.5805, longitude: -46.6633 },
+      coordenadas: { latitude: -24.7067, longitude: -47.5534 },
     },
     {
       id: 6,
       nome: 'Centro Esportivo Municipal',
       tipo: 'Esporte',
-      endereco: 'Rua Haddock Lobo, 200 - Cerqueira César',
-      telefone: '(11) 3333-6666',
-      email: 'cem@prefeitura.sp.gov.br',
+      endereco: 'Rua São Miguel, 258 - Bairro São Miguel',
+      telefone: '(13) 3841-6666',
+      email: 'cem.iguape@prefeitura.iguape.sp.gov.br',
       horario: 'Segunda a Domingo: 6h às 22h',
       especialidades: ['Natação', 'Futebol', 'Tênis', 'Ginástica'],
-      capacidade: 800,
-      funcionarios: 35,
+      capacidade: 500,
+      funcionarios: 18,
       icon: 'football',
       color: '#FF2D92',
-      coordenadas: { latitude: -23.5905, longitude: -46.6733 },
+      coordenadas: { latitude: -24.7189, longitude: -47.5567 },
+    },
+    {
+      id: 7,
+      nome: 'Casa de Cultura "Caiçara"',
+      tipo: 'Casa de Cultura',
+      endereco: 'Rua José Bonifácio, 369 - Vila Operária',
+      telefone: '(13) 3841-7777',
+      email: 'casa.cultura.iguape@prefeitura.iguape.sp.gov.br',
+      horario: 'Terça a Domingo: 10h às 20h',
+      especialidades: ['Arte Caiçara', 'Exposições', 'Oficinas'],
+      capacidade: 120,
+      funcionarios: 5,
+      icon: 'brush',
+      color: '#00CED1',
+      coordenadas: { latitude: -24.7201, longitude: -47.5498 },
+    },
+    {
+      id: 8,
+      nome: 'Praça de Eventos "Centenário"',
+      tipo: 'Praça de Eventos',
+      endereco: 'Rua Santa Rita, 852 - Bairro Santa Rita',
+      telefone: '(13) 3841-8888',
+      email: 'praca.eventos.iguape@prefeitura.iguape.sp.gov.br',
+      horario: 'Diariamente: 6h às 23h',
+      especialidades: ['Eventos', 'Shows', 'Feiras'],
+      capacidade: 3000,
+      funcionarios: 10,
+      icon: 'musical-notes',
+      color: '#FF8C00',
+      coordenadas: { latitude: -24.7045, longitude: -47.5612 },
     },
   ];
 
@@ -126,17 +157,12 @@ export const CulturaLazerScreen: React.FC = () => {
 
   const renderUnidadeCard = ({ item: unidade }: { item: any }) => (
     <TouchableOpacity
-      style={[
-        styles.unidadeCard,
-        { backgroundColor: theme.colors.background },
-      ]}
+      style={[styles.unidadeCard, { backgroundColor: theme.colors.background }]}
       onPress={() => handleUnidadePress(unidade)}
       activeOpacity={0.7}
     >
       <View style={styles.unidadeHeader}>
-        <View
-          style={[styles.unidadeIcon, { backgroundColor: unidade.color }]}
-        >
+        <View style={[styles.unidadeIcon, { backgroundColor: unidade.color }]}>
           <Ionicons name={unidade.icon as any} size={24} color="white" />
         </View>
         <View style={styles.unidadeInfo}>
@@ -158,16 +184,9 @@ export const CulturaLazerScreen: React.FC = () => {
 
       <View style={styles.unidadeDetails}>
         <View style={styles.detailItem}>
-          <Ionicons
-            name="location"
-            size={16}
-            color={theme.colors.primary}
-          />
+          <Ionicons name="location" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.endereco}
           </Text>
@@ -176,10 +195,7 @@ export const CulturaLazerScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="call" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.telefone}
           </Text>
@@ -188,10 +204,7 @@ export const CulturaLazerScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="time" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.horario}
           </Text>
@@ -199,32 +212,31 @@ export const CulturaLazerScreen: React.FC = () => {
 
         <View style={styles.especialidadesContainer}>
           <Text
-            style={[
-              styles.especialidadesTitle,
-              { color: theme.colors.text },
-            ]}
+            style={[styles.especialidadesTitle, { color: theme.colors.text }]}
           >
             Atividades:
           </Text>
           <View style={styles.especialidadesList}>
-            {unidade.especialidades.map((especialidade: string, index: number) => (
-              <View
-                key={index}
-                style={[
-                  styles.especialidadeTag,
-                  { backgroundColor: theme.colors.primary + '20' },
-                ]}
-              >
-                <Text
+            {unidade.especialidades.map(
+              (especialidade: string, index: number) => (
+                <View
+                  key={index}
                   style={[
-                    styles.especialidadeText,
-                    { color: theme.colors.primary },
+                    styles.especialidadeTag,
+                    { backgroundColor: theme.colors.primary + '20' },
                   ]}
                 >
-                  {especialidade}
-                </Text>
-              </View>
-            ))}
+                  <Text
+                    style={[
+                      styles.especialidadeText,
+                      { color: theme.colors.primary },
+                    ]}
+                  >
+                    {especialidade}
+                  </Text>
+                </View>
+              )
+            )}
           </View>
         </View>
 
@@ -272,7 +284,11 @@ export const CulturaLazerScreen: React.FC = () => {
               { backgroundColor: theme.colors.primary },
             ]}
           >
-            <Ionicons name="color-palette" size={48} color={theme.colors.onPrimary} />
+            <Ionicons
+              name="color-palette"
+              size={48}
+              color={theme.colors.onPrimary}
+            />
           </View>
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
             Cultura e Lazer
@@ -283,7 +299,7 @@ export const CulturaLazerScreen: React.FC = () => {
               { color: theme.colors.textSecondary },
             ]}
           >
-            Espaços culturais e de lazer da cidade
+            Espaços culturais e de lazer de Iguape - SP
           </Text>
         </View>
 
@@ -366,26 +382,20 @@ export const CulturaLazerScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <View style={styles.mapPlaceholder}>
-            <Ionicons
-              name="map"
-              size={64}
-              color={theme.colors.textSecondary}
-            />
-            <Text
-              style={[styles.mapText, { color: theme.colors.textSecondary }]}
-            >
-              Mapa dos espaços culturais
-            </Text>
-            <Text
-              style={[
-                styles.mapSubtext,
-                { color: theme.colors.textSecondary },
-              ]}
-            >
-              Aqui seria exibido o mapa com todos os espaços
-            </Text>
-          </View>
+          <CustomMapView
+            locations={unidadesCulturaLazer.map(unidade => ({
+              id: unidade.id,
+              nome: unidade.nome,
+              coordenadas: unidade.coordenadas,
+              color: unidade.color,
+            }))}
+            initialRegion={{
+              latitude: -24.7081,
+              longitude: -47.5553,
+              latitudeDelta: 0.015,
+              longitudeDelta: 0.015,
+            }}
+          />
         )}
       </View>
     </ScreenWrapper>

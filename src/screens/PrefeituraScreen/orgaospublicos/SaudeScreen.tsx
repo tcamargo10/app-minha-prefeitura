@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { ScreenWrapper } from '@/components/ScreenWrapper';
+import { CustomMapView } from '@/components/MapView';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export const SaudeScreen: React.FC = () => {
@@ -21,93 +22,128 @@ export const SaudeScreen: React.FC = () => {
   const unidadesSaude = [
     {
       id: 1,
-      nome: 'UBS Vila Madalena',
+      nome: 'UBS "Dr. José Maria de Toledo"',
       tipo: 'Unidade Básica de Saúde',
-      endereco: 'Rua Harmonia, 123 - Vila Madalena',
-      telefone: '(11) 3333-1111',
-      email: 'ubs.vila.madalena@prefeitura.sp.gov.br',
+      endereco: 'Rua XV de Novembro, 456 - Centro',
+      telefone: '(13) 3841-1111',
+      email: 'ubs.toledo@prefeitura.iguape.sp.gov.br',
       horario: 'Segunda a Sexta: 7h às 19h',
       especialidades: ['Clínico Geral', 'Pediatria', 'Ginecologia'],
-      atendimentos: 1200,
-      medicos: 8,
+      atendimentos: 850,
+      medicos: 6,
       icon: 'medical',
       color: '#34C759',
-      coordenadas: { latitude: -23.5505, longitude: -46.6333 },
+      coordenadas: { latitude: -24.7081, longitude: -47.5553 },
     },
     {
       id: 2,
-      nome: 'Hospital Municipal São Paulo',
+      nome: 'Hospital Municipal de Iguape',
       tipo: 'Hospital Geral',
-      endereco: 'Av. Paulista, 1000 - Bela Vista',
-      telefone: '(11) 3333-2222',
-      email: 'hospital.sao.paulo@prefeitura.sp.gov.br',
+      endereco: 'Rua da Liberdade, 789 - Vila Nova',
+      telefone: '(13) 3841-2222',
+      email: 'hospital.iguape@prefeitura.iguape.sp.gov.br',
       horario: '24 horas',
       especialidades: ['Emergência', 'UTI', 'Cirurgia', 'Cardiologia'],
-      atendimentos: 3500,
-      medicos: 45,
+      atendimentos: 1200,
+      medicos: 25,
       icon: 'medical',
       color: '#FF3B30',
-      coordenadas: { latitude: -23.5605, longitude: -46.6433 },
+      coordenadas: { latitude: -24.7123, longitude: -47.5589 },
     },
     {
       id: 3,
-      nome: 'UBS Consolação',
+      nome: 'UBS "São João"',
       tipo: 'Unidade Básica de Saúde',
-      endereco: 'Rua Augusta, 789 - Consolação',
-      telefone: '(11) 3333-3333',
-      email: 'ubs.consolacao@prefeitura.sp.gov.br',
+      endereco: 'Rua São João, 321 - Bairro São João',
+      telefone: '(13) 3841-3333',
+      email: 'ubs.sao.joao@prefeitura.iguape.sp.gov.br',
       horario: 'Segunda a Sexta: 7h às 19h',
       especialidades: ['Clínico Geral', 'Odontologia', 'Psicologia'],
-      atendimentos: 980,
-      medicos: 6,
+      atendimentos: 650,
+      medicos: 4,
       icon: 'medical',
       color: '#007AFF',
-      coordenadas: { latitude: -23.5405, longitude: -46.6233 },
+      coordenadas: { latitude: -24.7156, longitude: -47.5521 },
     },
     {
       id: 4,
       nome: 'Centro de Especialidades Médicas',
       tipo: 'Centro Especializado',
-      endereco: 'Rua Oscar Freire, 456 - Jardins',
-      telefone: '(11) 3333-4444',
-      email: 'cem.jardins@prefeitura.sp.gov.br',
+      endereco: 'Rua das Palmeiras, 654 - Jardim das Palmeiras',
+      telefone: '(13) 3841-4444',
+      email: 'cem.iguape@prefeitura.iguape.sp.gov.br',
       horario: 'Segunda a Sexta: 8h às 18h',
-      especialidades: ['Cardiologia', 'Neurologia', 'Ortopedia', 'Dermatologia'],
-      atendimentos: 750,
-      medicos: 12,
+      especialidades: [
+        'Cardiologia',
+        'Neurologia',
+        'Ortopedia',
+        'Dermatologia',
+      ],
+      atendimentos: 450,
+      medicos: 8,
       icon: 'medical',
       color: '#AF52DE',
-      coordenadas: { latitude: -23.5705, longitude: -46.6533 },
+      coordenadas: { latitude: -24.7098, longitude: -47.5602 },
     },
     {
       id: 5,
-      nome: 'UPA Itaim Bibi',
+      nome: 'UPA "Vale do Ribeira"',
       tipo: 'Unidade de Pronto Atendimento',
-      endereco: 'Av. Brigadeiro Faria Lima, 1000 - Itaim Bibi',
-      telefone: '(11) 3333-5555',
-      email: 'upa.itaim.bibi@prefeitura.sp.gov.br',
+      endereco: 'Rua do Comércio, 987 - Centro Histórico',
+      telefone: '(13) 3841-5555',
+      email: 'upa.iguape@prefeitura.iguape.sp.gov.br',
       horario: '24 horas',
       especialidades: ['Emergência', 'Traumatologia', 'Pediatria'],
-      atendimentos: 2100,
-      medicos: 15,
+      atendimentos: 950,
+      medicos: 12,
       icon: 'medical',
       color: '#FF9500',
-      coordenadas: { latitude: -23.5805, longitude: -46.6633 },
+      coordenadas: { latitude: -24.7067, longitude: -47.5534 },
     },
     {
       id: 6,
       nome: 'Centro de Saúde Mental',
       tipo: 'Centro de Atenção Psicossocial',
-      endereco: 'Rua Haddock Lobo, 200 - Cerqueira César',
-      telefone: '(11) 3333-6666',
-      email: 'caps.cerqueira.cesar@prefeitura.sp.gov.br',
+      endereco: 'Rua São Miguel, 147 - Bairro São Miguel',
+      telefone: '(13) 3841-6666',
+      email: 'caps.iguape@prefeitura.iguape.sp.gov.br',
       horario: 'Segunda a Sexta: 8h às 18h',
       especialidades: ['Psiquiatria', 'Psicologia', 'Terapia Ocupacional'],
-      atendimentos: 450,
-      medicos: 5,
+      atendimentos: 280,
+      medicos: 3,
       icon: 'medical',
       color: '#FF2D92',
-      coordenadas: { latitude: -23.5905, longitude: -46.6733 },
+      coordenadas: { latitude: -24.7189, longitude: -47.5567 },
+    },
+    {
+      id: 7,
+      nome: 'UBS "Vila Operária"',
+      tipo: 'Unidade Básica de Saúde',
+      endereco: 'Rua José Bonifácio, 258 - Vila Operária',
+      telefone: '(13) 3841-7777',
+      email: 'ubs.vila.operaria@prefeitura.iguape.sp.gov.br',
+      horario: 'Segunda a Sexta: 7h às 19h',
+      especialidades: ['Clínico Geral', 'Pediatria', 'Vacinação'],
+      atendimentos: 520,
+      medicos: 3,
+      icon: 'medical',
+      color: '#00CED1',
+      coordenadas: { latitude: -24.7201, longitude: -47.5498 },
+    },
+    {
+      id: 8,
+      nome: 'Posto de Saúde "Santa Rita"',
+      tipo: 'Posto de Saúde',
+      endereco: 'Rua Santa Rita, 369 - Bairro Santa Rita',
+      telefone: '(13) 3841-8888',
+      email: 'posto.santa.rita@prefeitura.iguape.sp.gov.br',
+      horario: 'Segunda a Sexta: 8h às 17h',
+      especialidades: ['Clínico Geral', 'Vacinação', 'Prevenção'],
+      atendimentos: 380,
+      medicos: 2,
+      icon: 'medical',
+      color: '#FF8C00',
+      coordenadas: { latitude: -24.7045, longitude: -47.5612 },
     },
   ];
 
@@ -126,17 +162,12 @@ export const SaudeScreen: React.FC = () => {
 
   const renderUnidadeCard = ({ item: unidade }: { item: any }) => (
     <TouchableOpacity
-      style={[
-        styles.unidadeCard,
-        { backgroundColor: theme.colors.background },
-      ]}
+      style={[styles.unidadeCard, { backgroundColor: theme.colors.background }]}
       onPress={() => handleUnidadePress(unidade)}
       activeOpacity={0.7}
     >
       <View style={styles.unidadeHeader}>
-        <View
-          style={[styles.unidadeIcon, { backgroundColor: unidade.color }]}
-        >
+        <View style={[styles.unidadeIcon, { backgroundColor: unidade.color }]}>
           <Ionicons name={unidade.icon as any} size={24} color="white" />
         </View>
         <View style={styles.unidadeInfo}>
@@ -158,16 +189,9 @@ export const SaudeScreen: React.FC = () => {
 
       <View style={styles.unidadeDetails}>
         <View style={styles.detailItem}>
-          <Ionicons
-            name="location"
-            size={16}
-            color={theme.colors.primary}
-          />
+          <Ionicons name="location" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.endereco}
           </Text>
@@ -176,10 +200,7 @@ export const SaudeScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="call" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.telefone}
           </Text>
@@ -188,10 +209,7 @@ export const SaudeScreen: React.FC = () => {
         <View style={styles.detailItem}>
           <Ionicons name="time" size={16} color={theme.colors.primary} />
           <Text
-            style={[
-              styles.detailText,
-              { color: theme.colors.textSecondary },
-            ]}
+            style={[styles.detailText, { color: theme.colors.textSecondary }]}
           >
             {unidade.horario}
           </Text>
@@ -199,32 +217,31 @@ export const SaudeScreen: React.FC = () => {
 
         <View style={styles.especialidadesContainer}>
           <Text
-            style={[
-              styles.especialidadesTitle,
-              { color: theme.colors.text },
-            ]}
+            style={[styles.especialidadesTitle, { color: theme.colors.text }]}
           >
             Especialidades:
           </Text>
           <View style={styles.especialidadesList}>
-            {unidade.especialidades.map((especialidade: string, index: number) => (
-              <View
-                key={index}
-                style={[
-                  styles.especialidadeTag,
-                  { backgroundColor: theme.colors.primary + '20' },
-                ]}
-              >
-                <Text
+            {unidade.especialidades.map(
+              (especialidade: string, index: number) => (
+                <View
+                  key={index}
                   style={[
-                    styles.especialidadeText,
-                    { color: theme.colors.primary },
+                    styles.especialidadeTag,
+                    { backgroundColor: theme.colors.primary + '20' },
                   ]}
                 >
-                  {especialidade}
-                </Text>
-              </View>
-            ))}
+                  <Text
+                    style={[
+                      styles.especialidadeText,
+                      { color: theme.colors.primary },
+                    ]}
+                  >
+                    {especialidade}
+                  </Text>
+                </View>
+              )
+            )}
           </View>
         </View>
 
@@ -283,7 +300,7 @@ export const SaudeScreen: React.FC = () => {
               { color: theme.colors.textSecondary },
             ]}
           >
-            Unidades de saúde da cidade
+            Unidades de saúde de Iguape - SP
           </Text>
         </View>
 
@@ -366,26 +383,20 @@ export const SaudeScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <View style={styles.mapPlaceholder}>
-            <Ionicons
-              name="map"
-              size={64}
-              color={theme.colors.textSecondary}
-            />
-            <Text
-              style={[styles.mapText, { color: theme.colors.textSecondary }]}
-            >
-              Mapa das unidades de saúde
-            </Text>
-            <Text
-              style={[
-                styles.mapSubtext,
-                { color: theme.colors.textSecondary },
-              ]}
-            >
-              Aqui seria exibido o mapa com todas as unidades
-            </Text>
-          </View>
+          <CustomMapView
+            locations={unidadesSaude.map(unidade => ({
+              id: unidade.id,
+              nome: unidade.nome,
+              coordenadas: unidade.coordenadas,
+              color: unidade.color,
+            }))}
+            initialRegion={{
+              latitude: -24.7081,
+              longitude: -47.5553,
+              latitudeDelta: 0.015,
+              longitudeDelta: 0.015,
+            }}
+          />
         )}
       </View>
     </ScreenWrapper>
