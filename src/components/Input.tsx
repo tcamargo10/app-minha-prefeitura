@@ -21,9 +21,23 @@ export const Input: React.FC<InputProps> = ({
   error,
   containerStyle,
   style,
+  numberOfLines,
+  multiline,
   ...props
 }) => {
   const { theme } = useTheme();
+
+  // Calcula altura baseada no número de linhas para textarea
+  const getInputHeight = () => {
+    if (multiline && numberOfLines) {
+      // Altura base (padding + border) + (altura da linha * número de linhas)
+      const paddingVertical = 32; // 16px top + 16px bottom
+      const borderWidth = 2; // 1px top + 1px bottom
+      const lineHeight = 20; // altura aproximada de cada linha
+      return paddingVertical + borderWidth + lineHeight * numberOfLines;
+    }
+    return 50; // altura padrão para input simples
+  };
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -39,10 +53,13 @@ export const Input: React.FC<InputProps> = ({
             backgroundColor: theme.colors.surface,
             borderColor: error ? theme.colors.error : theme.colors.border,
             color: theme.colors.text,
+            height: getInputHeight(),
           },
           style,
         ]}
         placeholderTextColor={theme.colors.textSecondary}
+        numberOfLines={numberOfLines}
+        multiline={multiline}
         {...props}
       />
       {error && (
@@ -64,10 +81,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    height: 50,
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 16,
+    paddingVertical: 16,
     fontSize: 16,
   },
   errorText: {

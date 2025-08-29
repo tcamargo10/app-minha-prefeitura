@@ -3,8 +3,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
 import { BottomTabNavigator } from '@/navigation/BottomTabNavigator';
-import { ServicosScreen } from '@/screens/CategoriasScreen/ServicosScreen';
-import { ServicoDetalhesScreen } from '@/screens/CategoriasScreen/ServicoDetalhesScreen';
 import { ComunicacaoDetalhesScreen } from '@/screens/ComunicacaoScreen/DetalhesScreen';
 import { LoginScreen } from '@/screens/LoginScreen';
 import { PerfilScreen } from '@/screens/PerfilScreen';
@@ -29,6 +27,8 @@ import {
 import { OuvidoriaScreen } from '@/screens/PrefeituraScreen/OuvidoriaScreen';
 import { TransparenciaScreen } from '@/screens/PrefeituraScreen/TransparenciaScreen';
 import { RegisterScreen } from '@/screens/RegisterScreen';
+import { ServicosScreen } from '@/screens/ServicosScreen';
+import { ServicoDetalhesScreen } from '@/screens/ServicosScreen/ServicoDetalhesScreen';
 import { SolicitacoesDetalhesScreen } from '@/screens/SolicitacoesScreen/DetalhesScreen';
 
 export type RootStackParamList = {

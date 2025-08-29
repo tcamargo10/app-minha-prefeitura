@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,14 +9,11 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { CategoriesGrid } from '@/components/CategoriesGrid';
 import { ScreenWrapper } from '@/components/ScreenWrapper';
-import { useTheme } from '@/contexts/ThemeContext';
 import { useCity } from '@/contexts/CityContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
 import { categoryService, Category } from '@/services/categoryService';
 
@@ -44,7 +43,7 @@ export const CategoriasScreen: React.FC = () => {
         setLoading(true);
       }
       setError(null);
-      const data = await categoryService.getCategories(currentCity.id);
+      const data = await categoryService.getCategories(currentCity?.id || '');
       setCategories(data);
 
       // Se não há dados, não é erro, apenas estado vazio
