@@ -214,6 +214,15 @@ export const ServicoDetalhesScreen: React.FC = () => {
           </View>
         );
       }
+      case 'subtitle': {
+        return (
+          <View style={styles.subtitleContainer}>
+            <Text style={[styles.subtitleText, { color: theme.colors.text }]}>
+              {field.label}
+            </Text>
+          </View>
+        );
+      }
       case 'description': {
         return (
           <View style={styles.descriptionContainer}>
@@ -232,7 +241,7 @@ export const ServicoDetalhesScreen: React.FC = () => {
         return (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Vídeos
+              {field.label}
             </Text>
 
             <TouchableOpacity
@@ -242,14 +251,6 @@ export const ServicoDetalhesScreen: React.FC = () => {
               <View style={styles.videoThumbnail}>
                 <Ionicons name="play-circle" size={48} color="white" />
               </View>
-              <Text
-                style={[
-                  styles.videoTitle,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                {field.label}
-              </Text>
             </TouchableOpacity>
           </View>
         );
@@ -258,7 +259,7 @@ export const ServicoDetalhesScreen: React.FC = () => {
         return (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Imagens
+              {field.label}
             </Text>
 
             <View style={styles.imageContainer}>
@@ -658,26 +659,28 @@ export const ServicoDetalhesScreen: React.FC = () => {
             </View>
           )}
 
-          {/* Formulário */}
-          {(servico.type === 'FORM' || servico.type === 'AGENDAMENTO') &&
-            servico.form && (
-              <View style={styles.section}>
-                <Text
-                  style={[styles.sectionTitle, { color: theme.colors.text }]}
-                >
-                  Formulário de Solicitação
-                </Text>
+          <View style={styles.section}>
+            {(servico.type === 'FORM' || servico.type === 'AGENDAMENTO') &&
+              servico.form && (
+                <>
+                  <Text
+                    style={[styles.sectionTitle, { color: theme.colors.text }]}
+                  >
+                    Formulário de Solicitação
+                  </Text>
 
-                {/* Campos padrão */}
-                {renderDefaultFields()}
+                  {/* Campos padrão */}
+                  {renderDefaultFields()}
+                </>
+              )}
 
-                {servico.form.fields.map(field => (
-                  <View key={field.id} style={styles.formField}>
-                    {renderFormField(field)}
-                  </View>
-                ))}
+            {/* Formulário */}
+            {servico.form.fields.map(field => (
+              <View key={field.id} style={styles.formField}>
+                {renderFormField(field)}
               </View>
-            )}
+            ))}
+          </View>
 
           {/* Agendamento */}
           {renderAgendamentoSection()}
@@ -824,11 +827,21 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     marginBottom: 16,
+    alignItems: 'flex-start',
   },
   titleText: {
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'left',
+  },
+  subtitleContainer: {
+    marginBottom: 12,
+    alignItems: 'flex-start',
+  },
+  subtitleText: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'left',
   },
   descriptionContainer: {
     marginBottom: 16,
@@ -836,7 +849,7 @@ const styles = StyleSheet.create({
   descriptionText: {
     fontSize: 16,
     lineHeight: 24,
-    textAlign: 'justify',
+    textAlign: 'left',
   },
   formField: {
     marginBottom: 5,

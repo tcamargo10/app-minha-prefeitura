@@ -23,6 +23,7 @@ export interface ServicoDetalhes {
         | 'video'
         | 'imagem'
         | 'title'
+        | 'subtitle'
         | 'description';
       required: boolean;
       options?: string[];
@@ -244,57 +245,91 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
   },
   '3': {
     id: '3-1',
-    title: 'Coleta de Poda',
+    title: 'IPTU - Imposto Predial e Territorial Urbano',
     description:
-      'Informações sobre coleta de galhos e resíduos provenientes de poda de árvores em vias públicas e particulares.',
-    icon: 'leaf',
+      'Informações completas sobre o IPTU, incluindo prazos de pagamento, descontos, segunda via e isenções disponíveis.',
+    icon: 'home',
     type: 'INFO',
     information: [
-      'Este serviço é gratuito para todos os cidadãos',
-      'Os resíduos devem estar organizados e acessíveis',
-      'Não inclui poda de árvores, apenas coleta dos resíduos',
-      'Em caso de grandes quantidades, o prazo pode ser estendido',
-      'Coleta realizada semanalmente nas segundas-feiras',
+      'O IPTU é um imposto municipal obrigatório para todos os proprietários de imóveis',
+      'Vencimento da cota única: 31 de janeiro com 10% de desconto',
+      'Parcelamento em até 10 vezes sem juros (vencimento dia 10 de cada mês)',
+      'Desconto de 5% para pagamento até 28 de fevereiro',
+      'Isenção disponível para aposentados e pensionistas (renda até 3 salários mínimos)',
+      'Segunda via disponível no site da prefeitura ou presencialmente',
+      'Multa de 2% ao mês para pagamento em atraso',
+      'Após 60 dias de atraso, o nome vai para o SERASA',
     ],
     links: [
       {
-        title: 'Normas para Coleta de Poda',
-        url: 'https://exemplo.com/normas-poda',
+        title: 'Emitir Segunda Via do IPTU',
+        url: 'https://prefeitura.gov.br/iptu/segunda-via',
+        type: 'externo',
+      },
+      {
+        title: 'Solicitar Isenção de IPTU',
+        url: 'https://prefeitura.gov.br/iptu/isencao',
+        type: 'externo',
+      },
+      {
+        title: 'Tabela de Valores 2024',
+        url: 'https://prefeitura.gov.br/iptu/tabela-valores-2024.pdf',
         type: 'documento',
       },
       {
-        title: 'Cronograma de Coleta',
-        url: 'https://exemplo.com/cronograma-poda',
+        title: 'Manual de Isenções',
+        url: 'https://prefeitura.gov.br/iptu/manual-isencoes.pdf',
         type: 'documento',
       },
     ],
     form: {
       fields: [
         {
-          id: 'titulo_info',
-          label: 'Título da Informação',
-          type: 'title',
+          id: 'titulo_principal',
+          label: 'Informações Importantes sobre o IPTU 2024',
+          type: 'subtitle',
           required: false,
         },
         {
-          id: 'descricao_info',
-          label: 'Descrição Detalhada',
+          id: 'orientacoes_gerais',
+          label:
+            'O Imposto Predial e Territorial Urbano (IPTU) é a principal fonte de receita municipal, sendo utilizado para investimentos em saúde, educação, infraestrutura e serviços públicos. É fundamental que todos os proprietários de imóveis estejam em dia com suas obrigações.',
           type: 'description',
           required: false,
         },
         {
-          id: 'video_educativo',
-          label: 'Como Preparar Resíduos para Coleta',
+          id: 'video_explicativo',
+          label: 'Como Calcular e Pagar seu IPTU',
           type: 'video',
           required: false,
           youtubeId: 'dQw4w9WgXcQ',
         },
         {
-          id: 'imagem_exemplo',
-          label: 'Exemplo de Resíduos de Poda',
+          id: 'calendario_pagamento',
+          label: 'Calendário de Pagamento IPTU 2024',
           type: 'imagem',
           required: false,
-          url: 'https://via.placeholder.com/400x200/27AE60/FFFFFF?text=Coleta+Poda',
+          url: 'https://saomigueldaboavista.sc.gov.br/uploads/sites/15/2024/03/iptu-2022.png',
+        },
+        {
+          id: 'titulo_descontos',
+          label: 'Descontos Disponíveis',
+          type: 'subtitle',
+          required: false,
+        },
+        {
+          id: 'info_descontos',
+          label:
+            'Aproveite os descontos oferecidos pela prefeitura: 10% para pagamento à vista até 31/01, 5% até 28/02, e parcelamento sem juros em até 10 vezes. Aposentados e pensionistas podem solicitar isenção total.',
+          type: 'description',
+          required: false,
+        },
+        {
+          id: 'exemplo_calculo',
+          label: 'Exemplo de Cálculo do IPTU',
+          type: 'imagem',
+          required: false,
+          url: 'https://horacampinas.com.br/wp-content/uploads/2025/01/iptu-campinas-467x284.png',
         },
       ],
     },
@@ -302,5 +337,5 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
 };
 
 export const getServicoDetalhes = (servicoId: string): ServicoDetalhes => {
-  return servicosDetalhes[servicoId] || servicosDetalhes['2'];
+  return servicosDetalhes[servicoId] || servicosDetalhes['3'];
 };
