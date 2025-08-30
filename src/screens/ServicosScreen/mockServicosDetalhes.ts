@@ -1,6 +1,7 @@
 export interface ServicoDetalhes {
   id: string;
   title: string;
+  littleDescription: string;
   description: string;
   icon: string;
   type: 'INFO' | 'FORM' | 'AGENDAMENTO';
@@ -51,8 +52,10 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
   '1': {
     id: '1-1',
     title: 'Limpeza de Via Pública',
-    description:
+    littleDescription:
       'Solicitação de limpeza de ruas, avenidas e praças públicas da cidade.',
+    description:
+      'Solicite a limpeza completa de vias públicas, incluindo varrição, coleta de lixo e remoção de detritos. O serviço abrange ruas, avenidas, praças e calçadas do município. Nossa equipe utiliza equipamentos modernos para garantir a higiene e conservação dos espaços urbanos, promovendo um ambiente mais limpo e saudável para todos os cidadãos.',
     icon: 'trash',
     type: 'FORM',
     information: [
@@ -107,8 +110,10 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
   '2': {
     id: '2-1',
     title: 'Consulta com Nutricionista',
-    description:
+    littleDescription:
       'Agendamento de consulta individual com nutricionista para orientação nutricional e dietas especializadas.',
+    description:
+      'Agende sua consulta individual com nutricionista para orientação nutricional personalizada e elaboração de dietas específicas. O atendimento inclui avaliação completa, análise de exames e criação de plano alimentar adequado ao seu perfil. Oferecemos orientações sobre alimentação saudável, controle de peso e dietas terapêuticas para diversas condições de saúde.',
     icon: 'medical',
     type: 'AGENDAMENTO',
     information: [
@@ -246,7 +251,10 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
   '3': {
     id: '3-1',
     title: 'IPTU - Imposto Predial e Territorial Urbano',
-    description: '',
+    littleDescription:
+      'Informações completas sobre o IPTU, incluindo prazos de pagamento, descontos, segunda via e isenções disponíveis.',
+    description:
+      'Acesse informações completas sobre o IPTU, tributo municipal fundamental para o desenvolvimento da cidade. Encontre detalhes sobre prazos, descontos, parcelamento, segunda via e critérios de isenção. O IPTU financia serviços públicos essenciais e oferece benefícios como descontos para pagamento antecipado e programas de isenção para aposentados e famílias de baixa renda.',
     icon: 'home',
     type: 'INFO',
     information: [
@@ -283,13 +291,6 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
     ],
     form: {
       fields: [
-        {
-          id: 'orientacoes_gerais',
-          label:
-            'O Imposto Predial e Territorial Urbano (IPTU) é a principal fonte de receita municipal, sendo utilizado para investimentos em saúde, educação, infraestrutura e serviços públicos. É fundamental que todos os proprietários de imóveis estejam em dia com suas obrigações.',
-          type: 'description',
-          required: false,
-        },
         {
           id: 'video_explicativo',
           label: 'Como Calcular e Pagar seu IPTU',

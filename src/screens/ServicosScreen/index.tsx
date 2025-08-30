@@ -16,8 +16,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 
 interface Servico {
   id: string;
-  titulo: string;
-  descricao: string;
+  title: string;
+  littleDescription: string;
   icon: string;
 }
 
@@ -44,20 +44,22 @@ export const ServicosScreen: React.FC = () => {
       Limpeza: [
         {
           id: '1',
-          titulo: 'Limpeza de Via Pública',
-          descricao: 'Solicitação de limpeza de ruas, avenidas e praças',
+          title: 'Limpeza de Via Pública',
+          littleDescription:
+            'Solicitação de limpeza de ruas, avenidas e praças',
           icon: 'trash',
         },
         {
           id: '2',
-          titulo: 'Limpeza de Bueiros',
-          descricao: 'Desentupimento e limpeza de bueiros e bocas de lobo',
+          title: 'Limpeza de Bueiros',
+          littleDescription:
+            'Desentupimento e limpeza de bueiros e bocas de lobo',
           icon: 'water',
         },
         {
           id: '3',
-          titulo: 'Coleta de Entulho',
-          descricao: 'Remoção de entulhos e materiais de construção',
+          title: 'Coleta de Entulho',
+          littleDescription: 'Remoção de entulhos e materiais de construção',
           icon: 'cube',
         },
       ],
@@ -109,7 +111,7 @@ export const ServicosScreen: React.FC = () => {
           numberOfLines={3}
           ellipsizeMode="tail"
         >
-          {servico.titulo}
+          {servico.title}
         </Text>
 
         <Text
@@ -120,7 +122,7 @@ export const ServicosScreen: React.FC = () => {
           numberOfLines={3}
           ellipsizeMode="tail"
         >
-          {servico.descricao}
+          {servico.littleDescription}
         </Text>
       </View>
 

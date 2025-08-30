@@ -664,9 +664,6 @@ export const ServicoDetalhesScreen: React.FC = () => {
           {/* Descrição */}
           {servico.description && (
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Descrição
-              </Text>
               <Text
                 style={[
                   styles.description,
