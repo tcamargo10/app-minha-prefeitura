@@ -19,6 +19,7 @@ import { FileUpload } from '@/components/FileUpload';
 import { Input } from '@/components/Input';
 import { SelectInput } from '@/components/SelectInput';
 import { UserInfoCard } from '@/components/UserInfoCard';
+import { YouTubeVideo } from '@/components/YouTubeVideo';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { formatCPFPrivate, formatPhone } from '@/utils/masks';
@@ -48,13 +49,6 @@ export const ServicoDetalhesScreen: React.FC = () => {
   const handleLinkPress = (url: string) => {
     Linking.openURL(url).catch(() => {
       Alert.alert('Erro', 'Não foi possível abrir o link');
-    });
-  };
-
-  const handleVideoPress = (youtubeId: string) => {
-    const url = `https://www.youtube.com/watch?v=${youtubeId}`;
-    Linking.openURL(url).catch(() => {
-      Alert.alert('Erro', 'Não foi possível abrir o vídeo');
     });
   };
 
@@ -239,25 +233,16 @@ export const ServicoDetalhesScreen: React.FC = () => {
       }
       case 'video': {
         return (
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              {field.label}
-            </Text>
-
-            <TouchableOpacity
-              style={styles.videoContainer}
-              onPress={() => handleVideoPress(field.youtubeId)}
-            >
-              <View style={styles.videoThumbnail}>
-                <Ionicons name="play-circle" size={48} color="white" />
-              </View>
-            </TouchableOpacity>
-          </View>
+          <YouTubeVideo
+            youtubeId={field.youtubeId}
+            title={field.label}
+            height={200}
+          />
         );
       }
       case 'imagem': {
         return (
-          <View style={styles.section}>
+          <View>
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
               {field.label}
             </Text>
@@ -552,6 +537,74 @@ export const ServicoDetalhesScreen: React.FC = () => {
     );
   };
 
+  const renderInformationSection = () => {
+    return (
+      <>
+        {servico.information.length > 0 && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Informações Importantes
+            </Text>
+            {servico.information.map((info: string, index: number) => (
+              <View key={index} style={styles.infoRow}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={16}
+                  color={theme.colors.primary}
+                />
+                <Text
+                  style={[
+                    styles.infoText,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  {info}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </>
+    );
+  };
+
+  const renderLinksSection = () => {
+    return (
+      <>
+        {servico.links.length > 0 && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Links Úteis
+            </Text>
+            {servico.links.map((link, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.linkRow}
+                onPress={() => handleLinkPress(link.url)}
+              >
+                <Ionicons
+                  name={link.type === 'video' ? 'play-circle' : 'link'}
+                  size={20}
+                  color={theme.colors.primary}
+                />
+                <Text
+                  style={[styles.linkText, { color: theme.colors.primary }]}
+                >
+                  {link.title}
+                </Text>
+                <Ionicons
+                  name="open-outline"
+                  size={16}
+                  color={theme.colors.primary}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </>
+    );
+  };
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.primary }]}
@@ -587,77 +640,27 @@ export const ServicoDetalhesScreen: React.FC = () => {
           </View>
 
           {/* Descrição */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Descrição
-            </Text>
-            <Text
-              style={[
-                styles.description,
-                { color: theme.colors.textSecondary },
-              ]}
-            >
-              {servico.description}
-            </Text>
-          </View>
+          {servico.description && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                Descrição
+              </Text>
+              <Text
+                style={[
+                  styles.description,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {servico.description}
+              </Text>
+            </View>
+          )}
 
           {/* Informações */}
-          {servico.information.length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Informações Importantes
-              </Text>
-              {servico.information.map((info: string, index: number) => (
-                <View key={index} style={styles.infoRow}>
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={16}
-                    color={theme.colors.primary}
-                  />
-                  <Text
-                    style={[
-                      styles.infoText,
-                      { color: theme.colors.textSecondary },
-                    ]}
-                  >
-                    {info}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
+          {servico.type !== 'INFO' && <>{renderInformationSection()}</>}
 
           {/* Links */}
-          {servico.links.length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Links Úteis
-              </Text>
-              {servico.links.map((link, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.linkRow}
-                  onPress={() => handleLinkPress(link.url)}
-                >
-                  <Ionicons
-                    name={link.type === 'video' ? 'play-circle' : 'link'}
-                    size={20}
-                    color={theme.colors.primary}
-                  />
-                  <Text
-                    style={[styles.linkText, { color: theme.colors.primary }]}
-                  >
-                    {link.title}
-                  </Text>
-                  <Ionicons
-                    name="open-outline"
-                    size={16}
-                    color={theme.colors.primary}
-                  />
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
+          {servico.type !== 'INFO' && <>{renderLinksSection()}</>}
 
           <View style={styles.section}>
             {(servico.type === 'FORM' || servico.type === 'AGENDAMENTO') &&
@@ -699,6 +702,12 @@ export const ServicoDetalhesScreen: React.FC = () => {
               />
             </View>
           )}
+
+          {/* Informações */}
+          {servico.type === 'INFO' && <>{renderInformationSection()}</>}
+
+          {/* Links */}
+          {servico.type === 'INFO' && <>{renderLinksSection()}</>}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -809,22 +818,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
-  videoContainer: {
-    marginBottom: 16,
-  },
-  videoThumbnail: {
-    width: '100%',
-    height: 200,
-    backgroundColor: '#000',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  videoTitle: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
+
   titleContainer: {
     marginBottom: 16,
     alignItems: 'flex-start',

@@ -246,8 +246,7 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
   '3': {
     id: '3-1',
     title: 'IPTU - Imposto Predial e Territorial Urbano',
-    description:
-      'Informações completas sobre o IPTU, incluindo prazos de pagamento, descontos, segunda via e isenções disponíveis.',
+    description: '',
     icon: 'home',
     type: 'INFO',
     information: [
@@ -284,12 +283,6 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
     ],
     form: {
       fields: [
-        {
-          id: 'titulo_principal',
-          label: 'Informações Importantes sobre o IPTU 2024',
-          type: 'subtitle',
-          required: false,
-        },
         {
           id: 'orientacoes_gerais',
           label:

@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -13,10 +15,9 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
 import { AppBar } from '@/components/AppBar';
+import { YouTubeVideo } from '@/components/YouTubeVideo';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -140,23 +141,6 @@ export const ComunicacaoDetalhesScreen: React.FC = () => {
     });
   };
 
-  // Função para extrair o ID do vídeo do YouTube da URL
-  const getYouTubeVideoId = (url: string): string | null => {
-    const regExp =
-      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : null;
-  };
-
-  // Função para gerar a URL da thumbnail do YouTube
-  const getYouTubeThumbnail = (url: string): string => {
-    const videoId = getYouTubeVideoId(url);
-    if (videoId) {
-      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    }
-    return '';
-  };
-
   const isExpired = (dataExpiracao?: string) => {
     if (!dataExpiracao) return false;
     const expiracao = new Date(dataExpiracao);
@@ -196,7 +180,7 @@ export const ComunicacaoDetalhesScreen: React.FC = () => {
       dataExpiracao: communication.expires_at,
       imagem: communication.image_url,
       video: communication.video_url,
-      links: communication.communication_links?.map(link => ({
+      links: communication.links?.map(link => ({
         titulo: link.title,
         url: link.url,
         tipo: link.type as 'documento' | 'site' | 'formulario',
@@ -488,24 +472,11 @@ export const ComunicacaoDetalhesScreen: React.FC = () => {
               {/* Vídeo */}
               {comunicado.video && (
                 <View style={styles.videoSection}>
-                  <Text
-                    style={[styles.sectionTitle, { color: theme.colors.text }]}
-                  >
-                    Vídeo Relacionado
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.videoContainer}
-                    onPress={() => handleLinkPress(comunicado.video!)}
-                  >
-                    <Image
-                      source={{ uri: getYouTubeThumbnail(comunicado.video) }}
-                      style={styles.videoThumbnail}
-                      resizeMode="cover"
-                    />
-                    <View style={styles.videoOverlay}>
-                      <Ionicons name="play-circle" size={64} color="white" />
-                    </View>
-                  </TouchableOpacity>
+                  <YouTubeVideo
+                    videoUrl={comunicado.video}
+                    title="Vídeo Relacionado"
+                    height={200}
+                  />
                 </View>
               )}
 
@@ -691,26 +662,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 12,
   },
-  videoContainer: {
-    height: 200,
-    borderRadius: 12,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  videoThumbnail: {
-    width: '100%',
-    height: '100%',
-  },
-  videoOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   linksSection: {
     marginBottom: 24,
   },
