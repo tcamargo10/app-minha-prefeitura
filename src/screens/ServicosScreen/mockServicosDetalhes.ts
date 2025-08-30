@@ -330,5 +330,5 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
 };
 
 export const getServicoDetalhes = (servicoId: string): ServicoDetalhes => {
-  return servicosDetalhes[servicoId] || servicosDetalhes['3'];
+  return servicosDetalhes[servicoId];
 };

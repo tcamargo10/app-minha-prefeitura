@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -41,6 +41,23 @@ export const ServicoDetalhesScreen: React.FC = () => {
   const { servicoId } = route.params as { servicoId: string };
 
   const servico = getServicoDetalhes(servicoId);
+
+  // Validar se o serviço existe
+  useEffect(() => {
+    if (!servicoId || !servico) {
+      Alert.alert(
+        'Erro',
+        'Serviço não encontrado ou inválido.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  }, [servicoId, servico, navigation]);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -604,6 +621,11 @@ export const ServicoDetalhesScreen: React.FC = () => {
       </>
     );
   };
+
+  // Não renderizar se o serviço não existe
+  if (!servicoId || !servico) {
+    return null;
+  }
 
   return (
     <SafeAreaView
