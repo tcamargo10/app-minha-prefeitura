@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Image,
   Linking,
   Alert,
@@ -22,9 +21,9 @@ import { SelectInput } from '@/components/SelectInput';
 import { UserInfoCard } from '@/components/UserInfoCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
-import { formatCPF, formatCPFPrivate, formatPhone } from '@/utils/masks';
+import { formatCPFPrivate, formatPhone } from '@/utils/masks';
 
-import { ServicoDetalhes, getServicoDetalhes } from './mockServicosDetalhes';
+import { getServicoDetalhes } from './mockServicosDetalhes';
 
 export const ServicoDetalhesScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -32,7 +31,9 @@ export const ServicoDetalhesScreen: React.FC = () => {
   const { theme } = useTheme();
   const { citizen } = useAuth();
   const [formData, setFormData] = useState<Record<string, string>>({});
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [selectedMonth, setSelectedMonth] = useState<string>('');
+  const [selectedDay, setSelectedDay] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
 
   // Pegar parâmetros da rota
@@ -204,6 +205,76 @@ export const ServicoDetalhesScreen: React.FC = () => {
           </View>
         );
       }
+      case 'title': {
+        return (
+          <View style={styles.titleContainer}>
+            <Text style={[styles.titleText, { color: theme.colors.text }]}>
+              {field.label}
+            </Text>
+          </View>
+        );
+      }
+      case 'description': {
+        return (
+          <View style={styles.descriptionContainer}>
+            <Text
+              style={[
+                styles.descriptionText,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              {field.label}
+            </Text>
+          </View>
+        );
+      }
+      case 'video': {
+        return (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Vídeos
+            </Text>
+
+            <TouchableOpacity
+              style={styles.videoContainer}
+              onPress={() => handleVideoPress(field.youtubeId)}
+            >
+              <View style={styles.videoThumbnail}>
+                <Ionicons name="play-circle" size={48} color="white" />
+              </View>
+              <Text
+                style={[
+                  styles.videoTitle,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {field.label}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        );
+      }
+      case 'imagem': {
+        return (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Imagens
+            </Text>
+
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: field.url }} style={styles.image} />
+              <Text
+                style={[
+                  styles.imageTitle,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {field.title}
+              </Text>
+            </View>
+          </View>
+        );
+      }
       default:
         return (
           <Input
@@ -221,91 +292,260 @@ export const ServicoDetalhesScreen: React.FC = () => {
   const renderAgendamentoSection = () => {
     if (servico.type !== 'AGENDAMENTO' || !servico.scheduling) return null;
 
+    // Obter o local selecionado
+    const selectedLocationData = servico.scheduling.availableLocations.find(
+      location => location.location === selectedLocation
+    );
+
+    // Obter o mês selecionado
+    const selectedMonthData = selectedLocationData?.months.find(
+      month => month.month === selectedMonth
+    );
+
+    // Obter o dia selecionado
+    const selectedDayData = selectedMonthData?.days.find(
+      day => day.dayOfWeek === selectedDay
+    );
+
     return (
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
           Agendamento
         </Text>
 
-        {/* Campos padrão */}
-        {renderDefaultFields()}
-
-        <Text
-          style={[
-            styles.sectionSubtitle,
-            { color: theme.colors.textSecondary },
-          ]}
-        >
-          Selecione a data e horário desejados:
+        <Text style={[styles.sectionSubtitle, { color: theme.colors.text }]}>
+          Selecione o local, mês, dia e horário desejados:
         </Text>
 
         <View style={styles.agendamentoContainer}>
+          {/* Seleção de Local */}
           <Text style={[styles.agendamentoLabel, { color: theme.colors.text }]}>
-            Data:
+            Local:
           </Text>
-          <View style={styles.dateContainer}>
-            {servico.scheduling.availableDays.map((day: string) => (
+          <View style={styles.locationContainer}>
+            {servico.scheduling.availableLocations.map(locationData => (
               <TouchableOpacity
-                key={day}
+                key={locationData.location}
                 style={[
-                  styles.dateOption,
+                  styles.locationOption,
                   {
                     backgroundColor:
-                      selectedDate === day
+                      selectedLocation === locationData.location
                         ? theme.colors.primary
                         : theme.colors.surface,
                     borderColor: theme.colors.border,
                   },
                 ]}
-                onPress={() => setSelectedDate(day)}
+                onPress={() => {
+                  setSelectedLocation(locationData.location);
+                  setSelectedMonth(''); // Reset month selection
+                  setSelectedDay(''); // Reset day selection
+                  setSelectedTime(''); // Reset time selection
+                }}
               >
                 <Text
                   style={[
-                    styles.dateOptionText,
+                    styles.locationOptionTitle,
                     {
-                      color: selectedDate === day ? 'white' : theme.colors.text,
+                      color:
+                        selectedLocation === locationData.location
+                          ? 'white'
+                          : theme.colors.text,
                     },
                   ]}
                 >
-                  {day}
+                  {locationData.location}
+                </Text>
+                <Text
+                  style={[
+                    styles.locationOptionAddress,
+                    {
+                      color:
+                        selectedLocation === locationData.location
+                          ? 'rgba(255, 255, 255, 0.8)'
+                          : theme.colors.textSecondary,
+                    },
+                  ]}
+                >
+                  {locationData.address}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <Text style={[styles.agendamentoLabel, { color: theme.colors.text }]}>
-            Horário:
-          </Text>
-          <View style={styles.timeContainer}>
-            {servico.scheduling.availableHours.map((hour: string) => (
-              <TouchableOpacity
-                key={hour}
-                style={[
-                  styles.timeOption,
-                  {
-                    backgroundColor:
-                      selectedTime === hour
-                        ? theme.colors.primary
-                        : theme.colors.surface,
-                    borderColor: theme.colors.border,
-                  },
-                ]}
-                onPress={() => setSelectedTime(hour)}
+          {/* Seleção de Mês */}
+          {selectedLocation && selectedLocationData && (
+            <>
+              <Text
+                style={[styles.agendamentoLabel, { color: theme.colors.text }]}
               >
+                Mês:
+              </Text>
+              <View style={styles.monthContainer}>
+                {selectedLocationData.months.map(monthData => (
+                  <TouchableOpacity
+                    key={monthData.month}
+                    style={[
+                      styles.monthOption,
+                      {
+                        backgroundColor:
+                          selectedMonth === monthData.month
+                            ? theme.colors.primary
+                            : theme.colors.surface,
+                        borderColor: theme.colors.border,
+                      },
+                    ]}
+                    onPress={() => {
+                      setSelectedMonth(monthData.month);
+                      setSelectedDay(''); // Reset day selection
+                      setSelectedTime(''); // Reset time selection
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.monthOptionText,
+                        {
+                          color:
+                            selectedMonth === monthData.month
+                              ? 'white'
+                              : theme.colors.text,
+                        },
+                      ]}
+                    >
+                      {monthData.month}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          )}
+
+          {/* Seleção de Dia */}
+          {selectedMonth && selectedMonthData && (
+            <>
+              <Text
+                style={[styles.agendamentoLabel, { color: theme.colors.text }]}
+              >
+                Dia da Semana:
+              </Text>
+              <View style={styles.dayContainer}>
+                {selectedMonthData.days.map(dayData => (
+                  <TouchableOpacity
+                    key={dayData.dayOfWeek}
+                    style={[
+                      styles.dayOption,
+                      {
+                        backgroundColor:
+                          selectedDay === dayData.dayOfWeek
+                            ? theme.colors.primary
+                            : theme.colors.surface,
+                        borderColor: theme.colors.border,
+                      },
+                    ]}
+                    onPress={() => {
+                      setSelectedDay(dayData.dayOfWeek);
+                      setSelectedTime(''); // Reset time selection
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.dayOptionText,
+                        {
+                          color:
+                            selectedDay === dayData.dayOfWeek
+                              ? 'white'
+                              : theme.colors.text,
+                        },
+                      ]}
+                    >
+                      {dayData.dayOfWeek}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          )}
+
+          {/* Seleção de Horário */}
+          {selectedDay && selectedDayData && (
+            <>
+              <Text
+                style={[styles.agendamentoLabel, { color: theme.colors.text }]}
+              >
+                Horário:
+              </Text>
+              <View style={styles.timeContainer}>
+                {selectedDayData.availableHours.map(hour => (
+                  <TouchableOpacity
+                    key={hour}
+                    style={[
+                      styles.timeOption,
+                      {
+                        backgroundColor:
+                          selectedTime === hour
+                            ? theme.colors.primary
+                            : theme.colors.surface,
+                        borderColor: theme.colors.border,
+                      },
+                    ]}
+                    onPress={() => setSelectedTime(hour)}
+                  >
+                    <Text
+                      style={[
+                        styles.timeOptionText,
+                        {
+                          color:
+                            selectedTime === hour ? 'white' : theme.colors.text,
+                        },
+                      ]}
+                    >
+                      {hour}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          )}
+
+          {/* Resumo da Seleção */}
+          {selectedLocation && selectedMonth && selectedDay && selectedTime && (
+            <View style={styles.scheduleSummary}>
+              <Text
+                style={[
+                  styles.scheduleSummaryTitle,
+                  { color: theme.colors.text },
+                ]}
+              >
+                Agendamento Selecionado:
+              </Text>
+              <Text
+                style={[
+                  styles.scheduleSummaryText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                📍 {selectedLocation}
+              </Text>
+              <Text
+                style={[
+                  styles.scheduleSummaryText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                📅 {selectedMonth} - {selectedDay} às {selectedTime}
+              </Text>
+              {selectedLocationData && (
                 <Text
                   style={[
-                    styles.timeOptionText,
-                    {
-                      color:
-                        selectedTime === hour ? 'white' : theme.colors.text,
-                    },
+                    styles.scheduleSummaryText,
+                    { color: theme.colors.textSecondary },
                   ]}
                 >
-                  {hour}
+                  📋 {selectedLocationData.address}
                 </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+              )}
+            </View>
+          )}
         </View>
       </View>
     );
@@ -418,56 +658,6 @@ export const ServicoDetalhesScreen: React.FC = () => {
             </View>
           )}
 
-          {/* Imagens */}
-          {servico.images.length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Imagens
-              </Text>
-              {servico.images.map((image, index) => (
-                <View key={index} style={styles.imageContainer}>
-                  <Image source={{ uri: image.url }} style={styles.image} />
-                  <Text
-                    style={[
-                      styles.imageTitle,
-                      { color: theme.colors.textSecondary },
-                    ]}
-                  >
-                    {image.title}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Vídeos */}
-          {servico.videos.length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Vídeos
-              </Text>
-              {servico.videos.map((video, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.videoContainer}
-                  onPress={() => handleVideoPress(video.youtubeId)}
-                >
-                  <View style={styles.videoThumbnail}>
-                    <Ionicons name="play-circle" size={48} color="white" />
-                  </View>
-                  <Text
-                    style={[
-                      styles.videoTitle,
-                      { color: theme.colors.textSecondary },
-                    ]}
-                  >
-                    {video.title}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
           {/* Formulário */}
           {(servico.type === 'FORM' || servico.type === 'AGENDAMENTO') &&
             servico.form && (
@@ -569,8 +759,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionSubtitle: {
-    fontSize: 14,
-    marginBottom: 16,
+    fontSize: 15,
+    marginBottom: 10,
   },
   description: {
     fontSize: 16,
@@ -632,6 +822,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
+  titleContainer: {
+    marginBottom: 16,
+  },
+  titleText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  descriptionContainer: {
+    marginBottom: 16,
+  },
+  descriptionText: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'justify',
+  },
   formField: {
     marginBottom: 5,
   },
@@ -647,19 +853,51 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 12,
   },
-  dateContainer: {
+  locationContainer: {
+    gap: 12,
+    marginBottom: 20,
+  },
+  locationOption: {
+    padding: 16,
+    borderWidth: 1,
+    borderRadius: 12,
+  },
+  locationOptionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  locationOptionAddress: {
+    fontSize: 14,
+  },
+  monthContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     marginBottom: 20,
   },
-  dateOption: {
+  monthOption: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderWidth: 1,
     borderRadius: 8,
   },
-  dateOptionText: {
+  monthOptionText: {
+    fontSize: 14,
+  },
+  dayContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 20,
+  },
+  dayOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  dayOptionText: {
     fontSize: 14,
   },
   timeContainer: {
@@ -700,5 +938,23 @@ const styles = StyleSheet.create({
   },
   addressRowItem: {
     flex: 1,
+  },
+  scheduleSummary: {
+    gap: 5,
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(74, 144, 226, 0.2)',
+  },
+  scheduleSummaryTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  scheduleSummaryText: {
+    fontSize: 14,
+    marginBottom: 4,
   },
 });
