@@ -43,47 +43,22 @@ export const ServicosScreen: React.FC = () => {
       // Limpeza
       Limpeza: [
         {
-          id: '1-1',
+          id: '1',
           titulo: 'Limpeza de Via Pública',
           descricao: 'Solicitação de limpeza de ruas, avenidas e praças',
           icon: 'trash',
         },
         {
-          id: '1-2',
+          id: '2',
           titulo: 'Limpeza de Bueiros',
           descricao: 'Desentupimento e limpeza de bueiros e bocas de lobo',
           icon: 'water',
         },
         {
-          id: '1-3',
+          id: '3',
           titulo: 'Coleta de Entulho',
           descricao: 'Remoção de entulhos e materiais de construção',
           icon: 'cube',
-        },
-        {
-          id: '1-4',
-          titulo: 'Coleta de Poda',
-          descricao: 'Coleta de galhos e resíduos de poda de árvores',
-          icon: 'leaf',
-        },
-        {
-          id: '1-5',
-          titulo: 'Cata-Treco',
-          descricao:
-            'Coleta de móveis velhos, eletrodomésticos e objetos grandes',
-          icon: 'home',
-        },
-        {
-          id: '1-6',
-          titulo: 'Denúncia de Descarte Irregular de Resíduos',
-          descricao: 'Denúncia de descarte inadequado de lixo em vias públicas',
-          icon: 'alert-circle',
-        },
-        {
-          id: '1-7',
-          titulo: 'Coleta de Animais Mortos',
-          descricao: 'Remoção de animais mortos em vias públicas',
-          icon: 'paw',
         },
       ],
     };
