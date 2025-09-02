@@ -20,11 +20,9 @@ import { useCity } from '@/contexts/CityContext';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/utils/supabase';
 import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
+import { RootStackParamList } from '@/navigation/AppNavigator';
 
-type SolicitacoesScreenNavigationProp = StackNavigationProp<
-  BottomTabParamList,
-  'Solicitacoes'
->;
+type SolicitacoesScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 interface Solicitacao {
   id: string;
@@ -210,7 +208,7 @@ export const SolicitacoesScreen: React.FC = () => {
   };
 
   const handleSolicitacaoPress = (solicitacao: Solicitacao) => {
-    navigation.navigate('SolicitacoesDetalhes' as any, {
+    navigation.navigate('SolicitacoesDetalhes', {
       solicitacaoId: solicitacao.id,
     });
   };

@@ -406,13 +406,11 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
         />
         <View
           style={[
-            styles.contentContainer,
+            styles.loadingContainer,
             { backgroundColor: theme.colors.background },
           ]}
         >
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-          </View>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       </SafeAreaView>
     );

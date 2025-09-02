@@ -276,14 +276,6 @@ export const ComunicacaoDetalhesScreen: React.FC = () => {
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={theme.colors.primary} />
-              <Text
-                style={[
-                  styles.loadingText,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                Carregando detalhes...
-              </Text>
             </View>
           ) : (
             <>
