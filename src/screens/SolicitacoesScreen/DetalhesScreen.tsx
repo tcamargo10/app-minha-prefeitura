@@ -10,11 +10,15 @@ import {
   Dimensions,
   ActivityIndicator,
   Alert,
+  Clipboard,
+  TextInput,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppBar } from '@/components/AppBar';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/utils/supabase';
 
 interface TimelineItem {
@@ -42,6 +46,7 @@ interface SolicitacaoDetalhes {
   observacoes?: string;
   timeline: TimelineItem[];
   anexos?: { nome: string; tipo: string; tamanho: string }[];
+  taskId?: string;
 }
 
 const { width } = Dimensions.get('window');
@@ -50,6 +55,7 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { theme } = useTheme();
+  const { user } = useAuth();
 
   // Pegar o ID da solicitação dos parâmetros da rota
   const { solicitacaoId } = route.params as { solicitacaoId: string };
@@ -59,6 +65,9 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
   const [solicitacao, setSolicitacao] = useState<SolicitacaoDetalhes | null>(
     null
   );
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [messageText, setMessageText] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   // Função para buscar dados do Supabase
   const fetchSolicitacaoDetalhes = async () => {
@@ -71,6 +80,20 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
         .select('*')
         .eq('id', solicitacaoId)
         .single();
+
+      // Buscar o task_id separadamente da tabela service_requests
+      let taskId = null;
+      if (solicitacaoData) {
+        const { data: taskData, error: taskError } = await supabase
+          .from('service_requests')
+          .select('task_id')
+          .eq('id', solicitacaoId)
+          .single();
+
+        if (!taskError && taskData) {
+          taskId = taskData.task_id;
+        }
+      }
 
       if (solicitacaoError) {
         console.error('Erro ao buscar solicitação:', solicitacaoError);
@@ -131,6 +154,7 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
         observacoes: solicitacaoData.observacoes || solicitacaoData.notes,
         timeline: mapTimeline(timelineData || []),
         anexos: mapAnexos(anexosData || []),
+        taskId: taskId,
       };
 
       setSolicitacao(solicitacaoMapeada);
@@ -320,6 +344,112 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
     navigation.goBack();
   };
 
+  const handleCopyProtocol = async () => {
+    if (solicitacao?.protocolo) {
+      try {
+        await Clipboard.setString(solicitacao.protocolo);
+        Alert.alert(
+          'Sucesso',
+          'Protocolo copiado para a área de transferência!'
+        );
+      } catch (error) {
+        Alert.alert('Erro', 'Não foi possível copiar o protocolo');
+      }
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageText.trim()) {
+      Alert.alert('Atenção', 'Por favor, digite uma mensagem');
+      return;
+    }
+
+    if (!user) {
+      Alert.alert('Erro', 'Usuário não autenticado');
+      return;
+    }
+
+    if (!solicitacao) {
+      Alert.alert('Erro', 'Dados da solicitação não encontrados');
+      return;
+    }
+
+    try {
+      setSendingMessage(true);
+
+      // Se existe task_id, inserir comentário na tabela task_comments
+      if (solicitacao.taskId) {
+        const { error: commentError } = await supabase
+          .from('task_comments')
+          .insert({
+            task_id: solicitacao.taskId,
+            comment: messageText.trim(),
+            created_at: new Date().toISOString(),
+          });
+
+        if (commentError) {
+          console.error('Erro ao inserir comentário:', commentError);
+          // Continuar mesmo se houver erro no comentário, pois ainda podemos adicionar na timeline
+        }
+      }
+
+      // Adicionar entrada na timeline da solicitação (sempre fazer isso)
+      const { error: timelineError } = await supabase
+        .from('service_request_timeline')
+        .insert({
+          request_id: solicitacao.id,
+          status: 'Mensagem do Cidadão',
+          description: messageText.trim(),
+          responsible_name:
+            user.user_metadata?.full_name || user.email || 'Cidadão',
+          action_date: new Date().toISOString().split('T')[0],
+          action_time: new Date().toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+          created_by: user.id,
+        });
+
+      if (timelineError) {
+        console.error('Erro ao adicionar timeline:', timelineError);
+        throw timelineError; // Falhar se não conseguir adicionar na timeline
+      }
+
+      Alert.alert('Sucesso', 'Mensagem enviada com sucesso!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            setMessageText('');
+            setShowMessageModal(false);
+            // Recarregar os detalhes para mostrar a nova timeline
+            fetchSolicitacaoDetalhes();
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      Alert.alert(
+        'Erro',
+        'Não foi possível enviar a mensagem. Tente novamente.'
+      );
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  const handleOpenMessageModal = () => {
+    if (!user) {
+      Alert.alert('Atenção', 'Você precisa estar logado para enviar mensagens');
+      return;
+    }
+    setShowMessageModal(true);
+  };
+
+  const handleCloseMessageModal = () => {
+    setMessageText('');
+    setShowMessageModal(false);
+  };
+
   const renderTimelineItem = (item: TimelineItem, index: number) => {
     const isLast = index === solicitacao!.timeline.length - 1;
 
@@ -507,11 +637,27 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
               {solicitacao.titulo}
             </Text>
 
-            <Text
-              style={[styles.protocolo, { color: theme.colors.textSecondary }]}
-            >
-              Protocolo: {solicitacao.protocolo}
-            </Text>
+            <View style={styles.protocoloContainer}>
+              <Text
+                style={[
+                  styles.protocolo,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Protocolo: {solicitacao.protocolo}
+              </Text>
+              <TouchableOpacity
+                style={styles.copyButton}
+                onPress={handleCopyProtocol}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="copy-outline"
+                  size={18}
+                  color={theme.colors.primary}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Informações Gerais */}
@@ -548,7 +694,6 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
               <View style={styles.prioridadeContainer}>
                 <View
                   style={[
-                    styles.prioridadeDot,
                     {
                       backgroundColor: getPrioridadeColor(
                         solicitacao.prioridade
@@ -724,6 +869,7 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
                 { backgroundColor: theme.colors.primary },
               ]}
               activeOpacity={0.8}
+              onPress={handleOpenMessageModal}
             >
               <Ionicons
                 name="chatbubble"
@@ -742,6 +888,144 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
           </View>
         </ScrollView>
       </View>
+
+      {/* Modal para Enviar Mensagem */}
+      <Modal
+        visible={showMessageModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={handleCloseMessageModal}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.modalBackdrop}
+            activeOpacity={1}
+            onPress={handleCloseMessageModal}
+          />
+          <View
+            style={[
+              styles.modalContainer,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+                Enviar Mensagem
+              </Text>
+              <TouchableOpacity
+                onPress={handleCloseMessageModal}
+                style={styles.closeButton}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="close"
+                  size={24}
+                  color={theme.colors.textSecondary}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <Text
+                style={[
+                  styles.modalSubtitle,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Protocolo: {solicitacao?.protocolo}
+              </Text>
+
+              <View style={styles.inputContainer}>
+                <Text style={[styles.inputLabel, { color: theme.colors.text }]}>
+                  Sua mensagem:
+                </Text>
+                <TextInput
+                  style={[
+                    styles.messageInput,
+                    {
+                      backgroundColor: theme.colors.background,
+                      color: theme.colors.text,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}
+                  placeholder="Digite sua mensagem aqui..."
+                  placeholderTextColor={theme.colors.textSecondary}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                  value={messageText}
+                  onChangeText={setMessageText}
+                  maxLength={1000}
+                />
+                <Text
+                  style={[
+                    styles.characterCount,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  {messageText.length}/1000 caracteres
+                </Text>
+              </View>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[
+                    styles.modalButton,
+                    styles.cancelButton,
+                    { borderColor: theme.colors.border },
+                  ]}
+                  onPress={handleCloseMessageModal}
+                  activeOpacity={0.8}
+                >
+                  <Text
+                    style={[
+                      styles.cancelButtonText,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Cancelar
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.modalButton,
+                    styles.sendButton,
+                    { backgroundColor: theme.colors.primary },
+                    sendingMessage && styles.disabledButton,
+                  ]}
+                  onPress={handleSendMessage}
+                  activeOpacity={0.8}
+                  disabled={sendingMessage}
+                >
+                  {sendingMessage ? (
+                    <ActivityIndicator
+                      size="small"
+                      color={theme.colors.onPrimary}
+                    />
+                  ) : (
+                    <>
+                      <Ionicons
+                        name="send"
+                        size={18}
+                        color={theme.colors.onPrimary}
+                      />
+                      <Text
+                        style={[
+                          styles.sendButtonText,
+                          { color: theme.colors.onPrimary },
+                        ]}
+                      >
+                        Enviar
+                      </Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -798,9 +1082,20 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     lineHeight: 24,
   },
+  protocoloContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   protocolo: {
     fontSize: 14,
     fontWeight: '500',
+    flex: 1,
+  },
+  copyButton: {
+    padding: 8,
+    marginLeft: 8,
+    borderRadius: 6,
   },
   infoCard: {
     borderRadius: 16,
@@ -1001,5 +1296,105 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 16,
     textAlign: 'center',
+  },
+  // Estilos do Modal
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 20,
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  modalContainer: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingBottom: 10,
+  },
+  modalBody: {
+    padding: 20,
+    paddingTop: 0,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  messageInput: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    minHeight: 100,
+    maxHeight: 150,
+  },
+  characterCount: {
+    fontSize: 12,
+    textAlign: 'right',
+    marginTop: 4,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+  },
+  sendButton: {
+    gap: 8,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  sendButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
 });

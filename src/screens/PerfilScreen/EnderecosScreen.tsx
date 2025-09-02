@@ -19,12 +19,12 @@ import { AppBar } from '@/components/AppBar';
 import { SelectInput, SelectOption } from '@/components/SelectInput';
 import { useCity } from '@/contexts/CityContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { citizenService, CitizenAddress } from '@/services/citizenService';
 import {
   municipalityService,
   State,
   City,
 } from '@/services/municipalityService';
-import { citizenService, CitizenAddress } from '@/services/citizenService';
 import { supabase } from '@/utils/supabase';
 
 interface Endereco {
@@ -251,24 +251,66 @@ export const EnderecosScreen: React.FC = () => {
         {
           text: 'Excluir',
           style: 'destructive',
-          onPress: () => {
-            setEnderecos(enderecos.filter(e => e.id !== id));
+          onPress: async () => {
+            try {
+              const success = await citizenService.deleteCitizenAddress(id);
+
+              if (!success) {
+                Alert.alert('Erro', 'Não foi possível excluir o endereço.');
+                return;
+              }
+
+              // Recarregar endereços após excluir
+              await loadUserAddresses();
+              Alert.alert('Sucesso', 'Endereço excluído com sucesso!');
+            } catch (error) {
+              console.error('Erro ao excluir endereço:', error);
+              Alert.alert('Erro', 'Não foi possível excluir o endereço.');
+            }
           },
         },
       ]
     );
   };
 
-  const handleSetPrincipal = (id: string) => {
-    setEnderecos(
-      enderecos.map(endereco => ({
-        ...endereco,
-        principal: endereco.id === id,
-      }))
-    );
+  const handleSetPrincipal = async (id: string) => {
+    try {
+      // Primeiro, desmarcar todos os outros endereços como principal
+      const otherAddresses = enderecos.filter(e => e.id !== id);
+      for (const address of otherAddresses) {
+        if (address.principal) {
+          await citizenService.updateCitizenAddress(address.id, {
+            is_primary: false,
+          });
+        }
+      }
+
+      // Depois, definir o endereço selecionado como principal
+      const updatedAddress = await citizenService.updateCitizenAddress(id, {
+        is_primary: true,
+      });
+
+      if (!updatedAddress) {
+        Alert.alert(
+          'Erro',
+          'Não foi possível definir o endereço como principal.'
+        );
+        return;
+      }
+
+      // Recarregar endereços para refletir as mudanças
+      await loadUserAddresses();
+      Alert.alert('Sucesso', 'Endereço principal atualizado!');
+    } catch (error) {
+      console.error('Erro ao definir endereço principal:', error);
+      Alert.alert(
+        'Erro',
+        'Não foi possível definir o endereço como principal.'
+      );
+    }
   };
 
-  const handleSaveEndereco = () => {
+  const handleSaveEndereco = async () => {
     if (
       !formData.cep ||
       !formData.logradouro ||
@@ -281,43 +323,120 @@ export const EnderecosScreen: React.FC = () => {
       return;
     }
 
-    if (editingEndereco) {
-      // Editando endereço existente
-      setEnderecos(
-        enderecos.map(endereco =>
-          endereco.id === editingEndereco.id
-            ? {
-                ...endereco,
-                ...formData,
-                tipo: formData.tipo as 'residencial' | 'comercial' | 'outro',
-              }
-            : formData.principal
-              ? { ...endereco, principal: false }
-              : endereco
-        )
-      );
-    } else {
-      // Adicionando novo endereço
-      const newEndereco: Endereco = {
-        id: Date.now().toString(),
-        ...formData,
-        tipo: formData.tipo as 'residencial' | 'comercial' | 'outro',
-        municipality_id: '', // Será preenchido quando implementar salvamento no Supabase
-      };
-      setEnderecos([
-        ...enderecos.map(e => ({
-          ...e,
-          principal: formData.principal ? false : e.principal,
-        })),
-        newEndereco,
-      ]);
+    try {
+      // Verificar se há usuário logado
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        Alert.alert('Erro', 'Você precisa estar logado para salvar endereços.');
+        return;
+      }
+
+      // Buscar cidadão pelo email
+      const citizen = await citizenService.getCitizenByEmail(user.email || '');
+
+      if (!citizen) {
+        Alert.alert('Erro', 'Cidadão não encontrado.');
+        return;
+      }
+
+      // Buscar município
+      const { data: municipality, error: municipalityError } = await supabase
+        .from('municipalities')
+        .select('id')
+        .eq('state', formData.estado)
+        .eq('city', formData.cidade)
+        .eq('active', true)
+        .single();
+
+      if (municipalityError || !municipality) {
+        Alert.alert('Erro', 'Estado ou cidade não encontrados.');
+        return;
+      }
+
+      if (editingEndereco) {
+        // Editando endereço existente
+        const updateData = {
+          street: formData.logradouro,
+          number: formData.numero,
+          complement: formData.complemento || undefined,
+          neighborhood: formData.bairro,
+          postal_code: formData.cep,
+          municipality_id: municipality.id,
+          is_primary: formData.principal,
+        };
+
+        const updatedAddress = await citizenService.updateCitizenAddress(
+          editingEndereco.id,
+          updateData
+        );
+
+        if (!updatedAddress) {
+          Alert.alert('Erro', 'Não foi possível atualizar o endereço.');
+          return;
+        }
+
+        // Se definiu como principal, atualizar outros endereços
+        if (formData.principal) {
+          const otherAddresses = enderecos.filter(
+            e => e.id !== editingEndereco.id
+          );
+          for (const address of otherAddresses) {
+            if (address.principal) {
+              await citizenService.updateCitizenAddress(address.id, {
+                is_primary: false,
+              });
+            }
+          }
+        }
+      } else {
+        // Adicionando novo endereço
+        // Se definiu como principal, primeiro desmarcar outros
+        if (formData.principal) {
+          const primaryAddress = enderecos.find(e => e.principal);
+          if (primaryAddress) {
+            await citizenService.updateCitizenAddress(primaryAddress.id, {
+              is_primary: false,
+            });
+          }
+        }
+
+        const addressData = {
+          citizen_id: citizen.id,
+          municipality_id: municipality.id,
+          street: formData.logradouro,
+          number: formData.numero,
+          complement: formData.complemento || undefined,
+          neighborhood: formData.bairro,
+          postal_code: formData.cep,
+          is_primary: formData.principal,
+          active: true,
+        };
+
+        const newAddress = await citizenService.addCitizenAddress(addressData);
+
+        if (!newAddress) {
+          Alert.alert('Erro', 'Não foi possível adicionar o endereço.');
+          return;
+        }
+      }
+
+      // Recarregar endereços após salvar
+      await loadUserAddresses();
+
+      setModalVisible(false);
+      setEditingEndereco(null);
+
+      // Atualizar a lista de cidades disponíveis no contexto
+      refreshCities();
+
+      Alert.alert('Sucesso', 'Endereço salvo com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar endereço:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o endereço.');
     }
-
-    setModalVisible(false);
-    setEditingEndereco(null);
-
-    // Atualizar a lista de cidades disponíveis no contexto
-    refreshCities();
   };
 
   const getTipoLabel = (tipo: string) => {

@@ -57,7 +57,6 @@ export const ComunicacaoScreen: React.FC = () => {
   const { user, citizen } = useAuth();
   const navigation = useNavigation<ComunicacaoScreenNavigationProp>();
 
-
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [comunicados, setComunicados] = useState<Comunicado[]>([]);
@@ -67,7 +66,9 @@ export const ComunicacaoScreen: React.FC = () => {
     communication: CommunicationWithLinks
   ): Comunicado => {
     // Converter tipo do inglês para português
-    const mapTipo = (type: string): 'noticia' | 'informacao' | 'alerta' | 'evento' => {
+    const mapTipo = (
+      type: string
+    ): 'noticia' | 'informacao' | 'alerta' | 'evento' => {
       switch (type) {
         case 'news':
           return 'noticia';
@@ -252,7 +253,9 @@ export const ComunicacaoScreen: React.FC = () => {
         <View style={styles.comunicadoInfo}>
           <View style={styles.comunicadoTipo}>
             <Ionicons
-              name={getTipoIcon(comunicado.tipo) as keyof typeof Ionicons.glyphMap}
+              name={
+                getTipoIcon(comunicado.tipo) as keyof typeof Ionicons.glyphMap
+              }
               size={16}
               color={getTipoColor(comunicado.tipo)}
             />

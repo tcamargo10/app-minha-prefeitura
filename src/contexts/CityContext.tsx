@@ -5,8 +5,9 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { supabase } from '@/utils/supabase';
+
 import { citizenService } from '@/services/citizenService';
+import { supabase } from '@/utils/supabase';
 
 export interface City {
   id: string;
