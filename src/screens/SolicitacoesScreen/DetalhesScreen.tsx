@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppBar } from '@/components/AppBar';
 import { useTheme } from '@/contexts/ThemeContext';
+import { supabase } from '@/utils/supabase';
 
 interface TimelineItem {
   id: string;
@@ -51,162 +54,163 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
   // Pegar o ID da solicitação dos parâmetros da rota
   const { solicitacaoId } = route.params as { solicitacaoId: string };
 
-  // Dados mockados - em um app real, viriam de uma API baseada no solicitacaoId
-  const getSolicitacaoById = (id: string): SolicitacaoDetalhes => {
-    const solicitacoesData: Record<string, SolicitacaoDetalhes> = {
-      '1': {
-        id: '1',
-        tipo: 'documento',
-        titulo: 'Segunda Via de RG',
-        descricao:
-          'Solicitação de segunda via do documento de identidade. Documento perdido durante viagem.',
-        status: 'em_analise',
-        dataCriacao: '2024-01-15',
-        dataAtualizacao: '2024-01-18',
-        protocolo: '2024001',
-        categoria: 'Documentação',
-        prioridade: 'media',
-        endereco: 'Rua das Palmeiras, 456 - Centro',
-        observacoes: 'Documento perdido em 10/01/2024',
-        timeline: [
-          {
-            id: '1',
-            data: '2024-01-15',
-            hora: '09:30',
-            status: 'Solicitação Criada',
-            descricao: 'Solicitação registrada no sistema',
-            responsavel: 'Sistema',
-          },
-          {
-            id: '2',
-            data: '2024-01-15',
-            hora: '14:20',
-            status: 'Em Análise',
-            descricao: 'Solicitação encaminhada para análise',
-            responsavel: 'Maria Silva - Depto. Documentação',
-          },
-          {
-            id: '3',
-            data: '2024-01-18',
-            hora: '10:15',
-            status: 'Documentação Verificada',
-            descricao: 'Documentação do solicitante verificada',
-            responsavel: 'Carlos Santos - Analista',
-            observacoes: 'Documentação em ordem. Aguardando confirmação.',
-          },
-        ],
-        anexos: [
-          { nome: 'boletim_ocorrencia.pdf', tipo: 'PDF', tamanho: '1.2 MB' },
-          { nome: 'foto_3x4.jpg', tipo: 'Imagem', tamanho: '0.8 MB' },
-        ],
-      },
-      '2': {
-        id: '2',
-        tipo: 'servico',
-        titulo: 'Limpeza de Bueiro',
-        descricao:
-          'Solicitação de limpeza de bueiro entupido na Rua das Flores, próximo ao número 123. O bueiro está causando alagamento na via durante chuvas.',
-        status: 'concluida',
-        dataCriacao: '2024-01-10',
-        dataAtualizacao: '2024-01-16',
-        protocolo: '2024002',
-        categoria: 'Limpeza Urbana',
-        prioridade: 'media',
-        endereco: 'Rua das Flores, 123 - Centro',
-        observacoes: 'Bueiro localizado próximo à padaria do Sr. João',
-        timeline: [
-          {
-            id: '1',
-            data: '2024-01-10',
-            hora: '08:30',
-            status: 'Solicitação Criada',
-            descricao: 'Solicitação registrada no sistema',
-            responsavel: 'Sistema',
-          },
-          {
-            id: '2',
-            data: '2024-01-10',
-            hora: '14:20',
-            status: 'Em Análise',
-            descricao: 'Solicitação encaminhada para análise técnica',
-            responsavel: 'João Silva - Depto. Limpeza',
-          },
-          {
-            id: '3',
-            data: '2024-01-12',
-            hora: '08:15',
-            status: 'Vistoria Agendada',
-            descricao: 'Vistoria agendada para verificação local',
-            responsavel: 'Equipe Técnica',
-            observacoes: 'Vistoria agendada para 14/01/2024 às 10:00',
-          },
-          {
-            id: '4',
-            data: '2024-01-14',
-            hora: '10:30',
-            status: 'Vistoria Realizada',
-            descricao: 'Vistoria realizada no local',
-            responsavel: 'Carlos Santos - Técnico',
-            observacoes:
-              'Confirmado entupimento. Serviço aprovado para execução.',
-          },
-          {
-            id: '5',
-            data: '2024-01-16',
-            hora: '07:00',
-            status: 'Serviço Executado',
-            descricao: 'Limpeza do bueiro realizada com sucesso',
-            responsavel: 'Equipe de Limpeza',
-            observacoes: 'Bueiro desentupido e limpo. Via liberada.',
-          },
-        ],
-        anexos: [
-          { nome: 'foto_bueiro.jpg', tipo: 'Imagem', tamanho: '2.3 MB' },
-          { nome: 'localizacao.pdf', tipo: 'PDF', tamanho: '1.1 MB' },
-        ],
-      },
-      '3': {
-        id: '3',
-        tipo: 'denuncia',
-        titulo: 'Lixo Irregular',
-        descricao:
-          'Denúncia de descarte irregular de lixo em via pública. Material descartado em local inadequado.',
-        status: 'pendente',
-        dataCriacao: '2024-01-20',
-        protocolo: '2024003',
-        categoria: 'Fiscalização',
-        prioridade: 'alta',
-        endereco: 'Rua dos Ipês, 789 - Jardim das Flores',
-        observacoes: 'Lixo descartado próximo ao ponto de ônibus',
-        timeline: [
-          {
-            id: '1',
-            data: '2024-01-20',
-            hora: '16:45',
-            status: 'Denúncia Registrada',
-            descricao: 'Denúncia registrada no sistema',
-            responsavel: 'Sistema',
-          },
-          {
-            id: '2',
-            data: '2024-01-20',
-            hora: '17:30',
-            status: 'Encaminhada para Fiscalização',
-            descricao: 'Denúncia encaminhada para equipe de fiscalização',
-            responsavel: 'Ana Costa - Coordenadora',
-          },
-        ],
-        anexos: [
-          { nome: 'foto_lixo.jpg', tipo: 'Imagem', tamanho: '3.1 MB' },
-          { nome: 'video_denuncia.mp4', tipo: 'Vídeo', tamanho: '15.2 MB' },
-        ],
-      },
-    };
+  // Estados
+  const [loading, setLoading] = useState(true);
+  const [solicitacao, setSolicitacao] = useState<SolicitacaoDetalhes | null>(
+    null
+  );
 
-    return solicitacoesData[id] || solicitacoesData['1']; // Fallback para primeira solicitação
+  // Função para buscar dados do Supabase
+  const fetchSolicitacaoDetalhes = async () => {
+    try {
+      setLoading(true);
+
+      // Buscar dados da solicitação com JOIN para obter dados relacionados
+      const { data: solicitacaoData, error: solicitacaoError } = await supabase
+        .from('service_request_details')
+        .select('*')
+        .eq('id', solicitacaoId)
+        .single();
+
+      if (solicitacaoError) {
+        console.error('Erro ao buscar solicitação:', solicitacaoError);
+        Alert.alert(
+          'Erro',
+          'Não foi possível carregar os detalhes da solicitação'
+        );
+        navigation.goBack();
+        return;
+      }
+
+      // Buscar timeline da solicitação
+      const { data: timelineData, error: timelineError } = await supabase
+        .from('service_request_timeline_formatted')
+        .select('*')
+        .eq('request_id', solicitacaoId)
+        .order('data', { ascending: false })
+        .order('hora', { ascending: false });
+
+      if (timelineError) {
+        console.error('Erro ao buscar timeline:', timelineError);
+      }
+
+      // Buscar arquivos anexados
+      const { data: anexosData, error: anexosError } = await supabase
+        .from('service_request_files')
+        .select('*')
+        .eq('request_id', solicitacaoId);
+
+      if (anexosError) {
+        console.error('Erro ao buscar anexos:', anexosError);
+      }
+
+      // Mapear dados para o formato da interface
+      const solicitacaoMapeada: SolicitacaoDetalhes = {
+        id: solicitacaoData.id,
+        tipo: mapRequestType(
+          solicitacaoData.tipo || solicitacaoData.request_type || 'servico'
+        ),
+        titulo:
+          solicitacaoData.titulo ||
+          solicitacaoData.servico_nome ||
+          'Solicitação',
+        descricao:
+          solicitacaoData.descricao || solicitacaoData.observacoes || '',
+        status: mapStatus(solicitacaoData.status || 'pending'),
+        dataCriacao:
+          solicitacaoData.data_criacao ||
+          solicitacaoData.created_at ||
+          new Date().toISOString(),
+        dataAtualizacao:
+          solicitacaoData.data_atualizacao || solicitacaoData.updated_at,
+        protocolo: solicitacaoData.protocol || 'N/A',
+        categoria: solicitacaoData.categoria || 'Geral',
+        prioridade:
+          solicitacaoData.prioridade || solicitacaoData.priority || 'media',
+        endereco: solicitacaoData.endereco || solicitacaoData.address,
+        observacoes: solicitacaoData.observacoes || solicitacaoData.notes,
+        timeline: mapTimeline(timelineData || []),
+        anexos: mapAnexos(anexosData || []),
+      };
+
+      setSolicitacao(solicitacaoMapeada);
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+      Alert.alert('Erro', 'Ocorreu um erro inesperado');
+      navigation.goBack();
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const solicitacao = getSolicitacaoById(solicitacaoId);
+  // Funções de mapeamento
+  const mapRequestType = (
+    type: string
+  ): 'documento' | 'servico' | 'denuncia' | 'sugestao' => {
+    switch (type) {
+      case 'documento':
+        return 'documento';
+      case 'denuncia':
+        return 'denuncia';
+      case 'sugestao':
+        return 'sugestao';
+      default:
+        return 'servico';
+    }
+  };
+
+  const mapStatus = (
+    status: string
+  ): 'pendente' | 'em_analise' | 'aprovada' | 'rejeitada' | 'concluida' => {
+    switch (status) {
+      case 'pending':
+        return 'pendente';
+      case 'in_progress':
+        return 'em_analise';
+      case 'completed':
+        return 'concluida';
+      case 'cancelled':
+        return 'rejeitada';
+      default:
+        return 'pendente';
+    }
+  };
+
+  const mapTimeline = (timelineData: any[]): TimelineItem[] => {
+    return timelineData.map((item, index) => ({
+      id: item.id || index.toString(),
+      data:
+        item.data || item.action_date || new Date().toISOString().split('T')[0],
+      hora: item.hora || item.action_time || '00:00',
+      status: item.status || 'Atualização',
+      descricao: item.descricao || item.description || 'Sem descrição',
+      responsavel: item.responsavel || item.responsible_name,
+      observacoes: item.observacoes || item.notes,
+    }));
+  };
+
+  const mapAnexos = (
+    anexosData: any[]
+  ): { nome: string; tipo: string; tamanho: string }[] => {
+    return anexosData.map(item => ({
+      nome: item.file_name || 'Arquivo',
+      tipo: item.file_type || 'Arquivo',
+      tamanho: formatFileSize(item.file_size || 0),
+    }));
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  // Carregar dados na inicialização
+  useEffect(() => {
+    fetchSolicitacaoDetalhes();
+  }, [solicitacaoId]);
 
   const getTipoIcon = (tipo: string) => {
     switch (tipo) {
@@ -317,7 +321,7 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
   };
 
   const renderTimelineItem = (item: TimelineItem, index: number) => {
-    const isLast = index === solicitacao.timeline.length - 1;
+    const isLast = index === solicitacao!.timeline.length - 1;
 
     return (
       <View key={item.id} style={styles.timelineItem}>
@@ -387,6 +391,67 @@ export const SolicitacoesDetalhesScreen: React.FC = () => {
       </View>
     );
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: theme.colors.primary }]}
+        edges={['top']}
+      >
+        <AppBar
+          title="Detalhes da Solicitação"
+          showBackButton
+          onBackPress={handleBackPress}
+        />
+        <View
+          style={[
+            styles.contentContainer,
+            { backgroundColor: theme.colors.background },
+          ]}
+        >
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state - se não encontrou a solicitação
+  if (!solicitacao) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: theme.colors.primary }]}
+        edges={['top']}
+      >
+        <AppBar
+          title="Detalhes da Solicitação"
+          showBackButton
+          onBackPress={handleBackPress}
+        />
+        <View
+          style={[
+            styles.contentContainer,
+            { backgroundColor: theme.colors.background },
+          ]}
+        >
+          <View style={styles.errorContainer}>
+            <Ionicons
+              name="alert-circle"
+              size={48}
+              color={theme.colors.textSecondary}
+            />
+            <Text
+              style={[styles.errorText, { color: theme.colors.textSecondary }]}
+            >
+              Solicitação não encontrada
+            </Text>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -921,5 +986,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
+    textAlign: 'center',
   },
 });
