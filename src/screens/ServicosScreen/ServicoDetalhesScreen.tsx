@@ -22,6 +22,11 @@ import { UserInfoCard } from '@/components/UserInfoCard';
 import { YouTubeVideo } from '@/components/YouTubeVideo';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
+import {
+  validateFormData,
+  validateSchedulingData,
+  getFieldError,
+} from '@/utils/dynamicFormValidation';
 import { formatCPFPrivate, formatPhone } from '@/utils/masks';
 
 import { getServicoDetalhes } from './mockServicosDetalhes';
@@ -36,11 +41,44 @@ export const ServicoDetalhesScreen: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [schedulingErrors, setSchedulingErrors] = useState<
+    Record<string, string>
+  >({});
 
   // Pegar parâmetros da rota
   const { servicoId } = route.params as { servicoId: string };
 
   const servico = getServicoDetalhes(servicoId);
+
+  // Inicializar campos do formulário com strings vazias
+  useEffect(() => {
+    if (servico?.form?.fields) {
+      const initialFormData: Record<string, string> = {};
+
+      servico.form.fields.forEach(field => {
+        // Ignorar campos que não são de entrada
+        if (
+          ['title', 'subtitle', 'description', 'video', 'imagem'].includes(
+            field.type
+          )
+        ) {
+          return;
+        }
+
+        if (field.type === 'address') {
+          initialFormData[`${field.id}_rua`] = '';
+          initialFormData[`${field.id}_bairro`] = '';
+          initialFormData[`${field.id}_numero`] = '';
+          initialFormData[`${field.id}_complemento`] = '';
+        } else {
+          initialFormData[field.id] = '';
+        }
+      });
+
+      setFormData(initialFormData);
+    }
+  }, [servico]);
 
   // Validar se o serviço existe
   useEffect(() => {
@@ -70,6 +108,39 @@ export const ServicoDetalhesScreen: React.FC = () => {
   };
 
   const handleFormSubmit = () => {
+    // Limpar erros anteriores
+    setFormErrors({});
+    setSchedulingErrors({});
+
+    let hasErrors = false;
+
+    // Validar formulário se existir
+    if (servico.form && servico.form.fields) {
+      const formValidation = validateFormData(formData, servico.form.fields);
+      if (!formValidation.isValid) {
+        setFormErrors(formValidation.errors);
+        hasErrors = true;
+      }
+    }
+
+    // Validar agendamento se for necessário
+    if (servico.type === 'AGENDAMENTO') {
+      const schedulingValidation = validateSchedulingData(
+        selectedLocation,
+        selectedMonth,
+        selectedDay,
+        selectedTime
+      );
+      if (!schedulingValidation.isValid) {
+        setSchedulingErrors(schedulingValidation.errors);
+        hasErrors = true;
+      }
+    }
+
+    if (hasErrors) {
+      return;
+    }
+
     Alert.alert('Sucesso', 'Formulário enviado com sucesso!');
   };
 
@@ -108,6 +179,7 @@ export const ServicoDetalhesScreen: React.FC = () => {
 
   const renderFormField = (field: any) => {
     const value = formData[field.id] || '';
+    const error = getFieldError(field.id, formErrors);
 
     switch (field.type) {
       case 'textarea':
@@ -116,12 +188,21 @@ export const ServicoDetalhesScreen: React.FC = () => {
             label={field.label}
             placeholder={field.label}
             value={value}
-            onChangeText={text =>
-              setFormData({ ...formData, [field.id]: text })
-            }
+            onChangeText={text => {
+              setFormData({ ...formData, [field.id]: text });
+              // Limpar erro quando o usuário começar a digitar
+              if (error) {
+                setFormErrors(prev => {
+                  const newErrors = { ...prev };
+                  delete newErrors[field.id];
+                  return newErrors;
+                });
+              }
+            }}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
+            error={error}
           />
         );
       case 'select':
@@ -136,10 +217,19 @@ export const ServicoDetalhesScreen: React.FC = () => {
                 value: option,
               })) || []
             }
-            onSelect={selectedValue =>
-              setFormData({ ...formData, [field.id]: selectedValue })
-            }
+            onSelect={selectedValue => {
+              setFormData({ ...formData, [field.id]: selectedValue });
+              // Limpar erro quando o usuário selecionar
+              if (error) {
+                setFormErrors(prev => {
+                  const newErrors = { ...prev };
+                  delete newErrors[field.id];
+                  return newErrors;
+                });
+              }
+            }}
             required={field.required}
+            error={error}
           />
         );
       case 'upload': {
@@ -148,16 +238,31 @@ export const ServicoDetalhesScreen: React.FC = () => {
             label={field.label}
             placeholder="Selecione o arquivo ou imagem"
             required={field.required}
+            error={error}
             onChange={file => {
               if (file) {
                 console.log('Arquivo selecionado:', file);
                 setFormData({ ...formData, [field.id]: file.uri });
+                // Limpar erro quando o usuário selecionar arquivo
+                if (error) {
+                  setFormErrors(prev => {
+                    const newErrors = { ...prev };
+                    delete newErrors[field.id];
+                    return newErrors;
+                  });
+                }
+              } else {
+                setFormData({ ...formData, [field.id]: '' });
               }
             }}
           />
         );
       }
       case 'address': {
+        const ruaError = getFieldError(`${field.id}_rua`, formErrors);
+        const bairroError = getFieldError(`${field.id}_bairro`, formErrors);
+        const numeroError = getFieldError(`${field.id}_numero`, formErrors);
+
         return (
           <View>
             <Text
@@ -170,18 +275,34 @@ export const ServicoDetalhesScreen: React.FC = () => {
               label={field.required ? 'Rua *' : 'Rua'}
               placeholder="Digite o nome da rua"
               value={formData[`${field.id}_rua`] || ''}
-              onChangeText={text =>
-                setFormData({ ...formData, [`${field.id}_rua`]: text })
-              }
+              error={ruaError}
+              onChangeText={text => {
+                setFormData({ ...formData, [`${field.id}_rua`]: text });
+                if (ruaError) {
+                  setFormErrors(prev => {
+                    const newErrors = { ...prev };
+                    delete newErrors[`${field.id}_rua`];
+                    return newErrors;
+                  });
+                }
+              }}
             />
 
             <Input
               label={field.required ? 'Bairro *' : 'Bairro'}
               placeholder="Digite o bairro"
               value={formData[`${field.id}_bairro`] || ''}
-              onChangeText={text =>
-                setFormData({ ...formData, [`${field.id}_bairro`]: text })
-              }
+              error={bairroError}
+              onChangeText={text => {
+                setFormData({ ...formData, [`${field.id}_bairro`]: text });
+                if (bairroError) {
+                  setFormErrors(prev => {
+                    const newErrors = { ...prev };
+                    delete newErrors[`${field.id}_bairro`];
+                    return newErrors;
+                  });
+                }
+              }}
             />
 
             <View style={styles.addressRow}>
@@ -190,9 +311,17 @@ export const ServicoDetalhesScreen: React.FC = () => {
                   label={field.required ? 'Número *' : 'Número'}
                   placeholder="Digite o número"
                   value={formData[`${field.id}_numero`] || ''}
-                  onChangeText={text =>
-                    setFormData({ ...formData, [`${field.id}_numero`]: text })
-                  }
+                  error={numeroError}
+                  onChangeText={text => {
+                    setFormData({ ...formData, [`${field.id}_numero`]: text });
+                    if (numeroError) {
+                      setFormErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors[`${field.id}_numero`];
+                        return newErrors;
+                      });
+                    }
+                  }}
                   keyboardType="numeric"
                   containerStyle={{ marginBottom: 0 }}
                 />
@@ -284,9 +413,18 @@ export const ServicoDetalhesScreen: React.FC = () => {
             label={field.label}
             placeholder={field.label}
             value={value}
-            onChangeText={text =>
-              setFormData({ ...formData, [field.id]: text })
-            }
+            error={error}
+            onChangeText={text => {
+              setFormData({ ...formData, [field.id]: text });
+              // Limpar erro quando o usuário começar a digitar
+              if (error) {
+                setFormErrors(prev => {
+                  const newErrors = { ...prev };
+                  delete newErrors[field.id];
+                  return newErrors;
+                });
+              }
+            }}
           />
         );
     }
@@ -325,6 +463,16 @@ export const ServicoDetalhesScreen: React.FC = () => {
           <Text style={[styles.agendamentoLabel, { color: theme.colors.text }]}>
             Local:
           </Text>
+          {schedulingErrors.location && (
+            <Text
+              style={[
+                styles.errorText,
+                { color: theme.colors.error, marginBottom: 8 },
+              ]}
+            >
+              {schedulingErrors.location}
+            </Text>
+          )}
           <View style={styles.locationContainer}>
             {servico.scheduling.availableLocations.map(locationData => (
               <TouchableOpacity
@@ -344,6 +492,14 @@ export const ServicoDetalhesScreen: React.FC = () => {
                   setSelectedMonth(''); // Reset month selection
                   setSelectedDay(''); // Reset day selection
                   setSelectedTime(''); // Reset time selection
+                  // Limpar erro de local
+                  if (schedulingErrors.location) {
+                    setSchedulingErrors(prev => {
+                      const newErrors = { ...prev };
+                      delete newErrors.location;
+                      return newErrors;
+                    });
+                  }
                 }}
               >
                 <Text
@@ -384,6 +540,16 @@ export const ServicoDetalhesScreen: React.FC = () => {
               >
                 Mês:
               </Text>
+              {schedulingErrors.month && (
+                <Text
+                  style={[
+                    styles.errorText,
+                    { color: theme.colors.error, marginBottom: 8 },
+                  ]}
+                >
+                  {schedulingErrors.month}
+                </Text>
+              )}
               <View style={styles.monthContainer}>
                 {selectedLocationData.months.map(monthData => (
                   <TouchableOpacity
@@ -402,6 +568,14 @@ export const ServicoDetalhesScreen: React.FC = () => {
                       setSelectedMonth(monthData.month);
                       setSelectedDay(''); // Reset day selection
                       setSelectedTime(''); // Reset time selection
+                      // Limpar erro de mês
+                      if (schedulingErrors.month) {
+                        setSchedulingErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.month;
+                          return newErrors;
+                        });
+                      }
                     }}
                   >
                     <Text
@@ -431,6 +605,16 @@ export const ServicoDetalhesScreen: React.FC = () => {
               >
                 Dia da Semana:
               </Text>
+              {schedulingErrors.day && (
+                <Text
+                  style={[
+                    styles.errorText,
+                    { color: theme.colors.error, marginBottom: 8 },
+                  ]}
+                >
+                  {schedulingErrors.day}
+                </Text>
+              )}
               <View style={styles.dayContainer}>
                 {selectedMonthData.days.map(dayData => (
                   <TouchableOpacity
@@ -448,6 +632,14 @@ export const ServicoDetalhesScreen: React.FC = () => {
                     onPress={() => {
                       setSelectedDay(dayData.dayOfWeek);
                       setSelectedTime(''); // Reset time selection
+                      // Limpar erro de dia
+                      if (schedulingErrors.day) {
+                        setSchedulingErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.day;
+                          return newErrors;
+                        });
+                      }
                     }}
                   >
                     <Text
@@ -477,6 +669,16 @@ export const ServicoDetalhesScreen: React.FC = () => {
               >
                 Horário:
               </Text>
+              {schedulingErrors.time && (
+                <Text
+                  style={[
+                    styles.errorText,
+                    { color: theme.colors.error, marginBottom: 8 },
+                  ]}
+                >
+                  {schedulingErrors.time}
+                </Text>
+              )}
               <View style={styles.timeContainer}>
                 {selectedDayData.availableHours.map(hour => (
                   <TouchableOpacity
@@ -491,7 +693,17 @@ export const ServicoDetalhesScreen: React.FC = () => {
                         borderColor: theme.colors.border,
                       },
                     ]}
-                    onPress={() => setSelectedTime(hour)}
+                    onPress={() => {
+                      setSelectedTime(hour);
+                      // Limpar erro de horário
+                      if (schedulingErrors.time) {
+                        setSchedulingErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.time;
+                          return newErrors;
+                        });
+                      }
+                    }}
                   >
                     <Text
                       style={[
@@ -982,5 +1194,9 @@ const styles = StyleSheet.create({
   scheduleSummaryText: {
     fontSize: 14,
     marginBottom: 4,
+  },
+  errorText: {
+    fontSize: 14,
+    marginTop: 4,
   },
 });

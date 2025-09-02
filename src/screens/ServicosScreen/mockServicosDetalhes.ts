@@ -102,7 +102,7 @@ export const servicosDetalhes: Record<string, ServicoDetalhes> = {
           id: 'arquivos',
           label: 'Anexar Fotos',
           type: 'upload',
-          required: false,
+          required: true,
         },
       ],
     },

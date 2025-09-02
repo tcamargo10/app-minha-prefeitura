@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +16,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useCity } from '@/contexts/CityContext';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/utils/supabase';
 import { BottomTabParamList } from '@/navigation/BottomTabNavigator';
 
 type SolicitacoesScreenNavigationProp = StackNavigationProp<
@@ -23,58 +28,121 @@ type SolicitacoesScreenNavigationProp = StackNavigationProp<
 
 interface Solicitacao {
   id: string;
-  tipo: 'documento' | 'servico' | 'denuncia' | 'sugestao';
-  titulo: string;
-  descricao: string;
-  status: 'pendente' | 'em_analise' | 'aprovada' | 'rejeitada' | 'concluida';
-  dataCriacao: string;
-  dataAtualizacao?: string;
-  protocolo: string;
+  request_type: 'documento' | 'servico' | 'denuncia' | 'sugestao';
+  service_name: string;
+  notes: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  created_at: string;
+  updated_at?: string;
+  protocol: string;
+  priority: 'baixa' | 'media' | 'alta' | 'urgente';
+  address?: string;
 }
 
 export const SolicitacoesScreen: React.FC = () => {
   const { theme } = useTheme();
+  const { currentCity } = useCity();
+  const { user } = useAuth();
   const navigation = useNavigation<SolicitacoesScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
-  const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([
-    {
-      id: '1',
-      tipo: 'documento',
-      titulo: 'Segunda Via de RG',
-      descricao: 'Solicitação de segunda via do documento de identidade',
-      status: 'em_analise',
-      dataCriacao: '2024-01-15',
-      dataAtualizacao: '2024-01-18',
-      protocolo: '2024001',
-    },
-    {
-      id: '2',
-      tipo: 'servico',
-      titulo: 'Limpeza de Bueiro',
-      descricao: 'Solicitação de limpeza de bueiro na Rua das Flores',
-      status: 'concluida',
-      dataCriacao: '2024-01-10',
-      dataAtualizacao: '2024-01-16',
-      protocolo: '2024002',
-    },
-    {
-      id: '3',
-      tipo: 'denuncia',
-      titulo: 'Lixo Irregular',
-      descricao: 'Denúncia de descarte irregular de lixo',
-      status: 'pendente',
-      dataCriacao: '2024-01-20',
-      protocolo: '2024003',
-    },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
 
-  const onRefresh = () => {
+  // Função para buscar solicitações do usuário
+  const fetchSolicitacoes = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Buscar o citizen_id baseado no user_id
+      const { data: citizenData, error: citizenError } = await supabase
+        .from('citizens')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (citizenError) {
+        console.error(
+          'ERRO CRÍTICO - Usuário logado sem registro de citizen:',
+          {
+            user_id: user.id,
+            error: citizenError,
+          }
+        );
+        Alert.alert(
+          'Erro no Sistema',
+          'Há um problema com seu perfil. Entre em contato com o suporte.',
+          [{ text: 'OK' }]
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Buscar solicitações diretamente da tabela service_requests com JOIN
+      const { data: solicitacoesData, error: solicitacoesError } =
+        await supabase
+          .from('service_requests')
+          .select(
+            `
+          id,
+          protocol,
+          request_type,
+          notes,
+          status,
+          priority,
+          address,
+          created_at,
+          updated_at,
+          services!inner(name)
+        `
+          )
+          .eq('citizen_id', citizenData.id)
+          .order('created_at', { ascending: false });
+
+      if (solicitacoesError) {
+        console.error('Erro ao buscar solicitações:', solicitacoesError);
+        Alert.alert('Erro', 'Não foi possível carregar suas solicitações');
+        setLoading(false);
+        return;
+      }
+
+      // Mapear os dados para o formato esperado
+      const solicitacoesMapeadas: Solicitacao[] = (solicitacoesData || []).map(
+        item => ({
+          id: item.id,
+          request_type: item.request_type || 'servico',
+          service_name: item.services?.name || 'Serviço',
+          notes: item.notes || '',
+          status: item.status || 'pending',
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          protocol: item.protocol || '',
+          priority: item.priority || 'media',
+          address: item.address,
+        })
+      );
+
+      setSolicitacoes(solicitacoesMapeadas);
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+      Alert.alert('Erro', 'Ocorreu um erro inesperado');
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Carregar dados na inicialização
+  useEffect(() => {
+    fetchSolicitacoes();
+  }, [fetchSolicitacoes]);
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    // Simular atualização
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  };
+    await fetchSolicitacoes();
+    setRefreshing(false);
+  }, [fetchSolicitacoes]);
 
   const getTipoIcon = (tipo: string) => {
     switch (tipo) {
@@ -108,16 +176,14 @@ export const SolicitacoesScreen: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pendente':
+      case 'pending':
         return '#FF9500';
-      case 'em_analise':
+      case 'in_progress':
         return '#007AFF';
-      case 'aprovada':
+      case 'completed':
         return '#34C759';
-      case 'rejeitada':
+      case 'cancelled':
         return '#FF3B30';
-      case 'concluida':
-        return '#34C759';
       default:
         return theme.colors.textSecondary;
     }
@@ -125,16 +191,14 @@ export const SolicitacoesScreen: React.FC = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'pendente':
+      case 'pending':
         return 'Pendente';
-      case 'em_analise':
+      case 'in_progress':
         return 'Em Análise';
-      case 'aprovada':
-        return 'Aprovada';
-      case 'rejeitada':
-        return 'Rejeitada';
-      case 'concluida':
+      case 'completed':
         return 'Concluída';
+      case 'cancelled':
+        return 'Cancelada';
       default:
         return status;
     }
@@ -168,12 +232,12 @@ export const SolicitacoesScreen: React.FC = () => {
         <View style={styles.solicitacaoInfo}>
           <View style={styles.solicitacaoTipo}>
             <Ionicons
-              name={getTipoIcon(solicitacao.tipo) as any}
+              name={getTipoIcon(solicitacao.request_type) as any}
               size={20}
               color={theme.colors.primary}
             />
             <Text style={[styles.tipoText, { color: theme.colors.primary }]}>
-              {getTipoLabel(solicitacao.tipo)}
+              {getTipoLabel(solicitacao.request_type)}
             </Text>
           </View>
           <Text
@@ -182,7 +246,7 @@ export const SolicitacoesScreen: React.FC = () => {
               { color: theme.colors.textSecondary },
             ]}
           >
-            Protocolo: {solicitacao.protocolo}
+            Protocolo: {solicitacao.protocol}
           </Text>
         </View>
         <View
@@ -198,24 +262,24 @@ export const SolicitacoesScreen: React.FC = () => {
       </View>
 
       <Text style={[styles.tituloText, { color: theme.colors.text }]}>
-        {solicitacao.titulo}
+        {solicitacao.service_name}
       </Text>
       <Text
         style={[styles.descricaoText, { color: theme.colors.textSecondary }]}
         numberOfLines={2}
       >
-        {solicitacao.descricao}
+        {solicitacao.notes}
       </Text>
 
       <View style={styles.solicitacaoFooter}>
         <Text style={[styles.dataText, { color: theme.colors.textSecondary }]}>
-          Criada em: {formatDate(solicitacao.dataCriacao)}
+          Criada em: {formatDate(solicitacao.created_at)}
         </Text>
-        {solicitacao.dataAtualizacao && (
+        {solicitacao.updated_at && (
           <Text
             style={[styles.dataText, { color: theme.colors.textSecondary }]}
           >
-            Atualizada em: {formatDate(solicitacao.dataAtualizacao)}
+            Atualizada em: {formatDate(solicitacao.updated_at)}
           </Text>
         )}
       </View>
@@ -266,7 +330,7 @@ export const SolicitacoesScreen: React.FC = () => {
               <Text
                 style={[styles.statusCount, { color: theme.colors.primary }]}
               >
-                {getStatusCount('pendente')}
+                {getStatusCount('pending')}
               </Text>
               <Text
                 style={[
@@ -279,7 +343,7 @@ export const SolicitacoesScreen: React.FC = () => {
             </View>
             <View style={styles.statusItem}>
               <Text style={[styles.statusCount, { color: '#007AFF' }]}>
-                {getStatusCount('em_analise')}
+                {getStatusCount('in_progress')}
               </Text>
               <Text
                 style={[
@@ -292,7 +356,7 @@ export const SolicitacoesScreen: React.FC = () => {
             </View>
             <View style={styles.statusItem}>
               <Text style={[styles.statusCount, { color: '#34C759' }]}>
-                {getStatusCount('concluida')}
+                {getStatusCount('completed')}
               </Text>
               <Text
                 style={[
@@ -306,7 +370,19 @@ export const SolicitacoesScreen: React.FC = () => {
           </View>
 
           {/* Solicitações List */}
-          {solicitacoes.length > 0 ? (
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text
+                style={[
+                  styles.loadingText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Carregando suas solicitações...
+              </Text>
+            </View>
+          ) : solicitacoes.length > 0 ? (
             <View style={styles.solicitacoesList}>
               {solicitacoes.map(renderSolicitacao)}
             </View>
@@ -457,6 +533,15 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: 14,
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
     textAlign: 'center',
   },
 });

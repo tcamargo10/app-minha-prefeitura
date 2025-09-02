@@ -11,6 +11,7 @@ interface FileUploadProps {
   onChange?: (file: FileData | null) => void;
   disabled?: boolean;
   required?: boolean;
+  error?: string;
 }
 
 interface FileData {
@@ -26,6 +27,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   onChange,
   disabled = false,
   required = false,
+  error,
 }) => {
   const { theme } = useTheme();
   const [selectedFile, setSelectedFile] = useState<FileData | null>(null);
@@ -66,7 +68,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         style={[
           styles.fileUpload,
           {
-            borderColor: theme.colors.border,
+            borderColor: error ? theme.colors.error : theme.colors.border,
             opacity: disabled ? 0.5 : 1,
           },
         ]}
@@ -112,6 +114,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </TouchableOpacity>
         )}
       </TouchableOpacity>
+
+      {error && (
+        <Text style={[styles.errorText, { color: theme.colors.error }]}>
+          {error}
+        </Text>
+      )}
     </View>
   );
 };
@@ -140,5 +148,9 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     padding: 4,
+  },
+  errorText: {
+    fontSize: 14,
+    marginTop: 4,
   },
 });
